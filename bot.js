@@ -142,10 +142,6 @@ const processSelfText = function(obj) {
 
 
 class Warn {
-	user = undefined
-	reason = ''
-	date = undefined
-	server = undefined
 	/**
 	 * Use this object to create a warn.
 	 * @param {Discord.User} user The user to warn
