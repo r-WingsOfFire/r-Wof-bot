@@ -23,6 +23,7 @@
         "eslint": "^7.15.0"
     },
     "dependencies": {
+        "node-forge": ">=0.10.0",
         "discord.js": "^12.5.1",
         "fs": "0.0.1-security",
         "googleapis": "^39.2.0",
