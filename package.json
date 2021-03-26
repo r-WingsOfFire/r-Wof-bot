@@ -14,7 +14,8 @@
         "delay": 5
     },
     "scripts": {
-        "test": "node ."
+        "test": "node --check ."
+        "run": "node ."
     },
     "author": "",
     "license": "ISC",
