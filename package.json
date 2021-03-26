@@ -1,0 +1,33 @@
+{
+    "name": "package",
+    "version": "1.0.0",
+    "description": "",
+    "main": "bot.js",
+    "nodemonConfig": {
+        "ignore": [
+            "cacheBetweenBoots.json",
+            "package.json",
+            "package-lock.json",
+            "node_modules/*",
+            "*.json"
+        ],
+        "delay": 5
+    },
+    "scripts": {
+        "test": "node ."
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "babel-eslint": "^10.1.0",
+        "eslint": "^7.15.0"
+    },
+    "dependencies": {
+        "discord.js": "^12.5.1",
+        "fs": "0.0.1-security",
+        "googleapis": "^39.2.0",
+        "http": "0.0.1-security",
+        "https": "^1.0.0",
+        "nodemon": "^2.0.7"
+    }
+}
