@@ -14,7 +14,7 @@
         "delay": 5
     },
     "scripts": {
-        "test": "node --check ."
+        "test": "node --check .",
         "run": "node ."
     },
     "author": "",
