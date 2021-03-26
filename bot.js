@@ -220,6 +220,7 @@ class Warn {
 
 }
 // an async function is just a function that, when we execute it, the program will continue to execute without waiting for it to finish.
+/*
 async function checkDragonetBigwings() {
 	const timeStart = Date.now();
 	let clientGuild = client.guilds.resolve('716601325269549127');
@@ -272,11 +273,11 @@ async function checkDragonetBigwings() {
 	console.log('Done.');
 	return undefined;
 }
-
+*/
 client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
-	setInterval(checkDragonetBigwings, 60000);
-	checkDragonetBigwings(false);
+	// setInterval(checkDragonetBigwings, 60000);
+	// checkDragonetBigwings(false);
 	// searchReddit();
 	// setInterval(searchReddit, 30000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
@@ -881,32 +882,32 @@ client.on('message', (message) => {
 						});
 					}
 				}
-				if (message.content.toLowerCase().startsWith( prefix + 'help')) {
-					var helpmsg = message.content.slice(6)
+				if (message.content.toLowerCase().startsWith(prefix + 'help')) {
+					var helpmsg = message.content.slice(6);
 					if (helpmsg == 'frobiddenwords') {
 						channel.send(new Discord.MessageEmbed()
-						.setColor('DARK_GREEN')
-						.setTitle('forbiddenwords command help')
-						.setDescription('+forbiddenwords = sends a list of forbiddenwords to your dms. ')
-						.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setColor('DARK_GREEN')
+							.setTitle('forbiddenwords command help')
+							.setDescription('+forbiddenwords = sends a list of forbiddenwords to your dms. ')
+							.setFooter('Contact Snek or Dindin if you have any questions.'));
 					}
 					if (helpmsg == '') {
 						channel.send(new Discord.MessageEmbed()
-						.setColor('DARK_GREEN')
-						.setTitle(' command help')
-						.setDescription('')
-						.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setColor('DARK_GREEN')
+							.setTitle(' command help')
+							.setDescription('')
+							.setFooter('Contact Snek or Dindin if you have any questions.'));
 					}
 					if (helpmsg == '') {
 						channel.send(new Discord.MessageEmbed()
-						.setColor('DARK_GREEN')
-						.setTitle(' command help')
-						.setDescription('')
-						.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setColor('DARK_GREEN')
+							.setTitle(' command help')
+							.setDescription('')
+							.setFooter('Contact Snek or Dindin if you have any questions.'));
 					}
 				}
-				if ((message.content.toLowerCase().startsWith( prefix + 'modhelp')) && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
-					var modhelpmsg = message.content.slice(9)
+				if ((message.content.toLowerCase().startsWith(prefix + 'modhelp')) && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
+					var modhelpmsg = message.content.slice(9);
 					if (modhelpmsg == 'verbalwarn') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
@@ -1301,11 +1302,11 @@ client.on('message', (message) => {
 								poll.react('8️⃣');
 								poll.react('9️⃣');
 								poll.react('🔟');
-							})
-						
-					}	
-					
-				console.log('poll created in #' + message.channel.name + ' by ' + message.author.username)
+							});
+
+					}
+
+					console.log('poll created in #' + message.channel.name + ' by ' + message.author.username);
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setprefix') && (user.id == '373515998000840714' || user.id == '306582338039709696' || server.members.resolve(user.id).permissions.has('ADMINISTRATOR'))) {
 					prefix = message.content.toLowerCase().split(' ')[1];
 					fs.readFile('./config.json', (err, res) => {
