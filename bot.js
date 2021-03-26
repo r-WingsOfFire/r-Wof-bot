@@ -8,7 +8,7 @@ const fs = require('fs');
 var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
-var { upDootLimit, prefix } = require('./config.json');
+var { /* upDootLimit, */ prefix } = require('./config.json');
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
@@ -20,7 +20,7 @@ var modhelpstr = prefix + 'verbalwarn <mention user>\n ' + prefix + 'log <messag
 var pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
 var patribes = ["leafwing", "hivewing", "silkwing"];
 var alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing", "leafwing", "hivewing", "silkwing"];
-var starBoard = new Map();
+// var starBoard = new Map();
 
 var lastmessage = undefined;
 
@@ -220,6 +220,7 @@ class Warn {
 
 }
 // an async function is just a function that, when we execute it, the program will continue to execute without waiting for it to finish.
+
 /*
 async function checkDragonetBigwings() {
 	const timeStart = Date.now();
@@ -310,6 +311,7 @@ function randInt(min, max) {
 	return Math.floor(Math.random() * max - min) + min;
 }
 
+/*
 client.on('messageReactionAdd', (reac, user) => {
 	if (reac.message.author.id == client.user.id && reactionRolesMessage.has(reac.message.id)) {
 		if(reactionRolesMessage.get(reac.message.id).has(reac.emoji.toString())) {
@@ -397,11 +399,12 @@ client.on('messageReactionAdd', (reac, user) => {
 		}
 	}
 });
+*/
 
 client.on('messageDelete', (msg) => {
 	lastmessage = msg;
 });
-
+/*
 client.on('messageReactionRemove', (reac, user) => {
 	if (reac.message.author.id == client.user.id && reactionRolesMessage.has(reac.message.id)) {
 		if(reactionRolesMessage.get(reac.message.id).has(reac.emoji.toString())) {
@@ -489,7 +492,7 @@ client.on('messageReactionRemove', (reac, user) => {
 		}
 	}
 });
-
+*/
 client.on('message', (message) => {
 	if (!message.author.bot) {
 		var user = message.author;
@@ -605,7 +608,7 @@ client.on('message', (message) => {
 						.then(() => {
 							var killer = new String;
 							if (user.id == '373515998000840714') {
-								killer = 'dindin';
+								killer = 'Baguette speaker';
 							}
 							if (user.id == '306582338039709696') {
 								killer = 'snek';
@@ -884,26 +887,26 @@ client.on('message', (message) => {
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'help')) {
 					var helpmsg = message.content.slice(6);
-					if (helpmsg == 'frobiddenwords') {
+					if (helpmsg == 'forbiddenwords') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_GREEN')
 							.setTitle('forbiddenwords command help')
 							.setDescription('+forbiddenwords = sends a list of forbiddenwords to your dms. ')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette Speaker if you have any questions.'));
+					}
+					if (helpmsg == '') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle(' command help')
+							.setDescription(helpstr)
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					if (helpmsg == '') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_GREEN')
 							.setTitle(' command help')
 							.setDescription('')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
-					}
-					if (helpmsg == '') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_GREEN')
-							.setTitle(' command help')
-							.setDescription('')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 				}
 				if ((message.content.toLowerCase().startsWith(prefix + 'modhelp')) && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
@@ -913,70 +916,70 @@ client.on('message', (message) => {
 							.setColor('DARK_BLUE')
 							.setTitle('verbalwarn command help')
 							.setDescription('+verbalwarn <reason/message> = obviously, warns the person, and sends that message in their dms. Bot will then send a message to <#718192469560262656>')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'log') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('bot log command help')
 							.setDescription('+log <message> = will simply log any message you want to log to the bot\'s output console.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'clearword') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('clwarword command help')
 							.setDescription('+clearword <word> = adds the selected word to the forbiddenwords list, where it will delete any message containing that word.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'reply') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('reply command help')
 							.setDescription('+reply <modmail ID> <message> = Will send a message back to the person who sent the modmail message selected. It will send the message from <message>.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'getwarns') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('getwarns command help')
 							.setDescription('+getwarns <user> = will list out each of the verbalwarns that the user in question has recieved. (ping the user by doing "<@[id]>" and replacing the [id] with the user\'s ID.)')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'allowword') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('allowword command help')
 							.setDescription('+allowword <worrd ID> = Removes the selected word from the forbiddenwords list, if it exists.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == 'clearwarn') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('clearwarn command help')
 							.setDescription('+clearwarn <user> = will get rid of all the verbalwarns that the user has accumlated.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if ((modhelpmsg == 'reactionrole') || (helpmsg == 'rr')) {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_BLUE')
 							.setTitle('reactionrole (rr) command help')
 							.setDescription('+reactionrole (or +rr) <channel mention> = Select a channel by mentioning it, then follow the prompts to create a reactionrole message. Then the reactionrole message will appear in the channel you selected.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 					else if (modhelpmsg == '') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor([0, 0, 255])
 							.setTitle('r/Wingsoffire Bot Mod Help')
 							.setDescription(modhelpstr)
-							.setFooter('Contact Snek or Dindin if you have any questions. You can do +modhelp <command> for specifics on one command.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions. You can do +modhelp <command> for specifics on one command.'));
 					}
 					else {
 						channel.send(new Discord.MessageEmbed()
 							.setColor([255, 0, 0])
 							.setTitle('Error')
 							.setDescription('Did you type in the wrong command name? Check it again.')
-							.setFooter('Contact Snek or Dindin if you have any questions.'));
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'hybridgen')) {

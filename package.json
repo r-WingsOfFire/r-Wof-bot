@@ -1,5 +1,5 @@
 {
-    "name": "@r-WingsOfFire/r-Wof-bot",
+    "name": "@r-wingsoffire/r-wof-bot",
     "version": "1.0.0",
     "description": "simply a discord bot",
     "main": "bot.js",
@@ -25,7 +25,7 @@
     "dependencies": {
         "discord.js": "^12.5.1",
         "fs": "0.0.1-security",
-        "googleapis": "^39.2.0",
+        "googleapis": "^68.0.0",
         "http": "0.0.1-security",
         "https": "^1.0.0",
         "node-forge": ">=0.10.0",
