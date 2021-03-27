@@ -14,7 +14,7 @@ var { /* upDootLimit, */ prefix } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
-// var lastRedditPost = '';
+var lastRedditPost = '';
 
 var forbiddenWords = ['peepee', 'penis'];
 var warns = new Map();
@@ -29,7 +29,6 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
-/*
 const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
@@ -68,6 +67,7 @@ const processSelfText = function(obj) {
 		obj.data.children.forEach(function(item) {
 			if (item.data) {
 				console.log('we got a post');
+				/*
 				if (item.data.post_hint == 'image') {
 					if (item.data.spoiler) {
 						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
@@ -123,12 +123,12 @@ const processSelfText = function(obj) {
 						.addField('Content Warning', 'None', true)
 						.setDescription(item.data.selftext)
 						.setTitle(item.data.title));
-				}
+				}*/
 			}
 		});
 	}
 };
-*/
+
 
 class Warn {
 	/**
@@ -209,8 +209,8 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
-	// searchReddit();
-	// setInterval(searchReddit, 30000);
+	searchReddit();
+	setInterval(searchReddit, 30000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
