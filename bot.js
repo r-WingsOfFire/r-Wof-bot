@@ -67,6 +67,7 @@ const processSelfText = function(obj) {
 		obj.data.children.forEach(function(item) {
 			if (item.data) {
 				console.log('we got a post');
+				/*
 				if (item.data.post_hint == 'image') {
 					if (item.data.spoiler) {
 						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
@@ -122,7 +123,7 @@ const processSelfText = function(obj) {
 						.addField('Content Warning', 'None', true)
 						.setDescription(item.data.selftext)
 						.setTitle(item.data.title));
-				}
+				}*/
 			}
 		});
 	}
