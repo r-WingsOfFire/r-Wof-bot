@@ -14,12 +14,12 @@ var { /* upDootLimit, */ prefix } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
-var lastRedditPost = '';
+// var lastRedditPost = '';
 
 var forbiddenWords = ['peepee', 'penis'];
 var warns = new Map();
-const helpstr = prefix + 'forbiddenwords = gets a list of forbidden words\n ' + prefix + 'quote = will give you a quote, and you have to guess who said it.\n ' + prefix + 'fac = “flip a coin”. Means just that, will flip a coin and you will either get heads or tails.\n ' + prefix + 'ping = just checks to see what the response time is between you and the bot.\n ' + prefix + 'sunny = says a random quote from sunny\n  ' + prefix + 'hybridgen <pyrrhia/pantala/any> <same for #2> = generates a random hybrid from the inputs. If you choose pyrrhia, pantala, it will give you a hybrid of one tribe from each. You could also choose ‘any’ to allow the use of both pyrrhian and pantalan tribes in the generation. Also, if you leave the second, or both fields blank, it will default to <any> <any>.\n ' + prefix + 'poll <thumbs/numbers> <question> = creates a poll for you, of any question you want, and automatically adds :thumbsup: and :thumbsdown: reactions or numbers reactions to it.\n ' + prefix + 'rn = random number generator.\n ' + prefix + 'whois (or ' + prefix + 'whatis) <name or thing> = put in a canon character’s name and get the link to the wiki to read up about them\n ' + prefix + 'sumthemup <user> = checks the messages of a user excluding the channels meant to be excluded.\n ' + prefix + 'oc <oc name> = searches for the name of an oc in the approved characters channel\n' + prefix + 'messagemods <message> = send this to the bot in it’s DMs. It will send the mods the message in a channel where any of us can see and reply to it, which will come back to you through the bot.';
-const modhelpstr = prefix + 'verbalwarn <mention user>\n ' + prefix + 'log <message>\n' + prefix + 'clearword <word>\n ' + prefix + 'reply <modmail message ID> <message>\n ' + prefix + 'getwarns <user>\n ' + prefix + 'allowword <word ID>\n ' + prefix + 'clearwarn <user>\n ' + prefix + 'reactionrole (or ' + prefix + 'rr) <channel>';
+const helpstr = `${prefix}forbiddenwords = gets a list of forbidden words\n ${prefix}quote = will give you a quote, and you have to guess who said it.\n ${prefix}fac = “flip a coin”. Means just that, will flip a coin and you will either get heads or tails.\n ${prefix}ping = just checks to see what the response time is between you and the bot.\n ${prefix}sunny = says a random quote from sunny\n  ${prefix}hybridgen <pyrrhia/pantala/any> <same for #2> = generates a random hybrid from the inputs. If you choose pyrrhia, pantala, it will give you a hybrid of one tribe from each. You could also choose ‘any’ to allow the use of both pyrrhian and pantalan tribes in the generation. Also, if you leave the second, or both fields blank, it will default to <any> <any>.\n ${prefix}poll <thumbs/numbers> <question> = creates a poll for you, of any question you want, and automatically adds :thumbsup: and :thumbsdown: reactions or numbers reactions to it.\n ${prefix}rn = random number generator.\n ${prefix}whois (or ${prefix}whatis) <name or thing> = put in a canon character’s name and get the link to the wiki to read up about them\n ${prefix}sumthemup <user> = checks the messages of a user excluding the channels meant to be excluded.\n ${prefix}oc <oc name> = searches for the name of an oc in the approved characters channel\n${prefix}messagemods <message> = send this to the bot in it’s DMs. It will send the mods the message in a channel where any of us can see and reply to it, which will come back to you through the bot.`;
+const modhelpstr = prefix + `verbalwarn <mention user>\n ${prefix}log <message>\n${prefix}clearword <word>\n ${prefix}reply <modmail message ID> <message>\n ${prefix}getwarns <user>\n ${prefix}allowword <word ID>\n ${prefix}clearwarn <user>\n ${prefix}reactionrole (or ${prefix}rr) <channel>`;
 const pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
 const patribes = ["leafwing", "hivewing", "silkwing"];
 const alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing", "leafwing", "hivewing", "silkwing"];
@@ -29,6 +29,7 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
+/*
 const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
@@ -127,7 +128,7 @@ const processSelfText = function(obj) {
 		});
 	}
 };
-
+*/
 
 class Warn {
 	/**
@@ -208,13 +209,13 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
-	searchReddit();
-	setInterval(searchReddit, 30000);
+	// searchReddit();
+	// setInterval(searchReddit, 30000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
 	});
-	client.user.setUsername('r/WOF Bot (' + prefix + ')');
+	client.user.setUsername(`r/WOF Bot (${prefix})`);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if (err) process.stderr.write(err);
 		var resolved = JSON.parse(res);
@@ -499,7 +500,7 @@ client.on('message', (message) => {
 				rolesArray.push('and ' + new Number(message.guild.roles.cache.size - 40) + ' more...');
 				var emojisArray = [];
 				emojisArray = message.guild.emojis.cache.array().slice(0, 30);
-				emojisArray.push('and ' + new String(message.guild.emojis.cache.size - 30) + ' more. Run ' + prefix + 'emotes for a full list!');
+				emojisArray.push('and ' + new String(message.guild.emojis.cache.size - 30) + ` more. Run ${prefix}emotes for a full list!`);
 				var serverinfoembed = new Discord.MessageEmbed()
 					.setColor('RANDOM')
 					.setTitle('Server Info for ' + message.guild.name)
@@ -1066,12 +1067,12 @@ client.on('message', (message) => {
 					fs.readFile('./config.json', (err, res) => {
 						if (err) process.stderr.write(err);
 						var toWrite = res.toString().split('\n');
-						toWrite[1] = '\t"prefix": "' + prefix + '"';
+						toWrite[1] = `\t"prefix": "${prefix}"`;
 						fs.writeFile('./config.json', toWrite.join('\n'), err => {
 							if (err) process.stderr.write(err);
 						});
 					});
-					message.reply('Prefix changed. New prefix: ' + prefix + ' This prefix will be resetted to ' + prefix + 'on reboot.');
+					message.reply(`Prefix changed. New prefix: ${prefix} This prefix will be resetted to ${prefix}on reboot.`);
 					client.user.setActivity('Wings of Fire | Prefix: ' + prefix, { type: 'WATCHING' });
 				} else if (message.content.toLowerCase().startsWith(prefix + 'rn ') || message.content.toLowerCase().startsWith(prefix + 'randomnumber ')) {
 					const randomNumber = Math.floor((Math.random() * (new Number(message.content.split(' ')[2]) - new Number(message.content.split(' ')[1]))) + 1) + new Number(message.content.split(' ')[1]);
@@ -1396,7 +1397,7 @@ client.on('message', (message) => {
 					.setTitle('New message from user:')
 					.setAuthor(user.tag)
 					.setDescription(message.content.slice(13))
-					.setFooter('This is an automated message. Please answer using ' + prefix + 'reply ' + messageMods.length + ' <message>');
+					.setFooter(`This is an automated message. Please answer using ${prefix}reply ${messageMods.length} <message>`);
 				client.channels.fetch('785612417379336263')
 					.then(modChannel => {
 						modChannel.send(modsEmbed);
