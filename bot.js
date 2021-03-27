@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
 
+
 var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
@@ -13,66 +14,56 @@ var { /* upDootLimit, */ prefix } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
+var lastRedditPost = '';
+
 var forbiddenWords = ['peepee', 'penis'];
 var warns = new Map();
-var helpstr = prefix + 'forbiddenwords = gets a list of forbidden words\n ' + prefix + 'quote = will give you a quote, and you have to guess who said it.\n ' + prefix + 'fac = “flip a coin”. Means just that, will flip a coin and you will either get heads or tails.\n ' + prefix + 'ping = just checks to see what the response time is between you and the bot.\n ' + prefix + 'sunny = says a random quote from sunny\n  ' + prefix + 'hybridgen <pyrrhia/pantala/any> <same for #2> = generates a random hybrid from the inputs. If you choose pyrrhia, pantala, it will give you a hybrid of one tribe from each. You could also choose ‘any’ to allow the use of both pyrrhian and pantalan tribes in the generation. Also, if you leave the second, or both fields blank, it will default to <any> <any>.\n ' + prefix + 'poll <thumbs/numbers> <question> = creates a poll for you, of any question you want, and automatically adds :thumbsup: and :thumbsdown: reactions or numbers reactions to it.\n ' + prefix + 'rn = random number generator.\n ' + prefix + 'whois (or ' + prefix + 'whatis) <name or thing> = put in a canon character’s name and get the link to the wiki to read up about them\n ' + prefix + 'sumthemup <user> = checks the messages of a user excluding the channels meant to be excluded.\n ' + prefix + 'oc <oc name> = searches for the name of an oc in the approved characters channel\n' + prefix + 'messagemods <message> = send this to the bot in it’s DMs. It will send the mods the message in a channel where any of us can see and reply to it, which will come back to you through the bot.';
-var modhelpstr = prefix + 'verbalwarn <mention user>\n ' + prefix + 'log <message>\n' + prefix + 'clearword <word>\n ' + prefix + 'reply <modmail message ID> <message>\n ' + prefix + 'getwarns <user>\n ' + prefix + 'allowword <word ID>\n ' + prefix + 'clearwarn <user>\n ' + prefix + 'reactionrole (or ' + prefix + 'rr) <channel>';
-var pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
-var patribes = ["leafwing", "hivewing", "silkwing"];
-var alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing", "leafwing", "hivewing", "silkwing"];
+const helpstr = prefix + 'forbiddenwords = gets a list of forbidden words\n ' + prefix + 'quote = will give you a quote, and you have to guess who said it.\n ' + prefix + 'fac = “flip a coin”. Means just that, will flip a coin and you will either get heads or tails.\n ' + prefix + 'ping = just checks to see what the response time is between you and the bot.\n ' + prefix + 'sunny = says a random quote from sunny\n  ' + prefix + 'hybridgen <pyrrhia/pantala/any> <same for #2> = generates a random hybrid from the inputs. If you choose pyrrhia, pantala, it will give you a hybrid of one tribe from each. You could also choose ‘any’ to allow the use of both pyrrhian and pantalan tribes in the generation. Also, if you leave the second, or both fields blank, it will default to <any> <any>.\n ' + prefix + 'poll <thumbs/numbers> <question> = creates a poll for you, of any question you want, and automatically adds :thumbsup: and :thumbsdown: reactions or numbers reactions to it.\n ' + prefix + 'rn = random number generator.\n ' + prefix + 'whois (or ' + prefix + 'whatis) <name or thing> = put in a canon character’s name and get the link to the wiki to read up about them\n ' + prefix + 'sumthemup <user> = checks the messages of a user excluding the channels meant to be excluded.\n ' + prefix + 'oc <oc name> = searches for the name of an oc in the approved characters channel\n' + prefix + 'messagemods <message> = send this to the bot in it’s DMs. It will send the mods the message in a channel where any of us can see and reply to it, which will come back to you through the bot.';
+const modhelpstr = prefix + 'verbalwarn <mention user>\n ' + prefix + 'log <message>\n' + prefix + 'clearword <word>\n ' + prefix + 'reply <modmail message ID> <message>\n ' + prefix + 'getwarns <user>\n ' + prefix + 'allowword <word ID>\n ' + prefix + 'clearwarn <user>\n ' + prefix + 'reactionrole (or ' + prefix + 'rr) <channel>';
+const pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
+const patribes = ["leafwing", "hivewing", "silkwing"];
+const alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing", "leafwing", "hivewing", "silkwing"];
 // var starBoard = new Map();
 
 var lastmessage = undefined;
 
 var quoteBusy = false;
 
-/* const searchReddit = function() {
-	fs.readFile('./cacheBetweenBoots.json', (err, jsonRes) => {
-		if (err) return console.error(err);
-		const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${JSON.parse(jsonRes).lastRedditPost}&limit=99`, (res) => {
-			let chunks = [];
-			res.on('data', (d) => {
-				// d is a Buffer object.
-				chunks.push(d);
-			}).on('end', () => {
-				let result = Buffer.concat(chunks);
-				let tmpResult = result.toString();
-				try {
-					let parsedObj = JSON.parse(tmpResult);
-					// Print the string if you want to debug or prettify.
-					// console.log(tmpResult);
-					processSelfText(parsedObj);
-				} catch (err) {
-					console.log('There was an error!');
-					console.log(err.stack);
-					// I got an error, TypeError: Invalid data, chunk must be a string or buffer, not object
-					// Also I got this, when I'd pushed d.toString to chunks:
-					// TypeError: "list" argument must be an Array of Buffer or Uint8Array instances
-					process.stderr.write(err);
-				}
-			});
+const searchReddit = function() {
+	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
+		let chunks = [];
+		res.on('data', (d) => {
+			// d is a Buffer object.
+			chunks.push(d);
+		}).on('end', () => {
+			let result = Buffer.concat(chunks);
+			let tmpResult = result.toString();
+			try {
+				let parsedObj = JSON.parse(tmpResult);
+				// Print the string if you want to debug or prettify.
+				// console.log(tmpResult);
+				processSelfText(parsedObj);
+			} catch (err) {
+				console.log('There was an error!');
+				console.log(err.stack);
+				// I got an error, TypeError: Invalid data, chunk must be a string or buffer, not object
+				// Also I got this, when I'd pushed d.toString to chunks:
+				// TypeError: "list" argument must be an Array of Buffer or Uint8Array instances
+				process.stderr.write(err);
+			}
 		});
-
-		req.on('error', (error) => {
-			process.stderr.write(error);
-		});
-
-		req.end();
 	});
+
+	req.on('error', (error) => {
+		process.stderr.write(error);
+	});
+
+	req.end();
 };
 
 const processSelfText = function(obj) {
 	if (obj.data && obj.data.children && obj.data.children.length) {
-		fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-			if (err) return console.error(err);
-			var toWrite = res.toString();
-			toWrite = new String(toWrite).split('\n');
-			toWrite[1] = `\t"lastRedditPost": "${obj.data.children[obj.data.children.length - 1].data.name},"`;
-			var toWriteStr = toWrite.join('\n');
-			fs.writeFile('./cacheBetweenBoots.json', toWriteStr, (err) =>{
-				if (err) return console.error('Could not access to the file: ' + err);
-			});
-		});
+		lastRedditPost = obj.data.children[obj.data.children.length - 1].data.name;
 		obj.data.children.forEach(function(item) {
 			if (item.data) {
 				console.log('we got a post');
@@ -104,41 +95,38 @@ const processSelfText = function(obj) {
 							.addField('Content Warning', 'None', true)
 							.setTitle(item.data.title));
 					}
+				} else if (item.data.spoiler) {
+					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+						.setURL('https://www.reddit.com' + item.data.permalink)
+						.setColor([255, 0, 0])
+						.addField('Post Author', '/u/' + item.data.author, true)
+						.addField('Content Warning', 'Spoiler', true)
+						.setAuthor('New post on r/WingsOfFire')
+						.setDescription(item.data.selftext)
+						.setTitle(item.data.title));
+				} else if(item.data.over_18) {
+					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+						.setURL('https://www.reddit.com' + item.data.permalink)
+						.setColor([255, 0, 0])
+						.addField('Post Author', '/u/' + item.data.author, true)
+						.addField('Content Warning', 'NSFW', true)
+						.setAuthor('New post on r/WingsOfFire')
+						.setDescription(item.data.selftext)
+						.setTitle(item.data.title));
 				} else {
-					// eslint-disable-next-line no-lonely-if
-					if (item.data.spoiler) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'Spoiler', true)
-							.setAuthor('New post on r/WingsOfFire')
-							.setDescription(item.data.selftext)
-							.setTitle(item.data.title));
-					} else if(item.data.over_18) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'NSFW', true)
-							.setAuthor('New post on r/WingsOfFire')
-							.setDescription(item.data.selftext)
-							.setTitle(item.data.title));
-					} else {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author ', '/u/' + item.data.author, true)
-							.setAuthor('New post on /r/WingsOfFire')
-							.addField('Content Warning', 'None', true)
-							.setDescription(item.data.selftext)
-							.setTitle(item.data.title));
-					}
+					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+						.setURL('https://www.reddit.com' + item.data.permalink)
+						.setColor([255, 0, 0])
+						.addField('Post Author ', '/u/' + item.data.author, true)
+						.setAuthor('New post on /r/WingsOfFire')
+						.addField('Content Warning', 'None', true)
+						.setDescription(item.data.selftext)
+						.setTitle(item.data.title));
 				}
 			}
 		});
 	}
-};*/
+};
 
 
 class Warn {
@@ -220,8 +208,8 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
-	// searchReddit();
-	// setInterval(searchReddit, 30000);
+	searchReddit();
+	setInterval(searchReddit, 30000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
@@ -1124,7 +1112,7 @@ client.on('message', (message) => {
 							});
 						}
 					}
-				} else if (message.content.toLowerCase().startsWith(prefix + 'clearword ') && server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES')) {
+				/* } else if (message.content.toLowerCase().startsWith(prefix + 'clearword ') && server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES')) {
 					if(server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
 						forbiddenWords.push(message.content.toLowerCase().slice(12));
 						channel.send('That word has been generally set as forbidden.');
@@ -1133,7 +1121,7 @@ client.on('message', (message) => {
 						channel.send('You don\'t have permissions to do that! Requires manage messages permission.');
 					}
 					console.log(user.username + ' forbid a new word: ' + message.content.toLowerCase().slice(12));
-				} else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
+				*/ } else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
 					var messagesSent;
 					if (message.mentions.users.size == 0) {
 						if (!totalMessages.get(user.id)) totalMessages.set(user.id, 0);
