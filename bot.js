@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable no-redeclare */
 /* eslint-disable no-inline-comments */
@@ -1215,7 +1216,7 @@ client.on('message', (message) => {
 					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
 						.then(oldMsg => {
 							oldMsg.each(mess => {
-								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 									message.reply('Oc found!');
 									channel.send(mess.url);
 									found = true;
@@ -1225,7 +1226,7 @@ client.on('message', (message) => {
 								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
 									.then(oldMsg2 => {
 										oldMsg2.each(mess => {
-											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 												message.reply('Oc found!');
 												channel.send(mess.url);
 												found = true;
@@ -1235,7 +1236,7 @@ client.on('message', (message) => {
 											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 												.then(oldMsg3 => {
 													oldMsg3.each(mess => {
-														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 															message.reply('Oc found!');
 															channel.send(mess.url);
 															found = true;
@@ -1246,14 +1247,62 @@ client.on('message', (message) => {
 															.then(oldMsg4 => {
 																// eslint-disable-next-line max-nested-callbacks
 																oldMsg4.each(mess => {
-																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 																		message.reply('Oc found!');
 																		channel.send(mess.url);
 																		found = true;
 																	}
 																});
 																if (!found) {
-																	message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																		.then(oldMsg5 => {
+																			oldMsg5.each(mess => {
+																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																					message.reply('Oc found!');
+																					channel.send(mess.url);
+																					found = true;
+																				}
+																			});
+																			if (!found) {
+																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																					.then(oldMsg6 => {
+																						oldMsg6.each(mess => {
+																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																								message.reply('Oc found!');
+																								channel.send(mess.url);
+																								found = true;
+																							}
+																						});
+																						if (!found) {
+																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																								.then(oldMsg7 => {
+																									oldMsg7.each(mess => {
+																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																											message.reply('Oc found!');
+																											channel.send(mess.url);
+																											found = true;
+																										}
+																									});
+																									if (!found) {
+																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																											.then(oldMsg8 => {
+																												oldMsg8.each(mess => {
+																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																														message.reply('Oc found!');
+																														channel.send(mess.url);
+																														found = true;
+																													}
+																												});
+																												if (!found) {
+																													message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+																												}
+																											});
+																									}
+																								});
+																						}
+																					});
+																			}
+																		});
 																}
 															});
 													}
