@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable no-redeclare */
 /* eslint-disable no-inline-comments */
@@ -14,7 +15,42 @@ var { /* upDootLimit, */ prefix } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
-// var lastRedditPost = '';
+var lastRedditPost = 't3_mepu4n';
+// eslint-disable-next-line no-constant-condition
+if (true) { // Yup, this is sometimes useful (hierarchy problems)
+	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?limit=1`, (res) => {
+		let chunks = [];
+		res.on('data', (d) => {
+		// d is a Buffer object.
+			chunks.push(d);
+		}).on('end', () => {
+			let result = Buffer.concat(chunks);
+			let tmpResult = result.toString();
+			try {
+				let parsedObj = JSON.parse(tmpResult);
+				// Print the string if you want to debug or prettify.
+				// console.log(tmpResult);
+				if (parsedObj.data && parsedObj.data.children && parsedObj.data.children.length) {
+					lastRedditPost = parsedObj.data.children[0].data.name;
+				}
+			} catch (err) {
+				console.log('There was an error!');
+				console.log(err.stack);
+				// I got an error, TypeError: Invalid data, chunk must be a string or buffer, not object
+				// Also I got this, when I'd pushed d.toString to chunks:
+				// TypeError: "list" argument must be an Array of Buffer or Uint8Array instances
+				process.stderr.write(err);
+			}
+		});
+	});
+
+	req.on('error', (error) => {
+		process.stderr.write(error);
+	});
+
+	req.end();
+}
+
 
 var forbiddenWords = ['peepee', 'penis'];
 var warns = new Map();
@@ -29,7 +65,6 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
-/*
 const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
@@ -96,6 +131,34 @@ const processSelfText = function(obj) {
 							.addField('Content Warning', 'None', true)
 							.setTitle(item.data.title));
 					}
+				} else if (item.data.is_gallery == true) {
+					if (item.data.spoiler) {
+						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+							.setURL('https://www.reddit.com' + item.data.permalink)
+							.setColor([255, 0, 0])
+							.addField('Post Author', '/u/' + item.data.author, true)
+							.addField('Content Warning', 'Spoiler', true)
+							.setAuthor('New multi-image post on r/WingsOfFire')
+							.setTitle(item.data.title)
+						);
+					} else if(item.data.over_18) {
+						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+							.setURL('https://www.reddit.com' + item.data.permalink)
+							.setColor([255, 0, 0])
+							.addField('Post Author', '/u/' + item.data.author, true)
+							.addField('Content Warning', 'NSFW', true)
+							.setAuthor('New multi-image post on r/WingsOfFire')
+							.setTitle(item.data.title));
+					} else {
+						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
+							.setURL('https://www.reddit.com' + item.data.permalink)
+							.setThumbnail(item.data.thumbnail)
+							.setColor([255, 0, 0])
+							.addField('Post Author', '/u/' + item.data.author, true)
+							.setAuthor('New multi-image post on /r/WingsOfFire')
+							.addField('Content Warning', 'None', true)
+							.setTitle(item.data.title));
+					}
 				} else if (item.data.spoiler) {
 					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
 						.setURL('https://www.reddit.com' + item.data.permalink)
@@ -128,7 +191,7 @@ const processSelfText = function(obj) {
 		});
 	}
 };
-*/
+
 
 class Warn {
 	/**
@@ -209,8 +272,8 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
-	// searchReddit();
-	// setInterval(searchReddit, 30000);
+	searchReddit();
+	setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
@@ -1153,7 +1216,7 @@ client.on('message', (message) => {
 					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
 						.then(oldMsg => {
 							oldMsg.each(mess => {
-								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 									message.reply('Oc found!');
 									channel.send(mess.url);
 									found = true;
@@ -1163,7 +1226,7 @@ client.on('message', (message) => {
 								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
 									.then(oldMsg2 => {
 										oldMsg2.each(mess => {
-											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 												message.reply('Oc found!');
 												channel.send(mess.url);
 												found = true;
@@ -1173,7 +1236,7 @@ client.on('message', (message) => {
 											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 												.then(oldMsg3 => {
 													oldMsg3.each(mess => {
-														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 															message.reply('Oc found!');
 															channel.send(mess.url);
 															found = true;
@@ -1184,14 +1247,62 @@ client.on('message', (message) => {
 															.then(oldMsg4 => {
 																// eslint-disable-next-line max-nested-callbacks
 																oldMsg4.each(mess => {
-																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
+																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
 																		message.reply('Oc found!');
 																		channel.send(mess.url);
 																		found = true;
 																	}
 																});
 																if (!found) {
-																	message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																		.then(oldMsg5 => {
+																			oldMsg5.each(mess => {
+																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																					message.reply('Oc found!');
+																					channel.send(mess.url);
+																					found = true;
+																				}
+																			});
+																			if (!found) {
+																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																					.then(oldMsg6 => {
+																						oldMsg6.each(mess => {
+																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																								message.reply('Oc found!');
+																								channel.send(mess.url);
+																								found = true;
+																							}
+																						});
+																						if (!found) {
+																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																								.then(oldMsg7 => {
+																									oldMsg7.each(mess => {
+																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																											message.reply('Oc found!');
+																											channel.send(mess.url);
+																											found = true;
+																										}
+																									});
+																									if (!found) {
+																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																											.then(oldMsg8 => {
+																												oldMsg8.each(mess => {
+																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																														message.reply('Oc found!');
+																														channel.send(mess.url);
+																														found = true;
+																													}
+																												});
+																												if (!found) {
+																													message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+																												}
+																											});
+																									}
+																								});
+																						}
+																					});
+																			}
+																		});
 																}
 															});
 													}
