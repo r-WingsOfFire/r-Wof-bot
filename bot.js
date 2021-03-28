@@ -9,7 +9,7 @@ const fs = require('fs');
 var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
-var { /* upDootLimit, */ prefix } = require('./config.json');
+var { /* upDootLimit, */ prefix, token } = require('./config.json');
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
@@ -1432,4 +1432,4 @@ client.on('message', (message) => {
 	}
 });
 
-client.login('NzcxOTQ1OTEzMDQ0MzAzOTEy.X5zgpw.7VJrx-IK1SCRRUB_XxaK7kmhBfg');
+client.login(token);
