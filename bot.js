@@ -1216,7 +1216,7 @@ client.on('message', (message) => {
 					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
 						.then(oldMsg => {
 							oldMsg.each(mess => {
-								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+								if (mess.content.includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 									message.reply('Oc found!');
 									channel.send(mess.url);
 									found = true;
@@ -1226,7 +1226,7 @@ client.on('message', (message) => {
 								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
 									.then(oldMsg2 => {
 										oldMsg2.each(mess => {
-											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 												message.reply('Oc found!');
 												channel.send(mess.url);
 												found = true;
@@ -1236,7 +1236,7 @@ client.on('message', (message) => {
 											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 												.then(oldMsg3 => {
 													oldMsg3.each(mess => {
-														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 															message.reply('Oc found!');
 															channel.send(mess.url);
 															found = true;
@@ -1245,9 +1245,8 @@ client.on('message', (message) => {
 													if (!found) {
 														server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
 															.then(oldMsg4 => {
-																// eslint-disable-next-line max-nested-callbacks
 																oldMsg4.each(mess => {
-																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 																		message.reply('Oc found!');
 																		channel.send(mess.url);
 																		found = true;
@@ -1257,7 +1256,7 @@ client.on('message', (message) => {
 																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 																		.then(oldMsg5 => {
 																			oldMsg5.each(mess => {
-																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 																					message.reply('Oc found!');
 																					channel.send(mess.url);
 																					found = true;
@@ -1267,7 +1266,7 @@ client.on('message', (message) => {
 																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 																					.then(oldMsg6 => {
 																						oldMsg6.each(mess => {
-																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 																								message.reply('Oc found!');
 																								channel.send(mess.url);
 																								found = true;
@@ -1277,7 +1276,7 @@ client.on('message', (message) => {
 																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 																								.then(oldMsg7 => {
 																									oldMsg7.each(mess => {
-																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 																											message.reply('Oc found!');
 																											channel.send(mess.url);
 																											found = true;
@@ -1287,7 +1286,7 @@ client.on('message', (message) => {
 																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
 																											.then(oldMsg8 => {
 																												oldMsg8.each(mess => {
-																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' '))) {
+																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ')) || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ')))) {
 																														message.reply('Oc found!');
 																														channel.send(mess.url);
 																														found = true;
