@@ -65,6 +65,194 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
+var approved = new Map();
+
+class oc {
+	/**
+	 * an object that is an oc sheet
+	 * @param {String[]} nicknames the nicknames of the oc
+	 * @param {'Skywings' | 'Nightwings' | 'Sandwings' | 'Icewings' | 'Mudwings' | 'Seawings' | 'Rainwings' | 'Silkwings' | 'Hivewings' | 'Leafwings'[]} tribes the tribes of the oc
+	 * @param {String} dorm the winglet of the oc
+	 * @param {Discord.Message} message the message to the submission sheet of the oc
+	 * @param {String} occupation Student, teacher or healer
+	 */
+	constructor(nicknames, tribes, dorm, message, occupation) {
+		this._nicknames = nicknames;
+		this._tribes = tribes;
+		this._dorm = dorm;
+		this._message = message;
+		this._occupation = occupation;
+	}
+
+	get nicknames() {
+		return this._nicknames;
+	}
+	get tribes() {
+		return this._tribes;
+	}
+	get dorm() {
+		return this._dorm;
+	}
+	get winglet() {
+		return this._dorm;
+	}
+	get url() {
+		return this._message.url;
+	}
+	get message() {
+		return this._message;
+	}
+	get occupation() {
+		return this._occupation;
+	}
+	set nicknames(value) {
+		this._nicknames = value;
+	}
+	set tribes(value) {
+		this._tribes = value;
+	}
+	set dorm(value) {
+		this._dorm = value;
+	}
+	set winglet(value) {
+		this._dorm = value;
+	}
+	set url(value) {
+		this._message.url = value;
+	}
+	set message(value) {
+		this._message = value;
+	}
+	set occupation(value) {
+		this._occupation = value;
+	}
+}
+
+/**
+ * @param {Discord.Message} mess
+ */
+function addSheet(mess) {
+	if(!approved.has(mess.content.slice(mess.content.toLowerCase().search('name:') + 5, mess.content.slice(mess.content.toLowerCase().search('name:') + 5).search('\n') + mess.content.slice(0, mess.content.toLowerCase().search('name:') + 5).length).split(' ').join(' ').toLowerCase())) {
+		var nicks = [];
+		var name = '';
+		var tribes = [];
+		mess.content.toLowerCase().split('\n').forEach((line) => {
+			if(line.includes('name:')) {
+				name = line.split('name: ').join('').split('name:').join('');
+				if (name.includes('(') && name.includes(')') && !name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1).includes(' ')) {
+					nicks.push(name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1));
+					name = name.slice(0, name.search(/\(/) - 1);
+				}
+				if(name.includes(' or ')) {
+					nicks.push(name.slice(name.search(/or/) + 1, name.search(/or/) - 1));
+					name = name.slice(0, name.search(/or/) - 1);
+				}
+			} else if(line.includes('tribe:') || line.includes('tribes:') || line.includes('tribe(s):')) {
+				if(line.includes('night')) tribes.push('Nightwings');
+				if(line.includes('sand')) tribes.push('Sandwings');
+				if(line.includes('mud')) tribes.push('Mudwings');
+				if(line.includes('sky')) tribes.push('Skywings');
+				if(line.includes('rain')) tribes.push('Rainwings');
+				if(line.includes('sea')) tribes.push('Seawings');
+				if(line.includes('ice')) tribes.push('Icewings');
+				if(line.includes('silk')) tribes.push('Silkwings');
+				if(line.includes('hive')) tribes.push('Hivewings');
+				if(line.includes('leaf')) tribes.push('Leafwings');
+			} else if(line.includes('common nickname/s (used in activity checks):')) {
+				line.split('common nickname/s (used in activity checks): ').join('').split('common nickname/s (used in activity checks):').join('').split('/').join(',').split(',').forEach(nick => {
+					nicks.push(nick);
+				});
+			}
+		});
+		var winglet = '';
+		client.guilds.resolve('716601325269549127').channels.resolve('754476064746504272').children.each(channel => {
+			mess.content.toLowerCase().split('\n').forEach(line => {
+				if(!(line.includes('preferred dorm')) && (line.includes('dorm:') || line.includes('winglet:'))) {
+					if(line.includes(channel.name.split('-winglet').join(''))) {
+						winglet = channel.name.split('-winglet').join('');
+					}
+				}
+			});
+		});
+		var occupation = '';
+		mess.content.toLowerCase().split('\n').forEach(line => {
+			if(line.includes('occupation:')) {
+				occupation = line.split('occupation: ').join('').split('occupation:').join('');
+			}
+		});
+		approved.set(
+			name,
+			new oc(
+				nicks,
+				tribes,
+				winglet,
+				mess,
+				occupation
+			)
+		);
+	}
+}
+
+function mapSubmissions() {
+	const server = client.guilds.resolve('716601325269549127');
+	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
+		.then(oldMsg => {
+			oldMsg.each(mess => {
+				mess.content = mess.content.split('*').join('');
+				addSheet(mess);
+			});
+			server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
+				.then(oldMsg2 => {
+					oldMsg2.each(mess => {
+						mess.content = mess.content.split('*').join('');
+						addSheet(mess);
+					});
+					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+						.then(oldMsg3 => {
+							oldMsg3.each(mess => {
+								mess.content = mess.content.split('*').join('');
+								addSheet(mess);
+							});
+							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
+								.then(oldMsg4 => {
+									oldMsg4.each(mess => {
+										mess.content = mess.content.split('*').join('');
+										addSheet(mess);
+									});
+									server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+										.then(oldMsg5 => {
+											oldMsg5.each(mess => {
+												mess.content = mess.content.split('*').join('');
+												addSheet(mess);
+											});
+											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+												.then(oldMsg6 => {
+													oldMsg6.each(mess => {
+														mess.content = mess.content.split('*').join('');
+														addSheet(mess);
+													});
+													server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+														.then(oldMsg7 => {
+															oldMsg7.each(mess => {
+																mess.content = mess.content.split('*').join('');
+																addSheet(mess);
+															});
+															server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																.then(oldMsg8 => {
+																	oldMsg8.each(mess => {
+																		mess.content = mess.content.split('*').join('');
+																		addSheet(mess);
+																	});
+																});
+														});
+												});
+										});
+								});
+						});
+				});
+		});
+}
+
 const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
@@ -103,7 +291,7 @@ const processSelfText = function(obj) {
 		obj.data.children.forEach(function(item) {
 			if (item.data) {
 				console.log('we got a post');
-				if (item.data.post_hint == 'image') {
+				/* if (item.data.post_hint == 'image') {
 					if (item.data.spoiler) {
 						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
 							.setURL('https://www.reddit.com' + item.data.permalink)
@@ -187,6 +375,7 @@ const processSelfText = function(obj) {
 						.setDescription(item.data.selftext)
 						.setTitle(item.data.title));
 				}
+				*/
 			}
 		});
 	}
@@ -272,6 +461,7 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
+	mapSubmissions();
 	searchReddit();
 	setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
@@ -724,6 +914,9 @@ client.on('message', (message) => {
 							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
 				}
+				if (message.channel.id == '754470277634719845') {
+					addSheet(message);
+				}
 				if ((message.content.toLowerCase().startsWith(prefix + 'modhelp')) && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
 					var modhelpmsg = message.content.slice(9);
 					if (modhelpmsg == 'verbalwarn') {
@@ -1085,7 +1278,7 @@ client.on('message', (message) => {
 						channel.send('Please mention a channel');
 					}
 				} else if(message.content.toLowerCase().startsWith(prefix + 'log')) {
-					console.log(user.username + ' wanted to log the message: ' + message.content.slice(6));
+					console.log(user.username + ' wanted to log the message: ' + message.content.slice(5));
 				} else if (message.content.toLowerCase().startsWith(prefix + 'enlarge ')) {
 					var msgArray = message.content.toLowerCase().split(' ');
 					channel.send(new Discord.MessageEmbed().setImage(server.emojis.resolve(msgArray[1].slice(-19, -1)).url).setColor('RANDOM'));
@@ -1212,104 +1405,24 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested the number of messages ' + message.mentions.users.first().username + ' sent');
 					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'oc ')) {
-					var found = false;
-					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
-						.then(oldMsg => {
-							oldMsg.each(mess => {
-								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+					if(approved.has(message.content.toLowerCase().split('+oc ').join(''))) {
+						message.reply('Oc found!');
+						message.channel.send(approved.get(message.content.toLowerCase().split('+oc ').join('')).url);
+					} else {
+						var found = false;
+						approved.forEach(value => {
+							value.nicknames.forEach(nick => {
+								if(nick.toLowerCase() == message.content.toLowerCase().split('+oc ').join('')) {
 									message.reply('Oc found!');
-									channel.send(mess.url);
+									message.channel.send(value.url);
 									found = true;
 								}
 							});
-							if (!found) {
-								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
-									.then(oldMsg2 => {
-										oldMsg2.each(mess => {
-											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-												message.reply('Oc found!');
-												channel.send(mess.url);
-												found = true;
-											}
-										});
-										if (!found) {
-											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-												.then(oldMsg3 => {
-													oldMsg3.each(mess => {
-														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-															message.reply('Oc found!');
-															channel.send(mess.url);
-															found = true;
-														}
-													});
-													if (!found) {
-														server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
-															.then(oldMsg4 => {
-																oldMsg4.each(mess => {
-																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-																		message.reply('Oc found!');
-																		channel.send(mess.url);
-																		found = true;
-																	}
-																});
-																if (!found) {
-																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																		.then(oldMsg5 => {
-																			oldMsg5.each(mess => {
-																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-																					message.reply('Oc found!');
-																					channel.send(mess.url);
-																					found = true;
-																				}
-																			});
-																			if (!found) {
-																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																					.then(oldMsg6 => {
-																						oldMsg6.each(mess => {
-																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-																								message.reply('Oc found!');
-																								channel.send(mess.url);
-																								found = true;
-																							}
-																						});
-																						if (!found) {
-																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																								.then(oldMsg7 => {
-																									oldMsg7.each(mess => {
-																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-																											message.reply('Oc found!');
-																											channel.send(mess.url);
-																											found = true;
-																										}
-																									});
-																									if (!found) {
-																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																											.then(oldMsg8 => {
-																												oldMsg8.each(mess => {
-																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
-																														message.reply('Oc found!');
-																														channel.send(mess.url);
-																														found = true;
-																													}
-																												});
-																												if (!found) {
-																													message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
-																												}
-																											});
-																									}
-																								});
-																						}
-																					});
-																			}
-																		});
-																}
-															});
-													}
-												});
-										}
-									});
-							}
 						});
+						if(!found) {
+							message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+						}
+					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setmessagecount ') && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
 					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2])) {
 						fs.readFile('./messagecount.json', (err, res) => {
