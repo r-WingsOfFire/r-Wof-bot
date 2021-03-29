@@ -165,13 +165,15 @@ class oc {
 	 * @param {String} dorm the winglet of the oc
 	 * @param {Discord.Message} message the message to the submission sheet of the oc
 	 * @param {String} occupation Student, teacher or healer
+	 * @param {Discord.User} user The owner of the oc
 	 */
-	constructor(nicknames, tribes, dorm, message, occupation) {
+	constructor(nicknames, tribes, dorm, message, occupation, user) {
 		this._nicknames = nicknames;
 		this._tribes = tribes;
 		this._dorm = dorm;
 		this._message = message;
 		this._occupation = occupation;
+		this._owner = user;
 	}
 
 	get nicknames() {
@@ -195,6 +197,12 @@ class oc {
 	get occupation() {
 		return this._occupation;
 	}
+	get owner() {
+		return this._owner;
+	}
+	get user() {
+		return this._owner;
+	}
 	set nicknames(value) {
 		this._nicknames = value;
 	}
@@ -216,6 +224,12 @@ class oc {
 	set occupation(value) {
 		this._occupation = value;
 	}
+	set owner(value) {
+		this._owner = value;
+	}
+	set user(value) {
+		this._owner = value;
+	}
 }
 
 /**
@@ -229,12 +243,12 @@ function addSheet(mess) {
 		mess.content.toLowerCase().split('\n').forEach((line) => {
 			if(line.includes('name:')) {
 				name = line.split('name: ').join('').split('name:').join('');
-				if (name.includes('(') && name.includes(')') && !name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1).includes(' ')) {
-					nicks.push(name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1));
+				if (name.includes('(') && name.includes(')')) {
+					nicks.push(name.slice(name.search(/\(/) + 1, name.search(/\)/)));
 					name = name.slice(0, name.search(/\(/) - 1);
 				}
 				if(name.includes(' or ')) {
-					nicks.push(name.slice(name.search(/or/) + 1, name.search(/or/) - 1));
+					nicks.push(name.slice(name.search(/or/) + 1, 0 - 1));
 					name = name.slice(0, name.search(/or/) - 1);
 				}
 			} else if(line.includes('tribe:') || line.includes('tribes:') || line.includes('tribe(s):')) {
@@ -270,6 +284,10 @@ function addSheet(mess) {
 				occupation = line.split('occupation: ').join('').split('occupation:').join('');
 			}
 		});
+		var user;
+		if(mess.mentions.members.first()) {
+			user = mess.mentions.members.first().user;
+		}
 		approved.set(
 			name,
 			new oc(
@@ -277,7 +295,8 @@ function addSheet(mess) {
 				tribes,
 				winglet,
 				mess,
-				occupation
+				occupation,
+				user
 			)
 		);
 	}
