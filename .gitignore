@@ -4,4 +4,4 @@
 .DS_Store
 .DS_Store
 .vscode
-messagecount.json
+./messagecount.json
