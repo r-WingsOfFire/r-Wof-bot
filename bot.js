@@ -12,7 +12,7 @@ const { google } = require('googleapis');
 var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
-var { /* upDootLimit, */ prefix, token } = require('./config.json');
+var { /* upDootLimit, */ prefix, pwd } = require('./config.json');
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
@@ -154,7 +154,6 @@ function readSheet(auth) {
 	});
 }
 
-/*
 
 var approved = new Map();
 
@@ -1747,4 +1746,4 @@ client.on('message', (message) => {
 	}
 });
 
-client.login(token);
+client.login(pwd);
