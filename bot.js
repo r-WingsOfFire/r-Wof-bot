@@ -571,6 +571,10 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
+	client.user.setActivity(' the prefix: ' + prefix);
+	setInterval(() => {
+		client.user.setActivity(' the prefix: ' + prefix);
+	}, 60000);
 	mapSubmissions();
 	searchReddit();
 	setInterval(searchReddit, 20000);
