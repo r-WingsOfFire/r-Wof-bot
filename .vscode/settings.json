@@ -1,3 +1,4 @@
 {
-    "codewindProfiling.showProfiling": true
+    "codewindProfiling.showProfiling": true,
+    "git.ignoreLimitWarning": true
 }
