@@ -129,7 +129,7 @@ function getNewToken(oAuth2Client, callback) {
 		});
 	});
 }
-
+var dorms = new Map();
 /**
    * Prints the dragons for each winglet in the spreadsheet:
    * @see https://docs.google.com/spreadsheets/d/1ml5rjBRytr8ZoTvXPFO0j8819p6KEVxHYTb8rIvrG44/edit
@@ -139,14 +139,61 @@ function readSheet(auth) {
 	const sheets = google.sheets({ version: 'v4', auth });
 	sheets.spreadsheets.values.get({
 		spreadsheetId: '1ml5rjBRytr8ZoTvXPFO0j8819p6KEVxHYTb8rIvrG44',
-		range: 'Dorms!A2:K13',
+		range: 'Dorms!A2:K26',
 	}, (err, res) => {
 		if (err) return console.log('The API returned an error: ' + err);
 		const rows = res.data.values;
 		if (rows.length) {
-			console.log('Winglet: Mudwing, Seawing, Rainwing, Nightwing, Sandwing, Skywing, Icewing, Silkwing, Hivewing and Leafwing');
-			rows.map((row) => {
-				console.log(`${row[0]}: ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]} and ${row[10]}`);
+			var dormName = '';
+			var mudwings = [];
+			var seawings = [];
+			var rainwings = [];
+			var nightwings = [];
+			var sandwings = [];
+			var skywings = [];
+			var icewings = [];
+			var silkwings = [];
+			var hivewings = [];
+			var leafwings = [];
+
+			rows.forEach((row) => {
+				if (row[0] != undefined && row[0] != '') {
+					dormName = row[0];
+					mudwings = [];
+					seawings = [];
+					rainwings = [];
+					nightwings = [];
+					sandwings = [];
+					skywings = [];
+					icewings = [];
+					silkwings = [];
+					hivewings = [];
+					leafwings = [];
+				}
+				mudwings.push(row[1]);
+				seawings.push(row[2]);
+				rainwings.push(row[3]);
+				nightwings.push(row[4]);
+				sandwings.push(row[5]);
+				skywings.push(row[6]);
+				icewings.push(row[7]);
+				silkwings.push(row[8]);
+				hivewings.push(row[9]);
+				leafwings.push(row[10]);
+				if (row[0] == undefined || row[0] == '') {
+					var dorm = new Map();
+					dorm.set('mudwings', mudwings);
+					dorm.set('seawings', seawings);
+					dorm.set('rainwings', rainwings);
+					dorm.set('nightwings', nightwings);
+					dorm.set('sandwings', sandwings);
+					dorm.set('skywings', skywings);
+					dorm.set('icewings', icewings);
+					dorm.set('silkwings', silkwings);
+					dorm.set('hivewings', hivewings);
+					dorm.set('leafwings', leafwings);
+					dorms.set(dormName, dorm);
+				}
 			});
 		} else {
 			console.log('No data found.');
@@ -426,7 +473,7 @@ const processSelfText = function(obj) {
 							.setColor([255, 0, 0])
 							.addField('Post Author', '/u/' + item.data.author, true)
 							.setAuthor('New image post on /r/WingsOfFire')
-							.addField('Content Warning', 'None', true)
+							.addField('Content Warning', '**None**', true)
 							.setTitle(item.data.title));
 					}
 				} else if (item.data.is_gallery == true) {
@@ -454,7 +501,7 @@ const processSelfText = function(obj) {
 							.setColor([255, 0, 0])
 							.addField('Post Author', '/u/' + item.data.author, true)
 							.setAuthor('New multi-image post on /r/WingsOfFire')
-							.addField('Content Warning', 'None', true)
+							.addField('Content Warning', '**None**', true)
 							.setTitle(item.data.title));
 					}
 				} else if (item.data.spoiler) {
@@ -481,7 +528,7 @@ const processSelfText = function(obj) {
 						.setColor([255, 0, 0])
 						.addField('Post Author ', '/u/' + item.data.author, true)
 						.setAuthor('New post on /r/WingsOfFire')
-						.addField('Content Warning', 'None', true)
+						.addField('Content Warning', '**None**', true)
 						.setDescription(item.data.selftext)
 						.setTitle(item.data.title));
 				}
@@ -1002,6 +1049,82 @@ client.on('message', (message) => {
 								if (err) process.stderr.write(err);
 							});
 						});
+					}
+				}
+				if (message.content.toLowerCase().startsWith(prefix + 'freedorms')) {
+					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0) {
+						var free = [''];
+						free.pop();
+						dorms.forEach((students, winglet) => {
+							students.get(message.content.toLowerCase().split(' ')[1]).forEach(dragon => {
+								if(dragon == undefined || dragon == '') {
+									free.push(winglet);
+								}
+							});
+						});
+						message.reply('Those dorms are free for this tribe: ' + free.join(', '));
+					}
+				}
+				if (message.content.toLowerCase().startsWith(prefix + 'winglet') || message.content.toLowerCase().startsWith(prefix + 'dorm')) {
+					var args = message.content.split(' ').slice(1);
+					if(dorms.has(args[0])) {
+						var dorm = new Map();
+						dorm.set('mudwings', dorms.get(args[0]).get('mudwings'));
+						dorm.set('seawings', dorms.get(args[0]).get('seawings'));
+						dorm.set('rainwings', dorms.get(args[0]).get('rainwings'));
+						dorm.set('nightwings', dorms.get(args[0]).get('nightwings'));
+						dorm.set('sandwings', dorms.get(args[0]).get('sandwings'));
+						dorm.set('skywings', dorms.get(args[0]).get('skywings'));
+						dorm.set('icewings', dorms.get(args[0]).get('icewings'));
+						dorm.set('silkwings', dorms.get(args[0]).get('silkwings'));
+						dorm.set('hivewings', dorms.get(args[0]).get('hivewings'));
+						dorm.set('leafwings', dorms.get(args[0]).get('leafwings'));
+						dorm.forEach((duo, tribe) => {
+							var finalDuo = [];
+							if(duo[0] != undefined && duo[0] != '') {
+								finalDuo.push(duo[0]);
+							}
+							if(duo[1] != undefined && duo[1] != '') {
+								finalDuo.push(duo[1]);
+							}
+							dorm.set(tribe, finalDuo);
+						});
+						var mudwings = '**None**';
+						var seawings = '**None**';
+						var rainwings = '**None**';
+						var nightwings = '**None**';
+						var sandwings = '**None**';
+						var skywings = '**None**';
+						var icewings = '**None**';
+						var silkwings = '**None**';
+						var hivewings = '**None**';
+						var leafwings = '**None**';
+
+						if (dorm.get('mudwings').length != 0) mudwings = dorm.get('mudwings').join(' & ');
+						if (dorm.get('seawings').length != 0) seawings = dorm.get('seawings').join(' & ');
+						if (dorm.get('rainwings').length != 0) rainwings = dorm.get('rainwings').join(' & ');
+						if (dorm.get('nightwings').length != 0) nightwings = dorm.get('nightwings').join(' & ');
+						if (dorm.get('sandwings').length != 0) sandwings = dorm.get('sandwings').join(' & ');
+						if (dorm.get('skywings').length != 0) skywings = dorm.get('skywings').join(' & ');
+						if (dorm.get('icewings').length != 0) icewings = dorm.get('icewings').join(' & ');
+						if (dorm.get('silkwings').length != 0) silkwings = dorm.get('silkwings').join(' & ');
+						if (dorm.get('hivewings').length != 0) hivewings = dorm.get('hivewings').join(' & ');
+						if (dorm.get('leafwings').length != 0) leafwings = dorm.get('leafwings').join(' & ');
+
+						message.channel.send(new Discord.MessageEmbed()
+							.setTitle('Students in the ' + args[0] + ' winglet: ')
+							.addField('Mudwings', mudwings)
+							.addField('Seawings', seawings)
+							.addField('Rainwings', rainwings)
+							.addField('Nightwings', nightwings)
+							.addField('Sandwings', sandwings)
+							.addField('Skywings', skywings)
+							.addField('Icewings', icewings)
+							.addField('Silkwings', silkwings)
+							.addField('Hivewings', hivewings)
+							.addField('Leafwings', leafwings)
+							.setColor('GREEN')
+						);
 					}
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'help')) {
