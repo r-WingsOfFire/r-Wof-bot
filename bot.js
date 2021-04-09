@@ -14,7 +14,7 @@ const https = require('https');
 const { exit } = require('process');
 var { /* upDootLimit, */ prefix, pwd } = require('./config.json');
 
-var reactionRolesMessage = new Map();
+// var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
 var lastRedditPost = 't3_mepu4n';
@@ -55,7 +55,7 @@ if (true) { // Yup, this is sometimes useful (hierarchy problems)
 
 const tribeColor = new Map();
 tribeColor.set("skywings", 'RED');
-tribeColor.set('seawings', 'NAVY');
+tribeColor.set('seawings', [0, 150, 150]);
 tribeColor.set('icewings', 'WHITE');
 tribeColor.set('nightwings', 'DARK_PURPLE');
 tribeColor.set('sandwings', 'GOLD');
@@ -655,10 +655,10 @@ client.on('ready', () => {
 	mapSubmissions();
 	searchReddit();
 	setInterval(searchReddit, 20000);
-	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
+	/* fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
-	});
+	});*/
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if (err) process.stderr.write(err);
@@ -1059,25 +1059,13 @@ client.on('message', (message) => {
 						server.roles.cache.get('735212949639135272').setMentionable(false);
 						setTimeout(() => {
 							server.roles.cache.get('735212949639135272').setMentionable(true);
-							fs.readFile('./cacheBetweenBoots.json', (err, res) => {
+							fs.writeFile('./cacheBetweenBoots.json', '{\n\t"rpSeekPinged": false\n}', (err) => {
 								if (err) process.stderr.write(err);
-								var toWrite = res.toString().split('\n');
-								toWrite[2] = '\t"rpSeekPinged": false';
-								toWrite[3] = '}';
-								fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-									if (err) process.stderr.write(err);
-								});
 							});
 						}, 3600000);
 						console.log(user.username + ' is looking for someone to rp with');
-						fs.readFile('./cacheBetweenBoots.json', (err, res) => {
+						fs.writeFile('./cacheBetweenBoots.json', '{\n\t"rpSeekPinged": true\n}', (err) => {
 							if (err) process.stderr.write(err);
-							var toWrite = res.toString().split('\n');
-							toWrite[2] = '\t"rpSeekPinged": true';
-							toWrite[3] = '}';
-							fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-								if (err) process.stderr.write(err);
-							});
 						});
 					}
 				}
@@ -1482,7 +1470,7 @@ client.on('message', (message) => {
 							.setDescription('Something is wrong with the selections you made. Please check your message for mistakes.'));
 					}
 
-				} else if ((message.content.toLowerCase().startsWith(prefix + 'rr') || message.content.toLowerCase().startsWith(prefix + 'reactionrole')) && server.members.resolve(user.id).hasPermission('MANAGE_ROLES')) {
+				}/* else if ((message.content.toLowerCase().startsWith(prefix + 'rr') || message.content.toLowerCase().startsWith(prefix + 'reactionrole')) && server.members.resolve(user.id).hasPermission('MANAGE_ROLES')) {
 					if (message.mentions.channels.first()) {
 						let reactionChannel = message.mentions.channels.first();
 						channel.send('Enter the base message');
@@ -1500,14 +1488,14 @@ client.on('message', (message) => {
 													reactionRolesMessage.set(msg.id, emojiRoles);
 													fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 														if (err) return console.error(err);
-														var toWrite = res.toString().split('\n');
+														var writing = res.toString().split('\n');
 														var entriesJaggedArray = new Array();
 														// eslint-disable-next-line max-nested-callbacks
 														reactionRolesMessage.forEach((val, k) => {
 															entriesJaggedArray.push([val, k]);
 														});
-														toWrite[2] = '\t"reactionRoles": ' + entriesJaggedArray;
-														toWrite[3] = '}';
+														writing[2] = '\t"reactionRoles": ' + entriesJaggedArray;
+														writing[3] = '}';
 														var toWriteStr = '';
 														// eslint-disable-next-line max-nested-callbacks
 														toWrite.forEach(elemInArray => {
@@ -1544,7 +1532,7 @@ client.on('message', (message) => {
 					} else {
 						channel.send('Please mention a channel');
 					}
-				} else if(message.content.toLowerCase().startsWith(prefix + 'log')) {
+				}*/ else if(message.content.toLowerCase().startsWith(prefix + 'log')) {
 					console.log(user.username + ' wanted to log the message: ' + message.content.slice(5));
 				} else if (message.content.toLowerCase().startsWith(prefix + 'enlarge ')) {
 					var msgArray = message.content.toLowerCase().split(' ');
@@ -1589,9 +1577,9 @@ client.on('message', (message) => {
 					prefix = message.content.toLowerCase().split(' ')[1];
 					fs.readFile('./config.json', (err, res) => {
 						if (err) process.stderr.write(err);
-						var toWrite = res.toString().split('\n');
-						toWrite[1] = `\t"prefix": "${prefix}"`;
-						fs.writeFile('./config.json', toWrite.join('\n'), err => {
+						var writing = res.toString().split('\n');
+						writing[1] = `\t"prefix": "${prefix}"`;
+						fs.writeFile('./config.json', writing.join('\n'), err => {
 							if (err) process.stderr.write(err);
 						});
 					});
@@ -1628,9 +1616,9 @@ client.on('message', (message) => {
 						if (new Number(message.content.split(' ')[1])) {
 							fs.readFile('./config.json', (err, res) => {
 								if (err) process.stderr.write(err);
-								var toWrite = res.toString().split('\n');
-								toWrite[2] = `\t"upDootLimit": ${new Number(message.content.split(' ')[1])}`;
-								fs.writeFile('./config.json', toWrite.join('\n'), err => {
+								var writing = res.toString().split('\n');
+								writing[2] = `\t"upDootLimit": ${new Number(message.content.split(' ')[1])}`;
+								fs.writeFile('./config.json', writing.join('\n'), err => {
 									if (err) process.stderr.write(err);
 								});
 							});
@@ -1672,13 +1660,13 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested the number of messages ' + message.mentions.users.first().username + ' sent');
 					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'oc ')) {
-					var owner = '';
-					if(approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == 'ERROR' || approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == undefined) {
-						owner = 'Error';
-					} else {
-						owner = approved.get(message.content.toLowerCase().split('+oc ').join('')).owner.tag;
-					}
 					if(approved.has(message.content.toLowerCase().split('+oc ').join(''))) {
+						var owner = '';
+						if(approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == 'ERROR' || approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == undefined) {
+							owner = 'Error';
+						} else {
+							owner = approved.get(message.content.toLowerCase().split('+oc ').join('')).owner.tag;
+						}
 						message.reply('Oc found!');
 						message.channel.send(
 							new Discord.MessageEmbed()
@@ -1708,24 +1696,24 @@ client.on('message', (message) => {
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setmessagecount ') && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
 					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2])) {
 						fs.readFile('./messagecount.json', (err, res) => {
-							var toWrite = res.toString().split('\n');
+							var writing = res.toString().split('\n');
 							if (err) process.stderr.write(err);
 							if (!res.toString().includes(message.mentions.members.first().id)) {
-								toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-								toWrite[toWrite.length - 1] = `\t"${message.mentions.members.first().id}": ${message.content.split(' ')[2]}`;
-								toWrite[toWrite.length] = '}';
+								writing[writing.length - 2] = writing[writing.length - 2] + ',';
+								writing[writing.length - 1] = `\t"${message.mentions.members.first().id}": ${message.content.split(' ')[2]}`;
+								writing[writing.length] = '}';
 							} else {
-								toWrite.forEach(entry => {
+								writing.forEach(entry => {
 									if (entry.includes(`"${message.mentions.members.first().id}": `)) {
-										if (toWrite.indexOf(entry) == toWrite.length - 2) {
-											toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]);
+										if (writing.indexOf(entry) == writing.length - 2) {
+											writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]);
 										} else {
-											toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]) + ',';
+											writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]) + ',';
 										}
 									}
 								});
 							}
-							fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
+							fs.writeFile('./messagecount.json', writing.join('\n'), err => {
 								if (err) process.stderr.write(err);
 							});
 							channel.send('The number of messages for this person has been sucessfully updated.');
@@ -1837,24 +1825,24 @@ client.on('message', (message) => {
 						totalMessages.set(user.id, 1);
 					}
 					fs.readFile('./messagecount.json', (err, res) => {
-						var toWrite = res.toString().split('\n');
+						var writing = res.toString().split('\n');
 						if (err) process.stderr.write(err);
 						if (!res.toString().includes(user.id)) {
-							toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-							toWrite[toWrite.length - 1] = `\t"${user.id}": 1`;
-							toWrite[toWrite.length] = '}';
+							writing[writing.length - 2] = writing[writing.length - 2] + ',';
+							writing[writing.length - 1] = `\t"${user.id}": 1`;
+							writing[writing.length] = '}';
 						} else {
-							toWrite.forEach(entry => {
+							writing.forEach(entry => {
 								if (entry.includes(`"${user.id}": `)) {
-									if (toWrite.indexOf(entry) == toWrite.length - 2) {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1);
+									if (writing.indexOf(entry) == writing.length - 2) {
+										writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1);
 									} else {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1) + ',';
+										writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1) + ',';
 									}
 								}
 							});
 						}
-						fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
+						fs.writeFile('./messagecount.json', writing.join('\n'), err => {
 							if (err) process.stderr.write(err);
 						});
 					});
@@ -1865,24 +1853,24 @@ client.on('message', (message) => {
 						totalMessages.set(user.id, 0.5);
 					}
 					fs.readFile('./messagecount.json', (err, res) => {
-						var toWrite = res.toString().split('\n');
+						var writing = res.toString().split('\n');
 						if (err) process.stderr.write(err);
 						if (!res.toString().includes(user.id)) {
-							toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-							toWrite[toWrite.length - 1] = `\t"${user.id}": 0.5`;
-							toWrite[toWrite.length] = '}';
+							writing[writing.length - 2] = writing[writing.length - 2] + ',';
+							writing[writing.length - 1] = `\t"${user.id}": 0.5`;
+							writing[writing.length] = '}';
 						} else {
-							toWrite.forEach(entry => {
+							writing.forEach(entry => {
 								if (entry.includes(`"${user.id}": `)) {
-									if (toWrite.indexOf(entry) == toWrite.length - 2) {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5);
+									if (writing.indexOf(entry) == writing.length - 2) {
+										writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5);
 									} else {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5) + ',';
+										writing[writing.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5) + ',';
 									}
 								}
 							});
 						}
-						fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
+						fs.writeFile('./messagecount.json', writing.join('\n'), err => {
 							if (err) process.stderr.write(err);
 						});
 					});
