@@ -53,6 +53,17 @@ if (true) { // Yup, this is sometimes useful (hierarchy problems)
 	req.end();
 }
 
+const tribeColor = new Map();
+tribeColor.set("skywings", 'RED');
+tribeColor.set('seawings', 'NAVY');
+tribeColor.set('icewings', 'WHITE');
+tribeColor.set('nightwings', 'DARK_PURPLE');
+tribeColor.set('sandwings', 'GOLD');
+tribeColor.set('mudwings', 'BROWN');
+tribeColor.set('rainwings', 'RANDOM');
+tribeColor.set('leafwings', 'DARK_GREEN');
+tribeColor.set('hivewings', 'YELLOW');
+tribeColor.set('silkwings', 'RANDOM');
 
 var forbiddenWords = ['peepee', 'penis'];
 var warns = new Map();
@@ -313,20 +324,28 @@ function addSheet(mess) {
 				line.split('common nickname/s (used in activity checks): ').join('').split('common nickname/s (used in activity checks):').join('').split('/').join(',').split(',').forEach(nick => {
 					nicks.push(nick);
 				});
+			} else if(line.includes('common nickname:')) {
+				line.split('common nickname: ').join('').split('common nickname:').join('').split('/').join(',').split(',').forEach(nick => {
+					nicks.push(nick);
+				});
+			} else if(line.includes('common nicknames:')) {
+				line.split('common nicknames: ').join('').split('common nicknames:').join('').split('/').join(',').split(',').forEach(nick => {
+					nicks.push(nick);
+				});
 			}
 		});
 		var winglet = '';
 		client.guilds.resolve('716601325269549127').channels.resolve('754476064746504272').children.each(channel => {
-			mess.content.toLowerCase().split('\n').forEach(line => {
+			mess.content.toLowerCase().split('\n').forEach((line) => {
 				if(!(line.includes('preferred dorm')) && (line.includes('dorm:') || line.includes('winglet:'))) {
-					if(line.includes(channel.name.split('-winglet').join(''))) {
-						winglet = channel.name.split('-winglet').join('');
+					if(line.includes(channel.name.toLowerCase().split('-winglet').join(''))) {
+						winglet = channel.name.toLowerCase().split('-winglet').join('');
 					}
 				}
 			});
 		});
 		var occupation = '';
-		mess.content.toLowerCase().split('\n').forEach(line => {
+		mess.content.toLowerCase().split('\n').forEach((line) => {
 			if(line.includes('occupation:')) {
 				occupation = line.split('occupation: ').join('').split('occupation:').join('');
 			}
@@ -334,6 +353,17 @@ function addSheet(mess) {
 		var user;
 		if(mess.mentions.members.first()) {
 			user = mess.mentions.members.first().user;
+		}
+		if(user == undefined) {
+			user == 'ERROR';
+		}
+
+		if(nicks.length == 0) {
+			nicks = ['none'];
+		}
+
+		if(winglet == '') {
+			winglet = 'ERROR';
 		}
 		approved.set(
 			name,
@@ -1642,9 +1672,24 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested the number of messages ' + message.mentions.users.first().username + ' sent');
 					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'oc ')) {
+					var owner = '';
+					if(approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == 'ERROR' || approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == undefined) {
+						owner = 'Error';
+					} else {
+						owner = approved.get(message.content.toLowerCase().split('+oc ').join('')).owner.tag;
+					}
 					if(approved.has(message.content.toLowerCase().split('+oc ').join(''))) {
 						message.reply('Oc found!');
-						message.channel.send(approved.get(message.content.toLowerCase().split('+oc ').join('')).url);
+						message.channel.send(
+							new Discord.MessageEmbed()
+								.setTitle(message.content.toLowerCase().split('+oc ').join('').slice(0, 1).toUpperCase() + message.content.toLowerCase().split('+oc ').join('').slice(1).toLowerCase())
+								.addField('Nickname(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).nicknames.join(', '))
+								.addField('Tribe(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes.join(' / '))
+								.addField('Dorm', approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(0, 1).toUpperCase() + approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(1).toLowerCase())
+								.addField('Owner', owner)
+								.setURL(approved.get(message.content.toLowerCase().split('+oc ').join('')).message.url)
+								.setColor(tribeColor.get(approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes[0].toLowerCase()))
+						);
 					} else {
 						var found = false;
 						approved.forEach(value => {
