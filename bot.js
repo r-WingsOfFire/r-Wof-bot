@@ -645,6 +645,13 @@ class Warn {
 }
 
 client.on('ready', () => {
+	setInterval(() => {
+		fs.readFile('credentials.json', (err, content) => {
+			if (err) return console.log('Error loading client secret file:', err);
+			// Authorize a client with credentials, then call the Google Sheets API.
+			authorize(JSON.parse(content), readSheet);
+		});
+	}, 30000);
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
