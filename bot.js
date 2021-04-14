@@ -217,7 +217,7 @@ var approved = new Map();
 
 class oc {
 	/**
-	 * an object that is an oc sheet
+	 * an object that represents an oc sheet
 	 * @param {String[]} nicknames the nicknames of the oc
 	 * @param {'Skywings' | 'Nightwings' | 'Sandwings' | 'Icewings' | 'Mudwings' | 'Seawings' | 'Rainwings' | 'Silkwings' | 'Hivewings' | 'Leafwings'[]} tribes the tribes of the oc
 	 * @param {String} dorm the winglet of the oc
@@ -1070,7 +1070,7 @@ client.on('message', (message) => {
 					}
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'freedorms')) {
-					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0) {
+					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0 && ['skywings' , 'nightwings' , 'sandwings' , 'icewings' , 'mudwings' , 'seawings' , 'rainwings' , 'silkwings' , 'hivewings' , 'leafwings'].includes(message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join(''))) {
 						var free = [''];
 						free.pop();
 						dorms.forEach((students, winglet) => {
