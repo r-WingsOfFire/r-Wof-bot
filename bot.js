@@ -667,18 +667,9 @@ client.on('ready', () => {
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
 	});*/
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
-	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
+	client.guilds.resolve('716601325269549127').roles.resolve('735212949639135272').setMentionable(true);
+	fs.writeFile('./cacheBetweenBoots.json', '{\n\t"rpSeekPinged": false\n}', (err) => {
 		if (err) process.stderr.write(err);
-		var resolved = JSON.parse(res);
-		if (resolved.rpSeekPinged) {
-			client.guilds.resolve('716601325269549127').roles.resolve('735212949639135272').setMentionable(true);
-			var toWrite = res.toString().split('\n');
-			toWrite[2] = '\t"rpSeekPinged": false';
-			toWrite[3] = '}';
-			fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-				if (err) process.stderr.write(err);
-			});
-		}
 	});
 });
 
@@ -1077,7 +1068,7 @@ client.on('message', (message) => {
 					}
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'freedorms')) {
-					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0 && ['skywings' , 'nightwings' , 'sandwings' , 'icewings' , 'mudwings' , 'seawings' , 'rainwings' , 'silkwings' , 'hivewings' , 'leafwings'].includes(message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join(''))) {
+					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0 && ['skywings', 'nightwings', 'sandwings', 'icewings', 'mudwings', 'seawings', 'rainwings', 'silkwings', 'hivewings', 'leafwings'].includes(message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join(''))) {
 						var free = [''];
 						free.pop();
 						dorms.forEach((students, winglet) => {
