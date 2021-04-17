@@ -228,7 +228,11 @@ class oc {
 	constructor(nicknames, tribes, dorm, message, occupation, user) {
 		this._nicknames = nicknames;
 		this._tribes = tribes;
-		this._dorm = dorm;
+		if(occupation.toLowerCase().includes('student')) {
+			this._dorm = dorm;
+		} else {
+			this._dorm = 'None (not a student)';
+		}
 		this._message = message;
 		this._occupation = occupation;
 		this._owner = user;
@@ -365,6 +369,15 @@ function addSheet(mess) {
 		if(winglet == '') {
 			winglet = 'ERROR';
 		}
+
+		nicks.forEach((nick, index) => {
+			if(nick.includes('or just ')) {
+				nicks[index] = nick.split(' or just ').join('');
+			}
+			if(nick.includes('or ')) {
+				nicks[index] = nick.split(' or ').join('');
+			}
+		});
 		approved.set(
 			name,
 			new oc(
@@ -429,14 +442,23 @@ function mapSubmissions() {
 																		mess.content = mess.content.split('*').join('');
 																		addSheet(mess);
 																	});
-																});
-														});
-												});
-										});
-								});
-						});
-				});
-		});
+																})
+																.catch(err => {console.error(err);});
+
+														})
+														.catch(err => {console.error(err);});
+												})
+												.catch(err => {console.error(err);});
+										})
+										.catch(err => {console.error(err);});
+								})
+								.catch(err => {console.error(err);});
+						})
+						.catch(err => {console.error(err);});
+				})
+				.catch(err => {console.error(err);});
+		})
+		.catch(err => {console.error(err);});
 }
 
 
@@ -597,8 +619,10 @@ class Warn {
 				client.channels.fetch('718192469560262656')
 					.then(logChannel => {
 						logChannel.send(warnlog);
-					});
-			});
+					})
+					.catch(err => {console.error(err);});
+			})
+			.catch(err => {console.error(err);});
 		this.date = new Date(Date.now());
 	}
 
@@ -709,7 +733,8 @@ client.on('message', (message) => {
 					client.channels.fetch('718192469560262656')
 						.then(logChannel => {
 							logChannel.send(badword);
-						});
+						})
+						.catch(err => {console.error(err);});
 					console.log(user.username + ' said something bad');
 				}
 			});
@@ -757,7 +782,8 @@ client.on('message', (message) => {
 											awaitQuizzMessage();
 										}
 									}
-								});
+								})
+								.catch(err => {console.error(err);});
 						}
 						awaitQuizzMessage();
 					});
@@ -798,9 +824,6 @@ client.on('message', (message) => {
 			case prefix + 'kill':
 				if (user.id == '373515998000840714' || user.id == '306582338039709696') {
 					channel.send('Alright, the bot is logging out...')
-						.catch((e) => {
-							console.error('tf is going on? an error occured... check that out:\n' + e);
-						})
 						.then(() => {
 							var killer = new String;
 							if (user.id == '373515998000840714') {
@@ -812,7 +835,8 @@ client.on('message', (message) => {
 							console.warn('The bot got killed by ' + killer);
 							client.destroy();
 							exit();
-						});
+						})
+						.catch(err => {console.error(err);});
 				} else {
 					channel.send('You don\'t have permission to do that!');
 				}
@@ -886,7 +910,8 @@ client.on('message', (message) => {
 					user.createDM()
 						.then(DMchannel => {
 							DMchannel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
-						});
+						})
+						.catch(err => {console.error(err);});
 				});
 				console.log('checked forbidden words');
 				break;
@@ -1550,7 +1575,8 @@ client.on('message', (message) => {
 							.then(poll => {
 								poll.react('👍');
 								poll.react('👎');
-							});
+							})
+							.catch(err => {console.error(err);});
 					} else if (content[0].toLowerCase() == 'numbers') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('GREEN')
@@ -1568,8 +1594,8 @@ client.on('message', (message) => {
 								poll.react('8️⃣');
 								poll.react('9️⃣');
 								poll.react('🔟');
-							});
-
+							})
+							.catch(err => {console.error(err);});
 					}
 
 					console.log('poll created in #' + message.channel.name + ' by ' + message.author.username);
@@ -1663,28 +1689,45 @@ client.on('message', (message) => {
 					if(approved.has(message.content.toLowerCase().split('+oc ').join(''))) {
 						var owner = '';
 						if(approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == 'ERROR' || approved.get(message.content.toLowerCase().split('+oc ').join('')).owner == undefined) {
-							owner = 'Error';
+							owner = 'Error fetching the owner, please contact dindin';
 						} else {
 							owner = approved.get(message.content.toLowerCase().split('+oc ').join('')).owner.tag;
 						}
-						message.reply('Oc found!');
-						message.channel.send(
-							new Discord.MessageEmbed()
-								.setTitle(message.content.toLowerCase().split('+oc ').join('').slice(0, 1).toUpperCase() + message.content.toLowerCase().split('+oc ').join('').slice(1).toLowerCase())
-								.addField('Nickname(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).nicknames.join(', '))
-								.addField('Tribe(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes.join(' / '))
-								.addField('Dorm', approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(0, 1).toUpperCase() + approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(1).toLowerCase())
-								.addField('Owner', owner)
-								.setURL(approved.get(message.content.toLowerCase().split('+oc ').join('')).message.url)
-								.setColor(tribeColor.get(approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes[0].toLowerCase()))
-						);
+						var searchEmbed = new Discord.MessageEmbed()
+							.setTitle(message.content.toLowerCase().split('+oc ').join('').slice(0, 1).toUpperCase() + message.content.toLowerCase().split('+oc ').join('').slice(1).toLowerCase())
+							.addField('Nickname(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).nicknames.join(', '))
+							.addField('Tribe(s)', approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes.join(' / '))
+							.addField('Dorm', approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(0, 1).toUpperCase() + approved.get(message.content.toLowerCase().split('+oc ').join('')).dorm.slice(1).toLowerCase())
+							.addField('Owner', owner)
+							.setURL(approved.get(message.content.toLowerCase().split('+oc ').join('')).message.url)
+							.setColor(tribeColor.get(approved.get(message.content.toLowerCase().split('+oc ').join('')).tribes[0].toLowerCase()));
+						if (approved.get(message.content.toLowerCase().split('+oc ').join('')).message.attachments.size > 0) {
+							searchEmbed.setImage(approved.get(message.content.toLowerCase().split('+oc ').join('')).message.attachments.first().url);
+						}
+						message.channel.send(searchEmbed);
 					} else {
 						var found = false;
-						approved.forEach(value => {
+						approved.forEach((value, name) => {
 							value.nicknames.forEach(nick => {
 								if(nick.toLowerCase() == message.content.toLowerCase().split('+oc ').join('')) {
-									message.reply('Oc found!');
-									message.channel.send(value.url);
+									var owner2 = '';
+									if(approved.get(name).owner == 'ERROR' || approved.get(name).owner == undefined) {
+										owner2 = 'Error fetching the owner, please contact dindin';
+									} else {
+										owner2 = approved.get(name).owner.tag;
+									}
+									var searchEmbed2 = new Discord.MessageEmbed()
+										.setTitle(name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase())
+										.addField('Nickname(s)', approved.get(name).nicknames.join(', '))
+										.addField('Tribe(s)', approved.get(name).tribes.join(' / '))
+										.addField('Dorm', approved.get(name).dorm.slice(0, 1).toUpperCase() + approved.get(name).dorm.slice(1).toLowerCase())
+										.addField('Owner', owner2)
+										.setURL(approved.get(name).message.url)
+										.setColor(tribeColor.get(approved.get(name).tribes[0].toLowerCase()));
+									if (approved.get(name).message.attachments.size > 0) {
+										searchEmbed2.setImage(approved.get(name).message.attachments.first().url);
+									}
+									message.channel.send(searchEmbed2);
 									found = true;
 								}
 							});
@@ -1750,7 +1793,8 @@ client.on('message', (message) => {
 							.then((DMChannel) => {
 								DMChannel.send(reply);
 								console.log('the mods responded to ' + userA.username);
-							});
+							})
+							.catch(err => {console.error(err);});
 					} else {
 						message.reply('Syntax error. Please use the index of the message you want to answer to.');
 					}
@@ -1879,48 +1923,31 @@ client.on('message', (message) => {
 				break;
 			}
 
-		} else {
-			if(message.content.toLowerCase().startsWith(prefix + 'messagemods ')) {
-				user.createDM()
-					.then(DMchannel => {
-						DMchannel.send(':thumbsup:');
-					});
-				var modsEmbed = new Discord.MessageEmbed()
-					.setColor('ORANGE')
-					.setTitle('New message from user:')
-					.setAuthor(user.tag)
-					.setDescription(message.content.slice(13))
-					.setFooter(`This is an automated message. Please answer using ${prefix}reply ${messageMods.length} <message>`);
-				client.channels.fetch('785612417379336263')
-					.then(modChannel => {
-						modChannel.send(modsEmbed);
-					})
-					.catch(() => {
-						client.channels.fetch('647616102339313667')
-							.then(officialModChannel => {
-								officialModChannel.send(modsEmbed);
-							});
-					});
-				messageMods.push(user.id);
-				console.log('Somebody messaged the mods');
-			}
-
-			if (message.content.toLowerCase().startsWith(prefix + 'getfile') && (user.id == '373515998000840714' || user.id == '306582338039709696')) {
-				user.createDM()
-					.then((DMchannel) => {
-						DMchannel.send({
-							files: [{
-								attachment: 'bot.js',
-								name: 'bot.js'
-							}]
-						});
-						fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-							if (err) process.stderr.write(err);
-							DMchannel.send('The last post id (the thing to put in cacheBetweenBoots.json) is:' + res.toString().split('\n')[1]);
-						});
-					});
-				console.log(user.username + ' fetched the file. Have fun!');
-			}
+		} else if(message.content.toLowerCase().startsWith(prefix + 'messagemods ')) {
+			user.createDM()
+				.then(DMchannel => {
+					DMchannel.send(':thumbsup:');
+				})
+				.catch(err => {console.error(err);});
+			var modsEmbed = new Discord.MessageEmbed()
+				.setColor('ORANGE')
+				.setTitle('New message from user:')
+				.setAuthor(user.tag)
+				.setDescription(message.content.slice(13))
+				.setFooter(`This is an automated message. Please answer using ${prefix}reply ${messageMods.length} <message>`);
+			client.channels.fetch('785612417379336263')
+				.then(modChannel => {
+					modChannel.send(modsEmbed);
+				})
+				.catch(() => {
+					client.channels.fetch('647616102339313667')
+						.then(officialModChannel => {
+							officialModChannel.send(modsEmbed);
+						})
+						.catch(err => {console.error(err);});
+				});
+			messageMods.push(user.id);
+			console.log('Somebody messaged the mods');
 		}
 	}
 });
