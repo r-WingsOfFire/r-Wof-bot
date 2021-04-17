@@ -217,7 +217,7 @@ var approved = new Map();
 
 class oc {
 	/**
-	 * an object that is an oc sheet
+	 * an object that represents an oc sheet
 	 * @param {String[]} nicknames the nicknames of the oc
 	 * @param {'Skywings' | 'Nightwings' | 'Sandwings' | 'Icewings' | 'Mudwings' | 'Seawings' | 'Rainwings' | 'Silkwings' | 'Hivewings' | 'Leafwings'[]} tribes the tribes of the oc
 	 * @param {String} dorm the winglet of the oc
@@ -669,6 +669,13 @@ class Warn {
 }
 
 client.on('ready', () => {
+	setInterval(() => {
+		fs.readFile('credentials.json', (err, content) => {
+			if (err) return console.log('Error loading client secret file:', err);
+			// Authorize a client with credentials, then call the Google Sheets API.
+			authorize(JSON.parse(content), readSheet);
+		});
+	}, 30000);
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
@@ -684,18 +691,9 @@ client.on('ready', () => {
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
 	});*/
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
-	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
+	client.guilds.resolve('716601325269549127').roles.resolve('735212949639135272').setMentionable(true);
+	fs.writeFile('./cacheBetweenBoots.json', '{\n\t"rpSeekPinged": false\n}', (err) => {
 		if (err) process.stderr.write(err);
-		var resolved = JSON.parse(res);
-		if (resolved.rpSeekPinged) {
-			client.guilds.resolve('716601325269549127').roles.resolve('735212949639135272').setMentionable(true);
-			var toWrite = res.toString().split('\n');
-			toWrite[2] = '\t"rpSeekPinged": false';
-			toWrite[3] = '}';
-			fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-				if (err) process.stderr.write(err);
-			});
-		}
 	});
 });
 
@@ -1095,7 +1093,7 @@ client.on('message', (message) => {
 					}
 				}
 				if (message.content.toLowerCase().startsWith(prefix + 'freedorms')) {
-					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0) {
+					if (message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join('').length > 0 && ['skywings', 'nightwings', 'sandwings', 'icewings', 'mudwings', 'seawings', 'rainwings', 'silkwings', 'hivewings', 'leafwings'].includes(message.content.toLowerCase().slice(new String(prefix + 'freedorms').length).split(' ').join(''))) {
 						var free = [''];
 						free.pop();
 						dorms.forEach((students, winglet) => {
