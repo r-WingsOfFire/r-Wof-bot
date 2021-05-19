@@ -5,14 +5,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
 
 
 var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
-var { /* upDootLimit, */ prefix, pwd } = require('./config.json');
+var { /* upDootLimit, */ prefix, token } = require('./config.json');
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
@@ -54,9 +52,9 @@ if (true) { // Yup, this is sometimes useful (hierarchy problems)
 }
 
 
-var forbiddenWords = ['peepee', 'penis'];
+var forbiddenWords = ['placeholder1', 'placeholder2'];
 var warns = new Map();
-const helpstr = `${prefix}forbiddenwords = gets a list of forbidden words\n ${prefix}quote = will give you a quote, and you have to guess who said it.\n ${prefix}fac = “flip a coin”. Means just that, will flip a coin and you will either get heads or tails.\n ${prefix}ping = just checks to see what the response time is between you and the bot.\n ${prefix}sunny = says a random quote from sunny\n  ${prefix}hybridgen <pyrrhia/pantala/any> <same for #2> = generates a random hybrid from the inputs. If you choose pyrrhia, pantala, it will give you a hybrid of one tribe from each. You could also choose ‘any’ to allow the use of both pyrrhian and pantalan tribes in the generation. Also, if you leave the second, or both fields blank, it will default to <any> <any>.\n ${prefix}poll <thumbs/numbers> <question> = creates a poll for you, of any question you want, and automatically adds :thumbsup: and :thumbsdown: reactions or numbers reactions to it.\n ${prefix}rn = random number generator.\n ${prefix}whois (or ${prefix}whatis) <name or thing> = put in a canon character’s name and get the link to the wiki to read up about them\n ${prefix}sumthemup <user> = checks the messages of a user excluding the channels meant to be excluded.\n ${prefix}oc <oc name> = searches for the name of an oc in the approved characters channel\n${prefix}messagemods <message> = send this to the bot in it’s DMs. It will send the mods the message in a channel where any of us can see and reply to it, which will come back to you through the bot.`;
+const helpstr = `${prefix}forbiddenwords\n ${prefix}quote\n ${prefix}fac (or ${prefix}flipacoin)\n ${prefix}ping\n ${prefix}sunny\n  ${prefix}hybridgen <pyrrhia/pantala/any> <same for #2>\n ${prefix}poll <thumbs/numbers> <question>\n ${prefix}whois (or ${prefix}whatis) <name or thing>\n ${prefix}sumthemup <user>\n ${prefix}oc <oc name>\n${prefix}messagemods <message>`;
 const modhelpstr = prefix + `verbalwarn <mention user>\n ${prefix}log <message>\n${prefix}clearword <word>\n ${prefix}reply <modmail message ID> <message>\n ${prefix}getwarns <user>\n ${prefix}allowword <word ID>\n ${prefix}clearwarn <user>\n ${prefix}reactionrole (or ${prefix}rr) <channel>`;
 const pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
 const patribes = ["leafwing", "hivewing", "silkwing"];
@@ -66,283 +64,6 @@ const alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mu
 var lastmessage = undefined;
 
 var quoteBusy = false;
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json';
-
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-	if (err) return console.log('Error loading client secret file:', err);
-	// Authorize a client with credentials, then call the Google Sheets API.
-	authorize(JSON.parse(content), readSheet);
-});
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-function authorize(credentials, callback) {
-	const { client_secret, client_id, redirect_uris } = credentials.installed;
-	const oAuth2Client = new google.auth.OAuth2(
-		client_id, client_secret, redirect_uris[0]);
-
-	// Check if we have previously stored a token.
-	fs.readFile(TOKEN_PATH, (err, token) => {
-		if (err) return getNewToken(oAuth2Client, callback);
-		oAuth2Client.setCredentials(JSON.parse(token));
-		callback(oAuth2Client);
-	});
-}
-
-/**
-   * Get and store new token after prompting for user authorization, and then
-   * execute the given callback with the authorized OAuth2 client.
-   * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
-   * @param {getEventsCallback} callback The callback for the authorized client.
-   */
-function getNewToken(oAuth2Client, callback) {
-	const authUrl = oAuth2Client.generateAuthUrl({
-		access_type: 'offline',
-		scope: SCOPES,
-	});
-	console.log('Authorize this app by visiting this url:', authUrl);
-	const rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout,
-	});
-	rl.question('Enter the code from that page here: ', (code) => {
-		rl.close();
-		oAuth2Client.getToken(code, (err, token) => {
-			if (err) return console.error('Error while trying to retrieve access token', err);
-			oAuth2Client.setCredentials(token);
-			// Store the token to disk for later program executions
-			fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-				if (err) return console.error(err);
-				console.log('Token stored to', TOKEN_PATH);
-			});
-			callback(oAuth2Client);
-		});
-	});
-}
-
-/**
-   * Prints the dragons for each winglet in the spreadsheet:
-   * @see https://docs.google.com/spreadsheets/d/1ml5rjBRytr8ZoTvXPFO0j8819p6KEVxHYTb8rIvrG44/edit
-   * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
-   */
-function readSheet(auth) {
-	const sheets = google.sheets({ version: 'v4', auth });
-	sheets.spreadsheets.values.get({
-		spreadsheetId: '1ml5rjBRytr8ZoTvXPFO0j8819p6KEVxHYTb8rIvrG44',
-		range: 'Dorms!A2:K13',
-	}, (err, res) => {
-		if (err) return console.log('The API returned an error: ' + err);
-		const rows = res.data.values;
-		if (rows.length) {
-			console.log('Winglet: Mudwing, Seawing, Rainwing, Nightwing, Sandwing, Skywing, Icewing, Silkwing, Hivewing and Leafwing');
-			rows.map((row) => {
-				console.log(`${row[0]}: ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]} and ${row[10]}`);
-			});
-		} else {
-			console.log('No data found.');
-		}
-	});
-}
-
-
-var approved = new Map();
-
-class oc {
-	/**
-	 * an object that is an oc sheet
-	 * @param {String[]} nicknames the nicknames of the oc
-	 * @param {'Skywings' | 'Nightwings' | 'Sandwings' | 'Icewings' | 'Mudwings' | 'Seawings' | 'Rainwings' | 'Silkwings' | 'Hivewings' | 'Leafwings'[]} tribes the tribes of the oc
-	 * @param {String} dorm the winglet of the oc
-	 * @param {Discord.Message} message the message to the submission sheet of the oc
-	 * @param {String} occupation Student, teacher or healer
-	 */
-	constructor(nicknames, tribes, dorm, message, occupation) {
-		this._nicknames = nicknames;
-		this._tribes = tribes;
-		this._dorm = dorm;
-		this._message = message;
-		this._occupation = occupation;
-	}
-
-	get nicknames() {
-		return this._nicknames;
-	}
-	get tribes() {
-		return this._tribes;
-	}
-	get dorm() {
-		return this._dorm;
-	}
-	get winglet() {
-		return this._dorm;
-	}
-	get url() {
-		return this._message.url;
-	}
-	get message() {
-		return this._message;
-	}
-	get occupation() {
-		return this._occupation;
-	}
-	set nicknames(value) {
-		this._nicknames = value;
-	}
-	set tribes(value) {
-		this._tribes = value;
-	}
-	set dorm(value) {
-		this._dorm = value;
-	}
-	set winglet(value) {
-		this._dorm = value;
-	}
-	set url(value) {
-		this._message.url = value;
-	}
-	set message(value) {
-		this._message = value;
-	}
-	set occupation(value) {
-		this._occupation = value;
-	}
-}
-
-/**
- * @param {Discord.Message} mess
- */
-function addSheet(mess) {
-	if(!approved.has(mess.content.slice(mess.content.toLowerCase().search('name:') + 5, mess.content.slice(mess.content.toLowerCase().search('name:') + 5).search('\n') + mess.content.slice(0, mess.content.toLowerCase().search('name:') + 5).length).split(' ').join(' ').toLowerCase())) {
-		var nicks = [];
-		var name = '';
-		var tribes = [];
-		mess.content.toLowerCase().split('\n').forEach((line) => {
-			if(line.includes('name:')) {
-				name = line.split('name: ').join('').split('name:').join('');
-				if (name.includes('(') && name.includes(')') && !name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1).includes(' ')) {
-					nicks.push(name.slice(name.search(/\(/) + 1, name.search(/\)/) - 1));
-					name = name.slice(0, name.search(/\(/) - 1);
-				}
-				if(name.includes(' or ')) {
-					nicks.push(name.slice(name.search(/or/) + 1, name.search(/or/) - 1));
-					name = name.slice(0, name.search(/or/) - 1);
-				}
-			} else if(line.includes('tribe:') || line.includes('tribes:') || line.includes('tribe(s):')) {
-				if(line.includes('night')) tribes.push('Nightwings');
-				if(line.includes('sand')) tribes.push('Sandwings');
-				if(line.includes('mud')) tribes.push('Mudwings');
-				if(line.includes('sky')) tribes.push('Skywings');
-				if(line.includes('rain')) tribes.push('Rainwings');
-				if(line.includes('sea')) tribes.push('Seawings');
-				if(line.includes('ice')) tribes.push('Icewings');
-				if(line.includes('silk')) tribes.push('Silkwings');
-				if(line.includes('hive')) tribes.push('Hivewings');
-				if(line.includes('leaf')) tribes.push('Leafwings');
-			} else if(line.includes('common nickname/s (used in activity checks):')) {
-				line.split('common nickname/s (used in activity checks): ').join('').split('common nickname/s (used in activity checks):').join('').split('/').join(',').split(',').forEach(nick => {
-					nicks.push(nick);
-				});
-			}
-		});
-		var winglet = '';
-		client.guilds.resolve('716601325269549127').channels.resolve('754476064746504272').children.each(channel => {
-			mess.content.toLowerCase().split('\n').forEach(line => {
-				if(!(line.includes('preferred dorm')) && (line.includes('dorm:') || line.includes('winglet:'))) {
-					if(line.includes(channel.name.split('-winglet').join(''))) {
-						winglet = channel.name.split('-winglet').join('');
-					}
-				}
-			});
-		});
-		var occupation = '';
-		mess.content.toLowerCase().split('\n').forEach(line => {
-			if(line.includes('occupation:')) {
-				occupation = line.split('occupation: ').join('').split('occupation:').join('');
-			}
-		});
-		approved.set(
-			name,
-			new oc(
-				nicks,
-				tribes,
-				winglet,
-				mess,
-				occupation
-			)
-		);
-	}
-}
-
-function mapSubmissions() {
-	const server = client.guilds.resolve('716601325269549127');
-	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
-		.then(oldMsg => {
-			oldMsg.each(mess => {
-				mess.content = mess.content.split('*').join('');
-				addSheet(mess);
-			});
-			server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
-				.then(oldMsg2 => {
-					oldMsg2.each(mess => {
-						mess.content = mess.content.split('*').join('');
-						addSheet(mess);
-					});
-					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-						.then(oldMsg3 => {
-							oldMsg3.each(mess => {
-								mess.content = mess.content.split('*').join('');
-								addSheet(mess);
-							});
-							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
-								.then(oldMsg4 => {
-									oldMsg4.each(mess => {
-										mess.content = mess.content.split('*').join('');
-										addSheet(mess);
-									});
-									server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-										.then(oldMsg5 => {
-											oldMsg5.each(mess => {
-												mess.content = mess.content.split('*').join('');
-												addSheet(mess);
-											});
-											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-												.then(oldMsg6 => {
-													oldMsg6.each(mess => {
-														mess.content = mess.content.split('*').join('');
-														addSheet(mess);
-													});
-													server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-														.then(oldMsg7 => {
-															oldMsg7.each(mess => {
-																mess.content = mess.content.split('*').join('');
-																addSheet(mess);
-															});
-															server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																.then(oldMsg8 => {
-																	oldMsg8.each(mess => {
-																		mess.content = mess.content.split('*').join('');
-																		addSheet(mess);
-																	});
-																});
-														});
-												});
-										});
-								});
-						});
-				});
-		});
-}
-
 
 const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
@@ -382,7 +103,7 @@ const processSelfText = function(obj) {
 		obj.data.children.forEach(function(item) {
 			if (item.data) {
 				console.log('we got a post');
-				/* if (item.data.post_hint == 'image') {
+				if (item.data.post_hint == 'image') {
 					if (item.data.spoiler) {
 						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
 							.setURL('https://www.reddit.com' + item.data.permalink)
@@ -466,7 +187,6 @@ const processSelfText = function(obj) {
 						.setDescription(item.data.selftext)
 						.setTitle(item.data.title));
 				}
-				*/
 			}
 		});
 	}
@@ -552,7 +272,6 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	// setInterval(checkDragonetBigwings, 60000);
 	// checkDragonetBigwings(false);
-	mapSubmissions();
 	searchReddit();
 	setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
@@ -663,7 +382,7 @@ client.on('message', (message) => {
 					});
 				}
 				break;
-			case prefix + 'fuck':
+			case prefix + 'fuck' && (server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593')) :
 				channel.send('fuck');
 				break;
 
@@ -987,91 +706,86 @@ client.on('message', (message) => {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_GREEN')
 							.setTitle('forbiddenwords command help')
-							.setDescription('+forbiddenwords = sends a list of forbiddenwords to your dms. ')
+							.setDescription('+forbiddenwords = sends a list of forbidden words to your dms. ')
 							.setFooter('Contact Snek or Baguette Speaker if you have any questions.'));
 					}
-					if (helpmsg == '') {
+					else if (helpmsg == 'quote') {
 						channel.send(new Discord.MessageEmbed()
 							.setColor('DARK_GREEN')
-							.setTitle(' command help')
+							.setTitle('quote command help')
+							.setDescription('+quote will give you a random quote from a character out of the books. Your goal is to guess which character said it before the time expires. Simply type the character\'s name in the chat when you think you know who it is.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if ((helpmsg == 'fac') || (helpmsg == 'flipacoin')) {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('flipacoin command help')
+							.setDescription('+flipacoin (or +fac) will do a coinflip, giving you either heads or tails as a result.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'ping') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('ping command help')
+							.setDescription('+ping checks the responsiveness of the bot and your internet. If the bot seems to be malfunctioning or not working at all, you can do +ping to see if it is working. If the bot does not respond, there may be a problem.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'sunny') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('sunny command help')
+							.setDescription('+sunny gives you a random, upbeat quote from sunny')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'hybridgen') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('hybridgen command help')
+							.setDescription('+hybirdgen <pyrrhia/pantala/any> <py/pa/any> will give you a random hybrid combination within the peramaters that you chose. You may choose to specify "pyrrhia", "pantala", or "any" within the command. You can also leave it blank, and it will revert to <any> <any>. You may also only use one peramater, and leave the other blank. Any spot that is left blank will automatically use the "any" list.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'poll') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('poll command help')
+							.setDescription('+poll <thumbs/numbers> <question or proposal> will create a poll from the question or proposal you put in there. If you specifed thumbs, you would get reactions of thumbsup and thumbsdown. If you specified numbers, you will get reactions of numbers from 1-10. You can then react to vote on it.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if ((helpmsg == 'whois') || (helpmsg == 'whatis')) {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('whatis/whois command help')
+							.setDescription('+whatis (or +whois) Will search the wings of fire wiki for the thing or character you specified. If it does not match exactly, it may not work. This one is a bit touchy.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'sumthemup') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('sumthemup command help')
+							.setDescription('+sumthemup <user> will check out all the stats of the user specified.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'oc') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('oc command help')
+							.setDescription('+oc <oc name> will search the approved channel for a character by that name, and give you the bio, if it can be found.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == 'messagemods') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor('DARK_GREEN')
+							.setTitle('messagemods command help')
+							.setDescription('+messagemods <message> is a command that is only to be used in the bot\'s dms. It will give your message directly to us, in a mod chat, and we can then respond through the bot. If you\'re familiar with it, it\'s basically reddit modmail on discord.')
+							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+					}
+					else if (helpmsg == '') {
+						channel.send(new Discord.MessageEmbed()
+							.setColor([0, 255, 0])
+							.setTitle('Commands list')
+							.addField('Specific Commands', 'You can do +help <command> for specifics on the command you select.\n ex: +help poll will tell you all about the poll command.')
 							.setDescription(helpstr)
 							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					if (helpmsg == '') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_GREEN')
-							.setTitle(' command help')
-							.setDescription('')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-				}
-				if (message.channel.id == '754470277634719845') {
-					addSheet(message);
-				}
-				if ((message.content.toLowerCase().startsWith(prefix + 'modhelp')) && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
-					var modhelpmsg = message.content.slice(9);
-					if (modhelpmsg == 'verbalwarn') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('verbalwarn command help')
-							.setDescription('+verbalwarn <reason/message> = obviously, warns the person, and sends that message in their dms. Bot will then send a message to <#718192469560262656>')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'log') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('bot log command help')
-							.setDescription('+log <message> = will simply log any message you want to log to the bot\'s output console.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'clearword') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('clwarword command help')
-							.setDescription('+clearword <word> = adds the selected word to the forbiddenwords list, where it will delete any message containing that word.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'reply') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('reply command help')
-							.setDescription('+reply <modmail ID> <message> = Will send a message back to the person who sent the modmail message selected. It will send the message from <message>.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'getwarns') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('getwarns command help')
-							.setDescription('+getwarns <user> = will list out each of the verbalwarns that the user in question has recieved. (ping the user by doing "<@[id]>" and replacing the [id] with the user\'s ID.)')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'allowword') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('allowword command help')
-							.setDescription('+allowword <worrd ID> = Removes the selected word from the forbiddenwords list, if it exists.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == 'clearwarn') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('clearwarn command help')
-							.setDescription('+clearwarn <user> = will get rid of all the verbalwarns that the user has accumlated.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if ((modhelpmsg == 'reactionrole') || (helpmsg == 'rr')) {
-						channel.send(new Discord.MessageEmbed()
-							.setColor('DARK_BLUE')
-							.setTitle('reactionrole (rr) command help')
-							.setDescription('+reactionrole (or +rr) <channel mention> = Select a channel by mentioning it, then follow the prompts to create a reactionrole message. Then the reactionrole message will appear in the channel you selected.')
-							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
-					}
-					else if (modhelpmsg == '') {
-						channel.send(new Discord.MessageEmbed()
-							.setColor([0, 0, 255])
-							.setTitle('r/Wingsoffire Bot Mod Help')
-							.setDescription(modhelpstr)
-							.setFooter('Contact Snek or Baguette speaker if you have any questions. You can do +modhelp <command> for specifics on one command.'));
 					}
 					else {
 						channel.send(new Discord.MessageEmbed()
@@ -1080,7 +794,90 @@ client.on('message', (message) => {
 							.setDescription('Did you type in the wrong command name? Check it again.')
 							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
-				}
+				};
+				if (message.content.toLowerCase().startsWith(prefix + 'modhelp')) {
+					if ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593'))) {
+						var modhelpmsg = message.content.slice(9);
+						if (modhelpmsg == 'verbalwarn') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('verbalwarn command help')
+								.setDescription('+verbalwarn <reason/message> = obviously, warns the person, and sends that message in their dms. Bot will then send a message to <#718192469560262656>')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'log') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('bot log command help')
+								.setDescription('+log <message> = will simply log any message you want to log to the bot\'s output console.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'clearword') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('clwarword command help')
+								.setDescription('+clearword <word> = adds the selected word to the forbiddenwords list, where it will delete any message containing that word.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'reply') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('reply command help')
+								.setDescription('+reply <modmail ID> <message> = Will send a message back to the person who sent the modmail message selected. It will send the message from <message>.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'getwarns') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('getwarns command help')
+								.setDescription('+getwarns <user> = will list out each of the verbalwarns that the user in question has recieved. (ping the user by doing "<@[id]>" and replacing the [id] with the user\'s ID.)')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'allowword') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('allowword command help')
+								.setDescription('+allowword <worrd ID> = Removes the selected word from the forbiddenwords list, if it exists.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == 'clearwarn') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('clearwarn command help')
+								.setDescription('+clearwarn <user> = will get rid of all the verbalwarns that the user has accumlated.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if ((modhelpmsg == 'reactionrole') || (helpmsg == 'rr')) {
+							channel.send(new Discord.MessageEmbed()
+								.setColor('DARK_BLUE')
+								.setTitle('reactionrole (rr) command help')
+								.setDescription('+reactionrole (or +rr) <channel mention> = Select a channel by mentioning it, then follow the prompts to create a reactionrole message. Then the reactionrole message will appear in the channel you selected.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else if (modhelpmsg == '') {
+							channel.send(new Discord.MessageEmbed()
+								.setColor([0, 0, 255])
+								.setTitle('r/Wingsoffire Bot Mod Help')
+								.addField('Specific Mod Commands', 'You can do +modhelp <command> for specifics on the command you select. ex: +clearwarn poll will tell you all about the clearwarn command.')
+								.setDescription(modhelpstr)
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+						else {
+							channel.send(new Discord.MessageEmbed()
+								.setColor([255, 0, 0])
+								.setTitle('Error')
+								.setDescription('Did you type in the wrong command name? Check it again.')
+								.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
+						}
+					}
+					else {
+						channel.send(new Discord.MessageEmbed()
+							.setColor([255, 0, 0])
+							.setTitle('Permissions Issue')
+							.setDescription('You don\t have permission to do that.')
+							.setFooter('Contact Snek if this is an issue.'));
+					}
+				};
 				if (message.content.toLowerCase().startsWith(prefix + 'hybridgen')) {
 					if (message.content.slice(10 + prefix.length).toLowerCase().startsWith('pyrrhia')) {
 						console.log(pytribes);
@@ -1369,7 +1166,7 @@ client.on('message', (message) => {
 						channel.send('Please mention a channel');
 					}
 				} else if(message.content.toLowerCase().startsWith(prefix + 'log')) {
-					console.log(user.username + ' wanted to log the message: ' + message.content.slice(5));
+					console.log(user.username + ' wanted to log the message: ' + message.content.slice(6));
 				} else if (message.content.toLowerCase().startsWith(prefix + 'enlarge ')) {
 					var msgArray = message.content.toLowerCase().split(' ');
 					channel.send(new Discord.MessageEmbed().setImage(server.emojis.resolve(msgArray[1].slice(-19, -1)).url).setColor('RANDOM'));
@@ -1460,16 +1257,16 @@ client.on('message', (message) => {
 							});
 						}
 					}
-				/* } else if (message.content.toLowerCase().startsWith(prefix + 'clearword ') && server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES')) {
+				} else if (message.content.toLowerCase().startsWith(prefix + 'clearword ') && server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES')) {
 					if(server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
-						forbiddenWords.push(message.content.toLowerCase().slice(12));
+						forbiddenWords.push(message.content.toLowerCase().slice(11));
 						channel.send('That word has been generally set as forbidden.');
 					}
 					else {
 						channel.send('You don\'t have permissions to do that! Requires manage messages permission.');
 					}
 					console.log(user.username + ' forbid a new word: ' + message.content.toLowerCase().slice(12));
-				*/ } else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
+				} else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
 					var messagesSent;
 					if (message.mentions.users.size == 0) {
 						if (!totalMessages.get(user.id)) totalMessages.set(user.id, 0);
@@ -1496,24 +1293,104 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested the number of messages ' + message.mentions.users.first().username + ' sent');
 					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'oc ')) {
-					if(approved.has(message.content.toLowerCase().split('+oc ').join(''))) {
-						message.reply('Oc found!');
-						message.channel.send(approved.get(message.content.toLowerCase().split('+oc ').join('')).url);
-					} else {
-						var found = false;
-						approved.forEach(value => {
-							value.nicknames.forEach(nick => {
-								if(nick.toLowerCase() == message.content.toLowerCase().split('+oc ').join('')) {
+					var found = false;
+					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
+						.then(oldMsg => {
+							oldMsg.each(mess => {
+								if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
 									message.reply('Oc found!');
-									message.channel.send(value.url);
+									channel.send(mess.url);
 									found = true;
 								}
 							});
+							if (!found) {
+								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
+									.then(oldMsg2 => {
+										oldMsg2.each(mess => {
+											if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+												message.reply('Oc found!');
+												channel.send(mess.url);
+												found = true;
+											}
+										});
+										if (!found) {
+											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+												.then(oldMsg3 => {
+													oldMsg3.each(mess => {
+														if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+															message.reply('Oc found!');
+															channel.send(mess.url);
+															found = true;
+														}
+													});
+													if (!found) {
+														server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
+															.then(oldMsg4 => {
+																oldMsg4.each(mess => {
+																	if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+																		message.reply('Oc found!');
+																		channel.send(mess.url);
+																		found = true;
+																	}
+																});
+																if (!found) {
+																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																		.then(oldMsg5 => {
+																			oldMsg5.each(mess => {
+																				if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+																					message.reply('Oc found!');
+																					channel.send(mess.url);
+																					found = true;
+																				}
+																			});
+																			if (!found) {
+																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																					.then(oldMsg6 => {
+																						oldMsg6.each(mess => {
+																							if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+																								message.reply('Oc found!');
+																								channel.send(mess.url);
+																								found = true;
+																							}
+																						});
+																						if (!found) {
+																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																								.then(oldMsg7 => {
+																									oldMsg7.each(mess => {
+																										if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+																											message.reply('Oc found!');
+																											channel.send(mess.url);
+																											found = true;
+																										}
+																									});
+																									if (!found) {
+																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
+																											.then(oldMsg8 => {
+																												oldMsg8.each(mess => {
+																													if (mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + '\n') || mess.content.toLowerCase().includes('name: ' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ') || (mess.content.toLowerCase().includes('name:' + message.content.toLowerCase().split(' ').slice(1).join(' ') + ' ')))) {
+																														message.reply('Oc found!');
+																														channel.send(mess.url);
+																														found = true;
+																													}
+																												});
+																												if (!found) {
+																													message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
+																												}
+																											});
+																									}
+																								});
+																						}
+																					});
+																			}
+																		});
+																}
+															});
+													}
+												});
+										}
+									});
+							}
 						});
-						if(!found) {
-							message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
-						}
-					}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setmessagecount ') && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
 					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2])) {
 						fs.readFile('./messagecount.json', (err, res) => {
@@ -1746,4 +1623,4 @@ client.on('message', (message) => {
 	}
 });
 
-client.login(pwd);
+client.login(token);
