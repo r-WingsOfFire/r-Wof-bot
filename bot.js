@@ -1477,17 +1477,20 @@ client.on('message', (message) => {
 						channel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
 					});
 				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					// eslint-disable-next-line no-lonely-if
-					if (db.get(`totalMessages${user.id}`)) {
+					if (db.has(`totalMessages.${user.id}`)) {
 						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 1);
+						console.log("Is in the db");
 					} else {
+						console.log("isnt in the db");
 						db.set(`totalMessages.${user.id}`, 1);
 					}
 				} else if (message.guild.channels.resolve('752320436699922462').children.has(message.id) || message.guild.channels.resolve('754482269166633000').children.has(message.id) || message.guild.channels.resolve('754476064746504272').children.has(message.id) || message.guild.channels.resolve('757031225893322892').children.has(message.id) || message.guild.channels.resolve('754491019768365157').children.has(message.id) || message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					if (db.get(`totalMessages.${user.id}`)) {
+					if (db.has(`totalMessages.${user.id}`)) {
 						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 0.5);
+						console.log("is in the db");
 					} else {
 						db.set(`totalMessages.${user.id}`, 0.5);
+						console.log("Isnt in the db");
 					}
 				}
 				break;
