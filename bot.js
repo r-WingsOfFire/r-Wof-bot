@@ -794,7 +794,7 @@ client.on('message', (message) => {
 							.setDescription('Did you type in the wrong command name? Check it again.')
 							.setFooter('Contact Snek or Baguette speaker if you have any questions.'));
 					}
-				};
+				}
 				if (message.content.toLowerCase().startsWith(prefix + 'modhelp')) {
 					if ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593'))) {
 						var modhelpmsg = message.content.slice(9);
@@ -877,7 +877,7 @@ client.on('message', (message) => {
 							.setDescription('You don\t have permission to do that.')
 							.setFooter('Contact Snek if this is an issue.'));
 					}
-				};
+				}
 				if (message.content.toLowerCase().startsWith(prefix + 'hybridgen')) {
 					if (message.content.slice(10 + prefix.length).toLowerCase().startsWith('pyrrhia')) {
 						console.log(pytribes);
