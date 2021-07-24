@@ -5,9 +5,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
+const db = require('quick.db');
 
-
-var totalMessages = new Map();
 const https = require('https');
 const { exit } = require('process');
 var { /* upDootLimit, */ prefix, token } = require('./config.json');
@@ -1269,9 +1268,9 @@ client.on('message', (message) => {
 				} else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
 					var messagesSent;
 					if (message.mentions.users.size == 0) {
-						if (!totalMessages.get(user.id)) totalMessages.set(user.id, 0);
+						if (!db.has(`totalMessages.${user.id}`)) db.set(`totalMessages.${user.id}`, 0);
 						if (!warns.get(user.id)) warns.set(user.id, []);
-						messagesSent = Math.floor(totalMessages.get(user.id));
+						messagesSent = Math.floor(db.get(`totalMessages.${user.id}`));
 						const sumEmbed = new Discord.MessageEmbed()
 							.setColor('BLUE')
 							.setTitle('Total messages sent from ' + user.username + ':')
@@ -1281,9 +1280,9 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested their number of messages sent');
 
 					} else {
-						if (!totalMessages.get(message.mentions.users.last().id)) totalMessages.set(message.mentions.users.last().id, 0);
+						if (!db.has(`totalMessages.${message.mentions.users.last().id}`)) db.set(`totalMessages${message.mentions.users.last().id}`, 0);
 						if (!warns.get(message.mentions.users.last().id)) warns.set(message.mentions.users.last().id, []);
-						messagesSent = Math.floor(totalMessages.get(message.mentions.users.last().id));
+						messagesSent = Math.floor(db.get(`totalMessages.${message.mentions.users.last().id}`));
 						const sumEmbed = new Discord.MessageEmbed()
 							.setColor('BLUE')
 							.setTitle('Total messages sent from ' + message.mentions.users.first().username + ':')
@@ -1393,45 +1392,7 @@ client.on('message', (message) => {
 						});
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setmessagecount ') && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
 					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2])) {
-						fs.readFile('./messagecount.json', (err, res) => {
-							var toWrite = res.toString().split('\n');
-							if (err) process.stderr.write(err);
-							if (!res.toString().includes(message.mentions.members.first().id)) {
-								toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-								toWrite[toWrite.length - 1] = `\t"${message.mentions.members.first().id}": ${message.content.split(' ')[2]}`;
-								toWrite[toWrite.length] = '}';
-							} else {
-								toWrite.forEach(entry => {
-									if (entry.includes(`"${message.mentions.members.first().id}": `)) {
-										if (toWrite.indexOf(entry) == toWrite.length - 2) {
-											toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]);
-										} else {
-											toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (message.content.split(' ')[2]) + ',';
-										}
-									}
-								});
-							}
-							fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
-								if (err) process.stderr.write(err);
-							});
-							channel.send('The number of messages for this person has been sucessfully updated.');
-						});
-						fs.readFile('./messagecount.json', (err, res) => {
-							if (err) process.stderr.write(err);
-							if (res.toString().includes(`"${message.mentions.members.first().id}": `)) {
-								res.toString().split('\n').slice(1, -1).forEach((element, index) => {
-									if (element.includes(`"${message.mentions.members.first().id}": `)) {
-										if (index == res.toString().split('\n').slice(1, -1).length - 1) {
-											totalMessages.set(element.split(':')[0].slice(2, -1), new Number(element.split(':')[1].slice(1)));
-										} else {
-											totalMessages.set(element.split(':')[0].slice(2, -1), new Number(element.split(':')[1].slice(1, -1)));
-										}
-									}
-								});
-							} else {
-								totalMessages.set(message.mentions.members.first().id, 0);
-							}
-						});
+						db.set(`totalMessages.${message.mentions.members.first().id}`, message.content.split(' ')[2]);
 					} else {
 						message.reply('Syntax incorrect. Please try again.');
 					}
@@ -1516,63 +1477,21 @@ client.on('message', (message) => {
 						channel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
 					});
 				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					// eslint-disable-next-line no-lonely-if
-					if (totalMessages.get(user.id)) {
-						totalMessages.set(user.id, totalMessages.get(user.id) + 1);
+					if (db.has(`totalMessages.${user.id}`)) {
+						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 1);
+						console.log("Is in the db");
 					} else {
-						totalMessages.set(user.id, 1);
+						console.log("isnt in the db");
+						db.set(`totalMessages.${user.id}`, 1);
 					}
-					fs.readFile('./messagecount.json', (err, res) => {
-						var toWrite = res.toString().split('\n');
-						if (err) process.stderr.write(err);
-						if (!res.toString().includes(user.id)) {
-							toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-							toWrite[toWrite.length - 1] = `\t"${user.id}": 1`;
-							toWrite[toWrite.length] = '}';
-						} else {
-							toWrite.forEach(entry => {
-								if (entry.includes(`"${user.id}": `)) {
-									if (toWrite.indexOf(entry) == toWrite.length - 2) {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1);
-									} else {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 1) + ',';
-									}
-								}
-							});
-						}
-						fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
-							if (err) process.stderr.write(err);
-						});
-					});
 				} else if (message.guild.channels.resolve('752320436699922462').children.has(message.id) || message.guild.channels.resolve('754482269166633000').children.has(message.id) || message.guild.channels.resolve('754476064746504272').children.has(message.id) || message.guild.channels.resolve('757031225893322892').children.has(message.id) || message.guild.channels.resolve('754491019768365157').children.has(message.id) || message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					if (totalMessages.get(user.id)) {
-						totalMessages.set(user.id, totalMessages.get(user.id) + 0.5);
+					if (db.has(`totalMessages.${user.id}`)) {
+						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 0.5);
+						console.log("is in the db");
 					} else {
-						totalMessages.set(user.id, 0.5);
+						db.set(`totalMessages.${user.id}`, 0.5);
+						console.log("Isnt in the db");
 					}
-					fs.readFile('./messagecount.json', (err, res) => {
-						var toWrite = res.toString().split('\n');
-						if (err) process.stderr.write(err);
-						if (!res.toString().includes(user.id)) {
-							toWrite[toWrite.length - 2] = toWrite[toWrite.length - 2] + ',';
-							toWrite[toWrite.length - 1] = `\t"${user.id}": 0.5`;
-							toWrite[toWrite.length] = '}';
-						} else {
-							toWrite.forEach(entry => {
-								if (entry.includes(`"${user.id}": `)) {
-									if (toWrite.indexOf(entry) == toWrite.length - 2) {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5);
-									} else {
-										toWrite[toWrite.indexOf(entry)] = entry.split(':')[0] + ': ' + (new Number(entry.split(':')[1].slice(1, -1)) + 0.5) + ',';
-									}
-								}
-							});
-						}
-						fs.writeFile('./messagecount.json', toWrite.join('\n'), err => {
-							if (err) process.stderr.write(err);
-						});
-					});
-
 				}
 				break;
 			}
