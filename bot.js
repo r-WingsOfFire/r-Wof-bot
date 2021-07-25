@@ -16,7 +16,7 @@ var { /* upDootLimit, */ prefix, token } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
-var lastRedditPost = 't3_mepu4n';
+/* var lastRedditPost = 't3_mepu4n';
 // eslint-disable-next-line no-constant-condition
 if (true) { // Yup, this is sometimes useful (hierarchy problems)
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?limit=1`, (res) => {
@@ -50,7 +50,7 @@ if (true) { // Yup, this is sometimes useful (hierarchy problems)
 	});
 
 	req.end();
-}
+} */
 
 
 var forbiddenWords = ['placeholder1', 'placeholder2'];
@@ -66,7 +66,7 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
-const searchReddit = function() {
+/* const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
 		res.on('data', (d) => {
@@ -191,7 +191,7 @@ const processSelfText = function(obj) {
 			}
 		});
 	}
-};
+}; */
 
 
 class Warn {
@@ -300,8 +300,8 @@ client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	setInterval(checkDragonetBigwings, 60000);
 	checkDragonetBigwings();
-	searchReddit();
-	setInterval(searchReddit, 20000);
+	// searchReddit();
+	// setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
@@ -1505,7 +1505,7 @@ client.on('message', (message) => {
 					forbiddenWords.forEach((word) => {
 						channel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
 					});
-				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
+				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id) && message.channel.id != '724790540721455144' && message.channel.id != '724792148368556383' && message.channel.id != '803093472043204638') {
 					if (totalMessages.has(user.id)) {
 						totalMessages.set(user.id, totalMessages.get(user.id) + 1);
 						console.log("Is in the db");
