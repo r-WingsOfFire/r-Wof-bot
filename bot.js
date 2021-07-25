@@ -6,6 +6,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
 const db = require('quick.db');
+var totalMessages = new db.table('totalMessage');
+var roleAsked = new db.table('roleAsked');
 
 const https = require('https');
 const { exit } = require('process');
@@ -14,7 +16,7 @@ var { /* upDootLimit, */ prefix, token } = require('./config.json');
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
 
-var lastRedditPost = 't3_mepu4n';
+/* var lastRedditPost = 't3_mepu4n';
 // eslint-disable-next-line no-constant-condition
 if (true) { // Yup, this is sometimes useful (hierarchy problems)
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?limit=1`, (res) => {
@@ -48,7 +50,7 @@ if (true) { // Yup, this is sometimes useful (hierarchy problems)
 	});
 
 	req.end();
-}
+} */
 
 
 var forbiddenWords = ['placeholder1', 'placeholder2'];
@@ -64,7 +66,7 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
-const searchReddit = function() {
+/* const searchReddit = function() {
 	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
 		let chunks = [];
 		res.on('data', (d) => {
@@ -189,7 +191,7 @@ const processSelfText = function(obj) {
 			}
 		});
 	}
-};
+}; */
 
 
 class Warn {
@@ -267,12 +269,39 @@ class Warn {
 
 }
 
+function checkDragonetBigwings() {
+	totalMessages.all().forEach(value => {
+		if(value.data >= 1500 && value.data < 7500 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('754760045602013255') && !roleAsked.get('dragonet').has(value.ID)) {
+			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
+				.setTitle('Role request: Dragonet')
+				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the dragonet role. Please give them the role or simply ignore this message if the action isn't needed.`)
+				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
+				.setColor('ORANGE'));
+			roleAsked.push('dragonet', value.ID);
+		} else if(value.data >= 7500 && value.data < 30000 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('754760458896146554') && !roleAsked.get('bigwings').has(value.ID)) {
+			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
+				.setTitle('Role request: Big Wings')
+				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the big wings role. Please give them the role or simply ignore this message if the action isn't needed.`)
+				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
+				.setColor('ORANGE'));
+			roleAsked.push('bigwings', value.ID);
+		} else if(value.data >= 30000 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('803107826313854976') && !roleAsked.get('noble').has(value.ID)) {
+			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
+				.setTitle('Role request: Noble')
+				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the noble role. Please give them the role or simply ignore this message if the action isn't needed.`)
+				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
+				.setColor('ORANGE'));
+			roleAsked.push('noble', value.ID);
+		}
+	});
+}
+
 client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
-	// setInterval(checkDragonetBigwings, 60000);
-	// checkDragonetBigwings(false);
-	searchReddit();
-	setInterval(searchReddit, 20000);
+	setInterval(checkDragonetBigwings, 60000);
+	checkDragonetBigwings();
+	// searchReddit();
+	// setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
@@ -1268,9 +1297,9 @@ client.on('message', (message) => {
 				} else if (message.content.toLowerCase().startsWith(prefix + 'sumthemup')) {
 					var messagesSent;
 					if (message.mentions.users.size == 0) {
-						if (!db.has(`totalMessages.${user.id}`)) db.set(`totalMessages.${user.id}`, 0);
+						if (!totalMessages.has(user.id)) totalMessages.set(user.id, 0);
 						if (!warns.get(user.id)) warns.set(user.id, []);
-						messagesSent = Math.floor(db.get(`totalMessages.${user.id}`));
+						messagesSent = Math.floor(totalMessages.get(user.id));
 						const sumEmbed = new Discord.MessageEmbed()
 							.setColor('BLUE')
 							.setTitle('Total messages sent from ' + user.username + ':')
@@ -1280,9 +1309,9 @@ client.on('message', (message) => {
 						console.log(user.username + ' requested their number of messages sent');
 
 					} else {
-						if (!db.has(`totalMessages.${message.mentions.users.last().id}`)) db.set(`totalMessages${message.mentions.users.last().id}`, 0);
+						if (!totalMessages.has(message.mentions.users.last().id)) totalMessages.set(message.mentions.users.last().id, 0);
 						if (!warns.get(message.mentions.users.last().id)) warns.set(message.mentions.users.last().id, []);
-						messagesSent = Math.floor(db.get(`totalMessages.${message.mentions.users.last().id}`));
+						messagesSent = Math.floor(totalMessages.get(message.mentions.users.last().id));
 						const sumEmbed = new Discord.MessageEmbed()
 							.setColor('BLUE')
 							.setTitle('Total messages sent from ' + message.mentions.users.first().username + ':')
@@ -1392,7 +1421,7 @@ client.on('message', (message) => {
 						});
 				} else if (message.content.toLowerCase().startsWith(prefix + 'setmessagecount ') && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
 					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2])) {
-						db.set(`totalMessages.${message.mentions.members.first().id}`, message.content.split(' ')[2]);
+						totalMessages.set(message.mentions.members.first().id, new Number(message.content.split(' ')[2]));
 					} else {
 						message.reply('Syntax incorrect. Please try again.');
 					}
@@ -1476,20 +1505,20 @@ client.on('message', (message) => {
 					forbiddenWords.forEach((word) => {
 						channel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
 					});
-				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					if (db.has(`totalMessages.${user.id}`)) {
-						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 1);
+				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id) && message.channel.id != '724790540721455144' && message.channel.id != '724792148368556383' && message.channel.id != '803093472043204638') {
+					if (totalMessages.has(user.id)) {
+						totalMessages.set(user.id, totalMessages.get(user.id) + 1);
 						console.log("Is in the db");
 					} else {
 						console.log("isnt in the db");
-						db.set(`totalMessages.${user.id}`, 1);
+						totalMessages.set(user.id, 1);
 					}
 				} else if (message.guild.channels.resolve('752320436699922462').children.has(message.id) || message.guild.channels.resolve('754482269166633000').children.has(message.id) || message.guild.channels.resolve('754476064746504272').children.has(message.id) || message.guild.channels.resolve('757031225893322892').children.has(message.id) || message.guild.channels.resolve('754491019768365157').children.has(message.id) || message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					if (db.has(`totalMessages.${user.id}`)) {
-						db.set(`totalMessages.${user.id}`, db.get(`totalMessages.${user.id}`) + 0.5);
+					if (totalMessages.has(user.id)) {
+						totalMessages.set(user.id, totalMessages.get(user.id) + 0.5);
 						console.log("is in the db");
 					} else {
-						db.set(`totalMessages.${user.id}`, 0.5);
+						totalMessages.set(user.id, 0.5);
 						console.log("Isnt in the db");
 					}
 				}
