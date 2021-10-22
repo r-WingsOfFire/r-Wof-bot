@@ -7,51 +7,13 @@ const client = new Discord.Client();
 const fs = require('fs');
 const db = require('quick.db');
 var totalMessages = new db.table('totalMessage');
-var roleAsked = new db.table('roleAsked');
 
 const https = require('https');
 const { exit } = require('process');
-var { /* upDootLimit, */ prefix, token } = require('./config.json');
+var { prefix, token } = require('./config.json');
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
-
-/* var lastRedditPost = 't3_mepu4n';
-// eslint-disable-next-line no-constant-condition
-if (true) { // Yup, this is sometimes useful (hierarchy problems)
-	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?limit=1`, (res) => {
-		let chunks = [];
-		res.on('data', (d) => {
-		// d is a Buffer object.
-			chunks.push(d);
-		}).on('end', () => {
-			let result = Buffer.concat(chunks);
-			let tmpResult = result.toString();
-			try {
-				let parsedObj = JSON.parse(tmpResult);
-				// Print the string if you want to debug or prettify.
-				// console.log(tmpResult);
-				if (parsedObj.data && parsedObj.data.children && parsedObj.data.children.length) {
-					lastRedditPost = parsedObj.data.children[0].data.name;
-				}
-			} catch (err) {
-				console.log('There was an error!');
-				console.log(err.stack);
-				// I got an error, TypeError: Invalid data, chunk must be a string or buffer, not object
-				// Also I got this, when I'd pushed d.toString to chunks:
-				// TypeError: "list" argument must be an Array of Buffer or Uint8Array instances
-				process.stderr.write(err);
-			}
-		});
-	});
-
-	req.on('error', (error) => {
-		process.stderr.write(error);
-	});
-
-	req.end();
-} */
-
 
 var forbiddenWords = ['placeholder1', 'placeholder2'];
 var warns = new Map();
@@ -60,248 +22,13 @@ const modhelpstr = prefix + `verbalwarn <mention user>\n ${prefix}log <message>\
 const pytribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing"];
 const patribes = ["leafwing", "hivewing", "silkwing"];
 const alltribes = ["skywing", "seawing", "icewing", "nightwing", "sandwing", "mudwing", "rainwing", "leafwing", "hivewing", "silkwing"];
-// var starBoard = new Map();
 
 var lastmessage = undefined;
 
 var quoteBusy = false;
 
-/* const searchReddit = function() {
-	const req = https.request(`https://www.reddit.com/r/WingsOfFire/new.json?before=${lastRedditPost}&limit=99`, (res) => {
-		let chunks = [];
-		res.on('data', (d) => {
-			// d is a Buffer object.
-			chunks.push(d);
-		}).on('end', () => {
-			let result = Buffer.concat(chunks);
-			let tmpResult = result.toString();
-			try {
-				let parsedObj = JSON.parse(tmpResult);
-				// Print the string if you want to debug or prettify.
-				// console.log(tmpResult);
-				processSelfText(parsedObj);
-			} catch (err) {
-				console.log('There was an error!');
-				console.log(err.stack);
-				// I got an error, TypeError: Invalid data, chunk must be a string or buffer, not object
-				// Also I got this, when I'd pushed d.toString to chunks:
-				// TypeError: "list" argument must be an Array of Buffer or Uint8Array instances
-				process.stderr.write(err);
-			}
-		});
-	});
-
-	req.on('error', (error) => {
-		process.stderr.write(error);
-	});
-
-	req.end();
-};
-
-const processSelfText = function(obj) {
-	if (obj.data && obj.data.children && obj.data.children.length) {
-		lastRedditPost = obj.data.children[obj.data.children.length - 1].data.name;
-		obj.data.children.forEach(function(item) {
-			if (item.data) {
-				console.log('we got a post');
-				if (item.data.post_hint == 'image') {
-					if (item.data.spoiler) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'Spoiler', true)
-							.setAuthor('New image post on r/WingsOfFire')
-							.setTitle(item.data.title)
-						);
-					} else if(item.data.over_18) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'NSFW', true)
-							.setAuthor('New image post on r/WingsOfFire')
-							.setTitle(item.data.title));
-					} else {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setImage(item.data.url)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.setAuthor('New image post on /r/WingsOfFire')
-							.addField('Content Warning', 'None', true)
-							.setTitle(item.data.title));
-					}
-				} else if (item.data.is_gallery == true) {
-					if (item.data.spoiler) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'Spoiler', true)
-							.setAuthor('New multi-image post on r/WingsOfFire')
-							.setTitle(item.data.title)
-						);
-					} else if(item.data.over_18) {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.addField('Content Warning', 'NSFW', true)
-							.setAuthor('New multi-image post on r/WingsOfFire')
-							.setTitle(item.data.title));
-					} else {
-						client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-							.setURL('https://www.reddit.com' + item.data.permalink)
-							.setThumbnail(item.data.thumbnail)
-							.setColor([255, 0, 0])
-							.addField('Post Author', '/u/' + item.data.author, true)
-							.setAuthor('New multi-image post on /r/WingsOfFire')
-							.addField('Content Warning', 'None', true)
-							.setTitle(item.data.title));
-					}
-				} else if (item.data.spoiler) {
-					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-						.setURL('https://www.reddit.com' + item.data.permalink)
-						.setColor([255, 0, 0])
-						.addField('Post Author', '/u/' + item.data.author, true)
-						.addField('Content Warning', 'Spoiler', true)
-						.setAuthor('New post on r/WingsOfFire')
-						.setDescription(item.data.selftext)
-						.setTitle(item.data.title));
-				} else if(item.data.over_18) {
-					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-						.setURL('https://www.reddit.com' + item.data.permalink)
-						.setColor([255, 0, 0])
-						.addField('Post Author', '/u/' + item.data.author, true)
-						.addField('Content Warning', 'NSFW', true)
-						.setAuthor('New post on r/WingsOfFire')
-						.setDescription(item.data.selftext)
-						.setTitle(item.data.title));
-				} else {
-					client.channels.resolve('716617066261643314').send(new Discord.MessageEmbed()
-						.setURL('https://www.reddit.com' + item.data.permalink)
-						.setColor([255, 0, 0])
-						.addField('Post Author ', '/u/' + item.data.author, true)
-						.setAuthor('New post on /r/WingsOfFire')
-						.addField('Content Warning', 'None', true)
-						.setDescription(item.data.selftext)
-						.setTitle(item.data.title));
-				}
-			}
-		});
-	}
-}; */
-
-
-class Warn {
-	/**
-	 * Use this object to create a warn.
-	 * @param {Discord.User} user The user to warn
-	 * @param {String} reason The reason of the warn
-	 * @param {Discord.Guild} server The server on which the warn happens
-	 */
-	constructor(user, reason, server) {
-		this.user = user;
-		this.reason = reason;
-		this.server = server;
-		const warnEmbed = new Discord.MessageEmbed()
-			.setColor('RED')
-			.setTitle('Warning from r/wingsoffire')
-			.setDescription(this.reason)
-			.setFooter('This is a message sent from the r/wingsoffire discord server mod team.');
-		this.server.members.resolve(this.user.id).createDM()
-			.then(channel => {
-				channel.send(warnEmbed);
-				console.log(this.user.username + ' was verbally warned');
-				const warnlog = new Discord.MessageEmbed()
-					.setColor('RED')
-					.setTitle(this.user.username + ' was verbally warned')
-					.setDescription(this.reason)
-					.setFooter('this is an automated log of a verbal warn given to ' + this.user.username);
-				client.channels.fetch('718192469560262656')
-					.then(logChannel => {
-						logChannel.send(warnlog);
-					});
-			});
-		this.date = new Date(Date.now());
-	}
-
-	get user() {
-		return this.user;
-	}
-
-	get reason() {
-		return this.reason;
-	}
-
-	get date() {
-		return this.date;
-	}
-
-	get server() {
-		return this.server;
-	}
-
-	set user(value) {
-		// eslint-disable-next-line no-undef
-		user = value;
-	}
-
-	set reason(value) {
-		// eslint-disable-next-line no-undef
-		reason = value;
-	}
-
-	set date(value) {
-		// eslint-disable-next-line no-undef
-		date = value;
-	}
-
-	set server(value) {
-		// eslint-disable-next-line no-undef
-		server = value;
-	}
-
-	getFullString() {
-		return this.reason + '\n Warned the ' + this.date.getMonth() + '/' + this.date.getDate() + '/' + this.date.getFullYear() + ' at ' + this.date.getHours() + ':' + this.date.getMinutes();
-	}
-
-}
-
-function checkDragonetBigwings() {
-	totalMessages.all().forEach(value => {
-		if(value.data >= 1500 && value.data < 7500 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('754760045602013255') && !roleAsked.get('dragonet').has(value.ID)) {
-			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
-				.setTitle('Role request: Dragonet')
-				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the dragonet role. Please give them the role or simply ignore this message if the action isn't needed.`)
-				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
-				.setColor('ORANGE'));
-			roleAsked.push('dragonet', value.ID);
-		} else if(value.data >= 7500 && value.data < 30000 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('754760458896146554') && !roleAsked.get('bigwings').has(value.ID)) {
-			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
-				.setTitle('Role request: Big Wings')
-				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the big wings role. Please give them the role or simply ignore this message if the action isn't needed.`)
-				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
-				.setColor('ORANGE'));
-			roleAsked.push('bigwings', value.ID);
-		} else if(value.data >= 30000 && !client.guilds.resolve('716601325269549127').members.resolve(value.ID).roles.cache.has('803107826313854976') && !roleAsked.get('noble').has(value.ID)) {
-			client.guilds.resolve('716601325269549127').channels.resolve('771833191824490526').send(new Discord.MessageEmbed()
-				.setTitle('Role request: Noble')
-				.setDescription(`<@${value.ID}> has reached the amount of messages needed for the noble role. Please give them the role or simply ignore this message if the action isn't needed.`)
-				.setFooter("This is an automated message. It is saved in a database, meaning it won't be sent another time. If it already has been sent, please ask Baguette Speaker for help.")
-				.setColor('ORANGE'));
-			roleAsked.push('noble', value.ID);
-		}
-	});
-}
-
 client.on('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
-	setInterval(checkDragonetBigwings, 60000);
-	checkDragonetBigwings();
-	// searchReddit();
-	// setInterval(searchReddit, 20000);
 	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
 		if(err) return console.error(err);
 		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
@@ -1442,63 +1169,63 @@ client.on('message', (message) => {
 					} else {
 						message.reply('Syntax error. Please use the index of the message you want to answer to.');
 					}
-				} else if (message.content.toLowerCase().startsWith(prefix + 'verbalwarn ') && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
-					if (!message.mentions.users.first()) {
-						channel.send('Please specify a user');
-					}
-					else {
-						const warnUser = message.mentions.users.first();
-						const warn = new Warn(warnUser, message.content.slice(35), server);
-						if (warns.get(warnUser.id)) {
-							warns.set(warnUser.id, warns.get(warnUser.id).push(warn));
-						} else {
-							warns.set(warnUser.id, [warn]);
-						}
-					}
-				} else if (message.content.toLowerCase().startsWith(prefix + 'purge ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
-					channel.bulkDelete(new Number(message.content.split(' ')[1]));
-				} else if (message.content.toLowerCase().startsWith(prefix + 'clearwarn ') && server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) {
-					if (!message.mentions.members.first()) {
-						message.reply('Please specify an user');
-					}
-					else {
-						warns.get(message.mentions.members.first().id).splice(message.content.slice(34) - 1);
-						channel.send('👍');
-					}
-				} else if (message.content.toLowerCase().startsWith(prefix + 'getwarns')) {
-					var warnsStr = '';
-					if (!message.mentions.members.first()) {
-						if (warns.has(user.id) && warns.get(user.id).length != 0) {
-							const mentionned = user;
-							const warnEmbed = new Discord.MessageEmbed()
-								.setColor('BLUE')
-								.setTitle('Warns of ' + mentionned.username + ':')
-								.setFooter('For a total of ' + warns.get(mentionned.id).length);
-							warns.get(mentionned.id).forEach((warn) => {
-								warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
-							});
-							warnEmbed.setDescription(warnsStr);
-							channel.send(warnEmbed);
-						}
-						else {
-							message.reply('You have no warns!');
-						}
-					}
-					else if (warns.has(message.mentions.members.first().id) && warns.get(message.mentions.members.first().id).length != 0) {
-						const mentionned = message.mentions.members.first();
-						const warnEmbed = new Discord.MessageEmbed()
-							.setColor('BLUE')
-							.setTitle('Warns of ' + mentionned.username + ':')
-							.setFooter('For a total of ' + warns.get(mentionned.id).length);
-						warns.get(mentionned.id).forEach((warn) => {
-							warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
-						});
-						warnEmbed.setDescription(warnsStr);
-						channel.send(warnEmbed);
-					}
-					else {
-						message.reply('This user has no warns!');
-					}
+					// } else if (message.content.toLowerCase().startsWith(prefix + 'verbalwarn ') && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
+					// 	if (!message.mentions.users.first()) {
+					// 		channel.send('Please specify a user');
+					// 	}
+					// 	else {
+					// 		const warnUser = message.mentions.users.first();
+					// 		const warn = new Warn(warnUser, message.content.slice(35), server);
+					// 		if (warns.get(warnUser.id)) {
+					// 			warns.set(warnUser.id, warns.get(warnUser.id).push(warn));
+					// 		} else {
+					// 			warns.set(warnUser.id, [warn]);
+					// 		}
+					// 	}
+					// } else if (message.content.toLowerCase().startsWith(prefix + 'purge ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
+					// channel.bulkDelete(new Number(message.content.split(' ')[1]));
+					// } else if (message.content.toLowerCase().startsWith(prefix + 'clearwarn ') && server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) {
+					// if (!message.mentions.members.first()) {
+					// message.reply('Please specify an user');
+					// }
+					// else {
+					// warns.get(message.mentions.members.first().id).splice(message.content.slice(34) - 1);
+					// channel.send('👍');
+					// }
+				// } else if (message.content.toLowerCase().startsWith(prefix + 'getwarns')) {
+				// 	var warnsStr = '';
+				// 	if (!message.mentions.members.first()) {
+				// 		if (warns.has(user.id) && warns.get(user.id).length != 0) {
+				// 			const mentionned = user;
+				// 			const warnEmbed = new Discord.MessageEmbed()
+				// 				.setColor('BLUE')
+				// 				.setTitle('Warns of ' + mentionned.username + ':')
+				// 				.setFooter('For a total of ' + warns.get(mentionned.id).length);
+				// 			warns.get(mentionned.id).forEach((warn) => {
+				// 				warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
+				// 			});
+				// 			warnEmbed.setDescription(warnsStr);
+				// 			channel.send(warnEmbed);
+				// 		}
+				// 		else {
+				// 			message.reply('You have no warns!');
+				// 		}
+				// 	}
+				// 	else if (warns.has(message.mentions.members.first().id) && warns.get(message.mentions.members.first().id).length != 0) {
+				// 		const mentionned = message.mentions.members.first();
+				// 		const warnEmbed = new Discord.MessageEmbed()
+				// 			.setColor('BLUE')
+				// 			.setTitle('Warns of ' + mentionned.username + ':')
+				// 			.setFooter('For a total of ' + warns.get(mentionned.id).length);
+				// 		warns.get(mentionned.id).forEach((warn) => {
+				// 			warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
+				// 		});
+				// 		warnEmbed.setDescription(warnsStr);
+				// 		channel.send(warnEmbed);
+				// 	}
+				// 	else {
+				// 		message.reply('This user has no warns!');
+				// 	}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'allowword ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
 					forbiddenWords.splice(message.content.toLowerCase().slice(12) - 1, 1);
 					channel.send('Allowed word. Current forbidden words: ');
