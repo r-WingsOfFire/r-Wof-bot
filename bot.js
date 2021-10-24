@@ -27,27 +27,11 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
-client.on('ready', () => {
+client.once('ready', () => {
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
-	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-		if(err) return console.error(err);
-		reactionRolesMessage = new Map(JSON.parse(res).reactionRoles);
-	});
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
-	fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-		if (err) process.stderr.write(err);
-		var resolved = JSON.parse(res);
-		if (resolved.rpSeekPinged) {
-			client.guilds.resolve('716601325269549127').roles.resolve('735212949639135272').setMentionable(true);
-			var toWrite = res.toString().split('\n');
-			toWrite[2] = '\t"rpSeekPinged": false';
-			toWrite[3] = '}';
-			fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-				if (err) process.stderr.write(err);
-			});
-		}
-	});
-});
+	client.guilds.resolve('716601325269549127').roles.resolve('795414220707463188').setMentionable(true);
+})
 
 /**
  * Kinda like a dice.
@@ -66,7 +50,13 @@ client.on('messageDelete', (msg) => {
 client.on('message', (message) => {
 	if (!message.author.bot) {
 		var user = message.author;
-		if (message.channel.type === 'text') {
+		if (message.content.toLowerCase().includes('quibli')) {
+			message.reply('it is spelled Qibli.');
+			console.log(user.username + ' misspelled qibli');
+		}
+		if (message.channel.type === 'text' && message.content.startsWith(prefix)) {
+			var command = message.content.toLowerCase().slice(prefix.length).split(' ')[0];
+			var args = message.content.toLowerCase().slice(prefix.length).split(' ').slice(1);
 			var channel = message.channel;
 			var server = message.guild;
 
@@ -88,8 +78,8 @@ client.on('message', (message) => {
 				}
 			});
 
-			switch (message.content.toLowerCase()) {
-			case prefix + 'quote':
+			switch (command) {
+			case 'quote':
 				if (!quoteBusy) {
 					quoteBusy = true;
 					fs.readFile('./quotes.json', (err, result) => {
@@ -137,12 +127,12 @@ client.on('message', (message) => {
 					});
 				}
 				break;
-			case prefix + 'fuck' && (server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593')) :
+			case 'fuck' && (server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593')) :
 				channel.send('fuck');
 				break;
 
-			case prefix + 'fac':
-			case prefix + 'flipacoin':
+			case 'fac':
+			case 'flipacoin':
 				var random = Math.random();
 				if(random < 0.5) {
 					message.reply(
@@ -165,11 +155,11 @@ client.on('message', (message) => {
 				}
 				break;
 
-			case prefix + 'idiot':
+			case 'idiot':
 				channel.send('Here is an idiot for you: ' + user.tag);
 				break;
 
-			case prefix + 'kill':
+			case 'kill':
 				if (user.id == '373515998000840714' || user.id == '306582338039709696') {
 					channel.send('Alright, the bot is logging out...')
 						.catch((e) => {
@@ -192,7 +182,7 @@ client.on('message', (message) => {
 				}
 				break;
 
-			case prefix + 'ping':
+			case 'ping':
 				var ping = new Date(Date.now()) - message.createdAt;
 				var color;
 				if(ping >= 0) {
@@ -216,7 +206,7 @@ client.on('message', (message) => {
 				console.log(user.username + ' used ping');
 				break;
 
-			case prefix + 'snek':
+			case 'snek':
 				channel.send({
 					files: [{
 						attachment: 'https://cdn.discordapp.com/attachments/647616102339313667/795971177754525706/snek.jpg',
@@ -226,7 +216,7 @@ client.on('message', (message) => {
 				console.log(user.username + ' used snek');
 				break;
 
-			case prefix + 'sunny':
+			case 'sunny':
 				fs.readFile('./quotes.json', (err, result) => {
 					if (err) return console.error(err);
 					const sunnyQuotes = JSON.parse(result).quotes.filter(quote => quote.character == 'Sunny');
@@ -239,7 +229,7 @@ client.on('message', (message) => {
 				});
 				break;
 
-			case prefix + 'snipe':
+			case 'snipe':
 				if (server.members.resolve(user.id).roles.cache.has('751577896132280330') || server.members.resolve(user.id).roles.cache.has('795414220707463188')) {
 					if (lastmessage != undefined) {
 						channel.send(
@@ -255,7 +245,7 @@ client.on('message', (message) => {
 				}
 				break;
 
-			case prefix + 'forbiddenwords':
+			case 'forbiddenwords':
 				forbiddenWords.forEach((word) => {
 					user.createDM()
 						.then(DMchannel => {
@@ -265,7 +255,7 @@ client.on('message', (message) => {
 				console.log('checked forbidden words');
 				break;
 
-			case prefix + 'serverinfo':
+			case 'serverinfo':
 				// eslint-disable-next-line no-case-declarations
 				let monthNumberToStr = new Map()
 					.set(0, 'January')
@@ -344,7 +334,7 @@ client.on('message', (message) => {
 				console.log(user.username + ' requested the server\'s info');
 				break;
 
-			case prefix + 'emotes':
+			case 'emotes':
 				// eslint-disable-next-line no-case-declarations
 				let staticEmojis = [message.guild.emojis.cache.filter(e => !e.animated).array().slice(0, 30).join(' '), message.guild.emojis.cache.filter(e => !e.animated).array().slice(30).join(' ')];
 				// eslint-disable-next-line no-case-declarations
@@ -361,8 +351,8 @@ client.on('message', (message) => {
 				);
 				break;
 
-			case prefix + 'subredditinfo':
-			case prefix + 'sri':
+			case 'subredditinfo':
+			case 'sri':
 				// eslint-disable-next-line no-redeclare
 				var memberco;
 				// eslint-disable-next-line no-redeclare
@@ -428,33 +418,6 @@ client.on('message', (message) => {
 				break;
 
 			default:
-				if(server.id == '716601325269549127') {
-					if(message.mentions.roles.first() == server.roles.cache.get('735212949639135272')) {
-						server.roles.cache.get('735212949639135272').setMentionable(false);
-						setTimeout(() => {
-							server.roles.cache.get('735212949639135272').setMentionable(true);
-							fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-								if (err) process.stderr.write(err);
-								var toWrite = res.toString().split('\n');
-								toWrite[2] = '\t"rpSeekPinged": false';
-								toWrite[3] = '}';
-								fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-									if (err) process.stderr.write(err);
-								});
-							});
-						}, 3600000);
-						console.log(user.username + ' is looking for someone to rp with');
-						fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-							if (err) process.stderr.write(err);
-							var toWrite = res.toString().split('\n');
-							toWrite[2] = '\t"rpSeekPinged": true';
-							toWrite[3] = '}';
-							fs.writeFile('./cacheBetweenBoots.json', toWrite.join('\n'), (err) => {
-								if (err) process.stderr.write(err);
-							});
-						});
-					}
-				}
 				if (message.content.toLowerCase().startsWith(prefix + 'help')) {
 					var helpmsg = message.content.slice(6);
 					if (helpmsg == 'forbiddenwords') {
@@ -874,26 +837,6 @@ client.on('message', (message) => {
 												emojiRoles.forEach((value, key) => {
 													msg.react(key);
 													reactionRolesMessage.set(msg.id, emojiRoles);
-													fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-														if (err) return console.error(err);
-														var toWrite = res.toString().split('\n');
-														var entriesJaggedArray = new Array();
-														// eslint-disable-next-line max-nested-callbacks
-														reactionRolesMessage.forEach((val, k) => {
-															entriesJaggedArray.push([val, k]);
-														});
-														toWrite[2] = '\t"reactionRoles": ' + entriesJaggedArray;
-														toWrite[3] = '}';
-														var toWriteStr = '';
-														// eslint-disable-next-line max-nested-callbacks
-														toWrite.forEach(elemInArray => {
-															toWriteStr = toWriteStr + elemInArray + '\n';
-														});
-														// eslint-disable-next-line max-nested-callbacks
-														// fs.writeFile('./cacheBetweenBoots.json', toWriteStr, (err) => {
-														// console.error(err);
-														// });
-													});
 												});
 											});
 									} else {
@@ -996,9 +939,6 @@ client.on('message', (message) => {
 						.setFooter('The link isn\'t correct? Double check the case and the orthograph. Or maybe this entry just don\'t exist...');
 					message.reply(whoisEmbed);
 					console.log(user.username + ' didn\'t know what ' + message.content.split(' ').slice(1).join(' ') + ' were, but now they do!');
-				} else if (message.content.toLowerCase().includes('quibli')) {
-					message.reply('it is spelled Qibli.');
-					console.log(user.username + ' misspelled qibli');
 				} else if (message.content.toLowerCase().startsWith(prefix + 'updootlimit ') && server.members.resolve(user.id).hasPermission('ADMINISTRATOR')) {
 					if (server.members.resolve(user.id).hasPermission('MANAGE_CHANNELS')) {
 						if (new Number(message.content.split(' ')[1])) {
@@ -1232,25 +1172,10 @@ client.on('message', (message) => {
 					forbiddenWords.forEach((word) => {
 						channel.send('[' + (forbiddenWords.indexOf(word) + 1) + ']: ' + word);
 					});
-				} else if (!message.guild.channels.resolve('752320436699922462').children.has(message.id) && !message.guild.channels.resolve('754482269166633000').children.has(message.id) && !message.guild.channels.resolve('754476064746504272').children.has(message.id) && !message.guild.channels.resolve('757031225893322892').children.has(message.id) && !message.guild.channels.resolve('754491019768365157').children.has(message.id) && !message.guild.channels.resolve('754489573660295168').children.has(message.id) && message.channel.id != '724790540721455144' && message.channel.id != '724792148368556383' && message.channel.id != '803093472043204638') {
-					if (totalMessages.has(user.id)) {
-						totalMessages.set(user.id, totalMessages.get(user.id) + 1);
-						console.log("Is in the db");
-					} else {
-						console.log("isnt in the db");
-						totalMessages.set(user.id, 1);
-					}
-				} else if (message.guild.channels.resolve('752320436699922462').children.has(message.id) || message.guild.channels.resolve('754482269166633000').children.has(message.id) || message.guild.channels.resolve('754476064746504272').children.has(message.id) || message.guild.channels.resolve('757031225893322892').children.has(message.id) || message.guild.channels.resolve('754491019768365157').children.has(message.id) || message.guild.channels.resolve('754489573660295168').children.has(message.id)) {
-					if (totalMessages.has(user.id)) {
-						totalMessages.set(user.id, totalMessages.get(user.id) + 0.5);
-						console.log("is in the db");
-					} else {
-						totalMessages.set(user.id, 0.5);
-						console.log("Isnt in the db");
-					}
 				}
 				break;
 			}
+			
 
 		} else {
 			if(message.content.toLowerCase().startsWith(prefix + 'messagemods ')) {
@@ -1286,10 +1211,6 @@ client.on('message', (message) => {
 								attachment: 'bot.js',
 								name: 'bot.js'
 							}]
-						});
-						fs.readFile('./cacheBetweenBoots.json', (err, res) => {
-							if (err) process.stderr.write(err);
-							DMchannel.send('The last post id (the thing to put in cacheBetweenBoots.json) is:' + res.toString().split('\n')[1]);
 						});
 					});
 				console.log(user.username + ' fetched the file. Have fun!');
