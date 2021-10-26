@@ -1,3 +1,4 @@
+
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable no-redeclare */
@@ -10,10 +11,13 @@ var totalMessages = new db.table('totalMessage');
 
 const https = require('https');
 const { exit } = require('process');
-var token = process.env.token
+var tokenBuffer = process.env.token
 if(token == undefined) {
-	token = require('./config.json');
+	const {token} = require('./config.json');
+	tokenBuffer = token
 }
+var token = tokenBuffer
+console.log(token)
 var prefix = require('./config.json');
 
 
