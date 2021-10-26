@@ -1,5 +1,5 @@
 {
-  "name": "r-wof-bot",
+  "name": "@r-WingsOfFire/r-wof-bot",
   "version": "1.0.0",
   "description": "a custom discord bot for the r/wings of fire discord server",
   "main": "bot.js",
@@ -15,7 +15,6 @@
     "agent-base": "^6.0.2",
     "core-util-is": "^1.0.3",
     "emoji-regex": "^8.0.0",
-    "eslint": "^7.32.0",
     "esquery": "^1.4.0",
     "file-entry-cache": "^6.0.1",
     "flatted": "^3.2.2",
@@ -42,7 +41,6 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "minipass": "^3.1.5",
-    "nodemon": "^2.0.12",
     "lodash.truncate": "^4.4.2",
     "node-abi": "^2.30.1",
     "prebuild-install": "^6.1.4",
@@ -60,7 +58,10 @@
     "wide-align": "^1.1.5",
     "ws": "^7.5.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "eslint": "^7.32.0"
+  },
   "scripts": {
     "test": "node -c"
   },
@@ -74,10 +75,13 @@
     "wingsoffire",
     "wof"
   ],
-  "author": "dindin-nibnib",
+  "author": "r-WingsOfFire",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/r-WingsOfFire/r-Wof-bot/issues"
   },
-  "homepage": "https://github.com/r-WingsOfFire/r-Wof-bot#readme"
+  "homepage": "https://github.com/r-WingsOfFire/r-Wof-bot#readme",
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com"
+  }
 }
