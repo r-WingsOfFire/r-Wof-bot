@@ -11,7 +11,7 @@ var totalMessages = new db.table('totalMessage');
 const https = require('https');
 const { exit } = require('process');
 var token = process.env.token
-if(token == "") {
+if(token == undefined) {
 	token = require('./config.json');
 }
 var prefix = require('./config.json');
