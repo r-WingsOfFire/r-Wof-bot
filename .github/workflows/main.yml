@@ -13,7 +13,11 @@ jobs:
       url: https://discord.gg/jpMFy5mPqv
     steps:
       - name: deploy
-        shell: "bash"
         env:
           token: ${{ secrets.token }}
-        run: "ls"
+      - name: install node
+        uses: actions/setup-node@v2.4.1
+        with: 
+          node-version: 14
+      - name: run
+        run: bot.js
