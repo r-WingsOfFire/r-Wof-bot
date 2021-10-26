@@ -13,6 +13,7 @@ jobs:
       url: https://discord.gg/jpMFy5mPqv
     steps:
       - name: deploy
+        shell: "bash"
         env:
           token: ${{ secrets.token }}
         run: "ls"
