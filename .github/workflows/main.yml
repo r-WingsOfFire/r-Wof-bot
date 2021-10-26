@@ -12,13 +12,16 @@ jobs:
       name: Node.js
       url: https://discord.gg/jpMFy5mPqv
     steps:
-      - name: Deploy
-        env:
-          token: ${{ secrets.token }}
-        uses: actions/setup-node@v2.4.1
-        with: 
-          node-version: 14
-      - name: Install modules
-        run: npm install
-      - name: Run
-        run: node bot.js
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node v16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run bot
+        run: node .
