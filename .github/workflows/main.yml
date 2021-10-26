@@ -15,7 +15,6 @@ jobs:
       - name: deploy
         env:
           token: ${{ secrets.token }}
-      - name: install node
         uses: actions/setup-node@v2.4.1
         with: 
           node-version: 14
