@@ -19,4 +19,4 @@ jobs:
         with: 
           node-version: 14
       - name: run
-        run: bot.js
+        run: node bot.js
