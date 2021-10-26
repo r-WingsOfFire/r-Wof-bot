@@ -12,9 +12,9 @@ const https = require('https');
 const { exit } = require('process');
 var token = process.env.token
 if(token == "") {
-	{ token } = require('./config.json');
+	token = require('./config.json');
 }
-var { prefix } = require('./config.json');
+var prefix = require('./config.json');
 
 
 var reactionRolesMessage = new Map();
