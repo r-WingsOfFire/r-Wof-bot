@@ -10,7 +10,12 @@ var totalMessages = new db.table('totalMessage');
 
 const https = require('https');
 const { exit } = require('process');
-var { prefix, token } = require('./config.json');
+var token = process.env.token
+if(token == "") {
+	{ token } = require('./config.json');
+}
+var { prefix } = require('./config.json');
+
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
