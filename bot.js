@@ -3,7 +3,7 @@
 /* eslint-disable no-redeclare */
 /* eslint-disable no-inline-comments */
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
 const fs = require('fs');
 const db = require('quick.db');
 var totalMessages = new db.table('totalMessage');
