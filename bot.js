@@ -1,3 +1,4 @@
+
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable no-redeclare */
@@ -10,10 +11,13 @@ var totalMessages = new db.table('totalMessage');
 
 const https = require('https');
 const { exit } = require('process');
-var token = process.env.token
+var tokenBuffer = process.env.token
 if(token == undefined) {
-	token = require('./config.json');
+	const {token} = require('./config.json');
+	tokenBuffer = token
 }
+var token = tokenBuffer
+console.log(token)
 var prefix = require('./config.json');
 
 
@@ -1114,63 +1118,63 @@ client.on('message', (message) => {
 					} else {
 						message.reply('Syntax error. Please use the index of the message you want to answer to.');
 					}
-					// } else if (message.content.toLowerCase().startsWith(prefix + 'verbalwarn ') && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
-					// 	if (!message.mentions.users.first()) {
-					// 		channel.send('Please specify a user');
-					// 	}
-					// 	else {
-					// 		const warnUser = message.mentions.users.first();
-					// 		const warn = new Warn(warnUser, message.content.slice(35), server);
-					// 		if (warns.get(warnUser.id)) {
-					// 			warns.set(warnUser.id, warns.get(warnUser.id).push(warn));
-					// 		} else {
-					// 			warns.set(warnUser.id, [warn]);
-					// 		}
-					// 	}
-					// } else if (message.content.toLowerCase().startsWith(prefix + 'purge ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
-					// channel.bulkDelete(new Number(message.content.split(' ')[1]));
-					// } else if (message.content.toLowerCase().startsWith(prefix + 'clearwarn ') && server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) {
-					// if (!message.mentions.members.first()) {
-					// message.reply('Please specify an user');
-					// }
-					// else {
-					// warns.get(message.mentions.members.first().id).splice(message.content.slice(34) - 1);
-					// channel.send('👍');
-					// }
-				// } else if (message.content.toLowerCase().startsWith(prefix + 'getwarns')) {
-				// 	var warnsStr = '';
-				// 	if (!message.mentions.members.first()) {
-				// 		if (warns.has(user.id) && warns.get(user.id).length != 0) {
-				// 			const mentionned = user;
-				// 			const warnEmbed = new Discord.MessageEmbed()
-				// 				.setColor('BLUE')
-				// 				.setTitle('Warns of ' + mentionned.username + ':')
-				// 				.setFooter('For a total of ' + warns.get(mentionned.id).length);
-				// 			warns.get(mentionned.id).forEach((warn) => {
-				// 				warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
-				// 			});
-				// 			warnEmbed.setDescription(warnsStr);
-				// 			channel.send(warnEmbed);
-				// 		}
-				// 		else {
-				// 			message.reply('You have no warns!');
-				// 		}
-				// 	}
-				// 	else if (warns.has(message.mentions.members.first().id) && warns.get(message.mentions.members.first().id).length != 0) {
-				// 		const mentionned = message.mentions.members.first();
-				// 		const warnEmbed = new Discord.MessageEmbed()
-				// 			.setColor('BLUE')
-				// 			.setTitle('Warns of ' + mentionned.username + ':')
-				// 			.setFooter('For a total of ' + warns.get(mentionned.id).length);
-				// 		warns.get(mentionned.id).forEach((warn) => {
-				// 			warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
-				// 		});
-				// 		warnEmbed.setDescription(warnsStr);
-				// 		channel.send(warnEmbed);
-				// 	}
-				// 	else {
-				// 		message.reply('This user has no warns!');
-				// 	}
+					/* } else if (message.content.toLowerCase().startsWith(prefix + 'verbalwarn ') && ((server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')))) {
+						if (!message.mentions.users.first()) {
+							channel.send('Please specify a user');
+						}
+						else {
+							const warnUser = message.mentions.users.first();
+							const warn = new Warn(warnUser, message.content.slice(35), server);
+							if (warns.get(warnUser.id)) {
+								warns.set(warnUser.id, warns.get(warnUser.id).push(warn));
+							} else {
+								warns.set(warnUser.id, [warn]);
+							}
+						}
+					} else if (message.content.toLowerCase().startsWith(prefix + 'purge ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
+					channel.bulkDelete(new Number(message.content.split(' ')[1]));
+					} else if (message.content.toLowerCase().startsWith(prefix + 'clearwarn ') && server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) {
+					if (!message.mentions.members.first()) {
+					message.reply('Please specify an user');
+					}
+					else {
+					warns.get(message.mentions.members.first().id).splice(message.content.slice(34) - 1);
+					channel.send('👍');
+					}
+				 } else if (message.content.toLowerCase().startsWith(prefix + 'getwarns')) {
+					var warnsStr = '';
+					if (!message.mentions.members.first()) {
+						if (warns.has(user.id) && warns.get(user.id).length != 0) {
+							const mentionned = user;
+				 			const warnEmbed = new Discord.MessageEmbed()
+								.setColor('BLUE')
+								.setTitle('Warns of ' + mentionned.username + ':')
+								.setFooter('For a total of ' + warns.get(mentionned.id).length);
+							warns.get(mentionned.id).forEach((warn) => {
+								warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
+							});
+							warnEmbed.setDescription(warnsStr);
+							channel.send(warnEmbed);
+						}
+						else {
+							message.reply('You have no warns!');
+				 		}
+					}
+					else if (warns.has(message.mentions.members.first().id) && warns.get(message.mentions.members.first().id).length != 0) {
+						const mentionned = message.mentions.members.first();
+						const warnEmbed = new Discord.MessageEmbed()
+							.setColor('BLUE')
+							.setTitle('Warns of ' + mentionned.username + ':')
+							.setFooter('For a total of ' + warns.get(mentionned.id).length);
+						warns.get(mentionned.id).forEach((warn) => {
+							warnsStr = warnsStr + 'Warn #' + (warns.get(mentionned.id).indexOf(warn) + 1) + ': \n' + warn.getFullString() + '\n\n\n';
+				 		});
+				 		warnEmbed.setDescription(warnsStr);
+				 		channel.send(warnEmbed);
+				 	}
+				 	else {
+				 		message.reply('This user has no warns!');
+				*/ 	}
 				} else if (message.content.toLowerCase().startsWith(prefix + 'allowword ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
 					forbiddenWords.splice(message.content.toLowerCase().slice(12) - 1, 1);
 					channel.send('Allowed word. Current forbidden words: ');
