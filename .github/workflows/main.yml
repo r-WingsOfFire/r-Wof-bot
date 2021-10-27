@@ -27,4 +27,7 @@ jobs:
         env:
           token: ${{ secrets.token }}
         run: echo $token
+      - name: test
+        env:
+          token: ${{ secrets.token }}
         run: node .
