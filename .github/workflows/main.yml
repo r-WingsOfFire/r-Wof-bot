@@ -24,7 +24,9 @@ jobs:
         run: npm ci
 
       - name: Run bot
+        shell: bash
         env:
-          token: ${{ secrets.token }}
-        run: echo $token
-        run: node .
+          token: ${{ secrets.TOKEN }}
+        run: |
+          echo "$token"
+          node .
