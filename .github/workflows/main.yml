@@ -26,6 +26,7 @@ jobs:
       - name: Run bot
         shell: bash
         env:
-          token: ${{ secrets.token }}
+          token: ${{ secrets.TOKEN }}
         run: |
+          echo "$token"
           node .
