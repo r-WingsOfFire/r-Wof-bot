@@ -28,5 +28,4 @@ jobs:
         env:
           token: ${{ secrets.token }}
         run: |
-          echo $token
           node .
