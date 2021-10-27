@@ -1174,7 +1174,7 @@ client.on('message', (message) => {
 				 	}
 				 	else {
 				 		message.reply('This user has no warns!');
-				*/ 	}
+				 	} */
 				} else if (message.content.toLowerCase().startsWith(prefix + 'allowword ') && server.members.resolve(user.id).permissions.has('MANAGE_MESSAGES')) {
 					forbiddenWords.splice(message.content.toLowerCase().slice(12) - 1, 1);
 					channel.send('Allowed word. Current forbidden words: ');
