@@ -12,13 +12,20 @@ var totalMessages = new db.table('totalMessage');
 const https = require('https');
 const { exit } = require('process');
 var tokenBuffer = process.env.token
-if(token == undefined) {
+if(tokenBuffer == undefined) {
 	const {token} = require('./config.json');
 	tokenBuffer = token
 }
 var token = tokenBuffer
 console.log(token)
-var prefix = require('./config.json');
+var prefix = '+'
+try {
+	prefix = require('./config.json');
+} catch (e) {
+	console.log(e);
+} finally {
+	console.log(prefix);
+}
 
 
 var reactionRolesMessage = new Map();
