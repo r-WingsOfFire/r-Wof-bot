@@ -8,6 +8,7 @@ const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
 const fs = require('fs');
 const db = require('quick.db');
 var totalMessages = new db.table('totalMessage');
+var stalking = new db.table('stalk');
 
 const https = require('https');
 const { exit } = require('process');
@@ -20,13 +21,13 @@ var token = tokenBuffer
 console.log(token)
 var prefix = '+'
 try {
-	prefix = require('./config.json');
+	{prefix;} require('./config.json');
 } catch (e) {
 	console.log(e);
 } finally {
-	console.log(prefix);
+	console.log(`prefix: ${prefix}`);
 }
-
+console.log(`prefix: ${prefix}`);
 
 var reactionRolesMessage = new Map();
 var messageMods = new Array();
@@ -43,11 +44,28 @@ var lastmessage = undefined;
 
 var quoteBusy = false;
 
+let rWingsOfFireServer;
+
 client.once('ready', () => {
-	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
+	let rWingsOfFireServer = client.guilds.resolve('716601325269549127');
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
-	client.guilds.resolve('716601325269549127').roles.resolve('795414220707463188').setMentionable(true);
-})
+	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
+	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true);
+	setInterval(() => {
+		stalking.all().forEach((stalked, stalker) => {
+			stalked.forEach((stalk) => {
+				if(rWingsOfFireServer.members.resolve(stalk).presence.status != 'offline' && rWingsOfFireServer.members.resolve(stalk).presence.status != 'dnd') {
+					rWingsOfFireServer.resolve(stalker).createDM()
+					.then((DM) => {
+						DM.send(`${rWingsOfFireServer.members.resolve(stalk).user.username} is online!`)
+					}).catch((err) => {
+						console.error(err);
+					});
+				}
+			});
+		});
+	});
+});
 
 /**
  * Kinda like a dice.
@@ -63,17 +81,17 @@ client.on('messageDelete', (msg) => {
 	lastmessage = msg;
 });
 
-client.on('message', (message) => {
+client.on('messageCreate', (message) => {
 	if (!message.author.bot) {
 		var user = message.author;
+		var channel = message.channel;
 		if (message.content.toLowerCase().includes('quibli')) {
 			message.reply('it is spelled Qibli.');
 			console.log(user.username + ' misspelled qibli');
 		}
-		if (message.channel.type === 'text' && message.content.startsWith(prefix)) {
+		if (channel.type === 'text' && message.content.startsWith(prefix)) {
 			var command = message.content.toLowerCase().slice(prefix.length).split(' ')[0];
 			var args = message.content.toLowerCase().slice(prefix.length).split(' ').slice(1);
-			var channel = message.channel;
 			var server = message.guild;
 
 			forbiddenWords.forEach(slur => {
@@ -175,6 +193,15 @@ client.on('message', (message) => {
 				channel.send('Here is an idiot for you: ' + user.tag);
 				break;
 
+			case 'stalk':
+				var stalked = server.members.resolve(args.join(' ').split('<').join('').split('>').join('').split('@').join())
+				if (stalked) {
+					channel.send(`You are now stalking ${stalked.displayName}. You will be notified when they log on.`)
+					stalking.push(server.members.resolve(user.id).user.username, stalked.user.username);
+				} else {
+					channel.send("The username you entered is invalid. Please ping them, or enter the id of the user.")
+				}
+				break;
 			case 'kill':
 				if (user.id == '373515998000840714' || user.id == '306582338039709696') {
 					channel.send('Alright, the bot is logging out...')
