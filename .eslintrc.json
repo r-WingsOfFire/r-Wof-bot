@@ -30,10 +30,14 @@
         ],
         "semi": [
             "error",
-            "never"
+            "always"
         ],
         "no-var-requires": [
-            "ignore"
+            0
+        ],
+        "object-curly-spacing": [
+            "warn",
+            "always"
         ]
     }
 }
