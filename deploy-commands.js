@@ -16,6 +16,7 @@ const commands = [
 			.setDescription('The name of the OC')
 			.setRequired(true)
 	),
+	new SlashCommandBuilder().setName('quote').setDescription('Quote quizz!'),
     new SlashCommandBuilder().setName('editoc').setDescription('Edit an oc or attributes to the oc.').addStringOption(option =>
 		option.setName('name')
 			.setDescription('The name of the OC')
