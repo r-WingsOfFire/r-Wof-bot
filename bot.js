@@ -16,7 +16,6 @@ if(tokenBuffer == undefined) {
 	tokenBuffer = token
 }
 var token = tokenBuffer
-console.log(token)
 var prefix = '+'
 try {
 	{prefix} require('./config.json')
@@ -428,6 +427,7 @@ async function fetchOCs() {
 
 client.once('ready', () => {
 	rWingsOfFireServer = client.guilds.resolve('716601325269549127')
+	rWingsOfFireServer.channels.resolve('724790540721455144').send('I am now online!')
 	client.user.setUsername(`r/WOF Bot (${prefix})`)
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`)
 	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true)
