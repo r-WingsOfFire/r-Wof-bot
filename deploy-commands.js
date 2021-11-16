@@ -8,6 +8,7 @@ const commands = [
 	new SlashCommandBuilder().setName('snek').setDescription('snek'),
 	new SlashCommandBuilder().setName('kill').setDescription('Kills the bot'),
 	new SlashCommandBuilder().setName('sunny').setDescription('get a nice quote from sunny'),
+	new SlashCommandBuilder().setName('fuck').setDescription('Fuck.').setDefaultPermission(false),
 	new SlashCommandBuilder().setName('stalk').setDescription('Get notified when a user logs in').addUserOption(option =>
 		option.setName('user')
 			.setDescription('The user you want to stalk')

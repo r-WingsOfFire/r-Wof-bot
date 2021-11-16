@@ -425,9 +425,9 @@ async function fetchOCs() {
 	return 0
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
 	rWingsOfFireServer = client.guilds.resolve('716601325269549127')
-	rWingsOfFireServer.channels.resolve('724790540721455144').send('I am now online!')
+	//rWingsOfFireServer.channels.resolve('724790540721455144').send('I am now online!')
 	client.user.setUsername(`r/WOF Bot (${prefix})`)
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`)
 	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true)
@@ -454,6 +454,24 @@ client.once('ready', () => {
 			})
 		})
 	}, 5000)
+	if (!client.application?.owner) await client.application?.fetch();
+
+	const command = await client.guilds.cache.get('716601325269549127')?.commands.fetch('910250822779162714');
+
+	const permissions = [
+		{
+			id: '795414220707463188',
+			type: 'ROLE',
+			permission: true,
+		},
+		{
+			id: '716603740051996703',
+			type: 'ROLE',
+			permission: true,
+		},
+	];
+
+	await command.permissions.add({ permissions });
 })
 
 /**
@@ -504,9 +522,7 @@ client.on('messageCreate', (message) => {
 
 			switch (command) {
 			
-			case 'fuck' && (server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593')) :
-				channel.send('fuck')
-				break
+			
 
 			case 'fac':
 			case 'flipacoin':
@@ -1812,6 +1828,10 @@ client.on('interactionCreate', async interaction => {
 		})
 		break
 
+	case 'fuck' :
+		interaction.reply('fuck')
+		break
+		
 	}
 })
 
