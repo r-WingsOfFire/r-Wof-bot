@@ -536,18 +536,6 @@ client.on('messageCreate', (message) => {
 				channel.send('Here is an idiot for you: ' + user.tag)
 				break
 
-			case 'sunny':
-				readFile('./quotes.json', (err, result) => {
-					if (err) return console.error(err)
-					const sunnyQuotes = JSON.parse(result).quotes.filter(quote => quote.character == 'Sunny')
-					channel.send(new MessageEmbed()
-						.setDescription('"' + sunnyQuotes[randInt(0, sunnyQuotes.length)].quote + '"')
-						.setFooter('-Sunny')
-						.setColor('GOLD')
-					)
-				})
-				break
-
 			case 'snipe':
 				if (server.members.resolve(user.id).roles.cache.has('751577896132280330') || server.members.resolve(user.id).roles.cache.has('795414220707463188')) {
 					if (lastmessage != undefined) {
@@ -1814,7 +1802,16 @@ client.on('interactionCreate', async interaction => {
 		}
 		break;
 	
-	
+	case 'sunny':
+		const { quotes } = require('./quotes.json')
+		const sunnyQuotes = quotes.filter(quote => quote.character == 'Sunny')
+		interaction.reply({embeds: [new MessageEmbed()
+			.setDescription('"' + sunnyQuotes[randInt(0, sunnyQuotes.length)].quote + '"')
+			.setFooter('-Sunny')
+			.setColor('GOLD')]
+		})
+		break
+
 	}
 })
 
