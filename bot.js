@@ -6,6 +6,7 @@ const { table } = require('quick.db')
 var totalMessages = new table('totalMessage')
 var stalking = new table('stalk')
 var ocs = new table('OC')
+const worker = require('worker_threads');
 
 const process = require('process')
 const exit = process.exit
@@ -302,7 +303,7 @@ async function fetchOCs() {
 			ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`)
 			if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url)
 			if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username)
-			if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, Number(searchInMessage(message, 'age')))
+			if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, new Number(searchInMessage(message, 'age')))
 			if(!searchInMessage(message,'gender').includes('N/A')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'))
 			if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url)
 			if(!searchInMessage(message, 'tribes', false).includes('N/A')) {
@@ -502,54 +503,7 @@ client.on('messageCreate', (message) => {
 			})
 
 			switch (command) {
-			case 'quote':
-				if (!quoteBusy) {
-					quoteBusy = true
-					readFile('./quotes.json', (err, result) => {
-						if (err) console.error(err)
-						const theChoosenOne = JSON.parse(result).quotes[Math.floor((Math.random() * JSON.parse(result).quotes.length) + 1) - 1]
-						var hahYouLose = []
-						const quoteEmbed = new MessageEmbed()
-							.setTitle('Who said this?')
-							.setDescription(theChoosenOne.quote)
-							.setFooter('You have 20 seconds, and only one try')
-							.setColor('GREEN')
-						channel.send(quoteEmbed)
-						var stopIt = false
-						let timeOut = setTimeout(() => {
-							stopIt = true
-							channel.send('The quizz is finished. The answer was ' + theChoosenOne.character)
-							quoteBusy = false
-						}, 20000)
-						var answers = []
-						JSON.parse(result).quotes.forEach(quote => {
-							answers.push(quote.character.toLowerCase())
-						})
-						const filter = quizzAnswer => quizzAnswer.author.id != client.user.id && answers.includes(quizzAnswer.content.toLowerCase())
-						function awaitQuizzMessage() {
-							channel.awaitMessages(filter, { max: 1 })
-								.then(quizzAnswer => {
-									if (stopIt) {
-										return
-									}
-									if (!hahYouLose.includes(quizzAnswer.first().author.id)) {
-										if (quizzAnswer.first().content.toLowerCase() == theChoosenOne.character.toLowerCase()) {
-											quizzAnswer.first().reply('Congratulation! This is correct!')
-											clearTimeout(timeOut)
-											quoteBusy = false
-											return
-										} else {
-											quizzAnswer.first().reply('Well... no, this is wrong.')
-											hahYouLose.push(quizzAnswer.first().author.id)
-											awaitQuizzMessage()
-										}
-									}
-								})
-						}
-						awaitQuizzMessage()
-					})
-				}
-				break
+			
 			case 'fuck' && (server.members.resolve(user.id).permissions.has('ADMINISTRATOR')) || (server.members.resolve(user.id).roles.cache.has('795847347397066773')) || (server.members.resolve(user.id).roles.cache.has('742827962944061593')) :
 				channel.send('fuck')
 				break
@@ -1808,6 +1762,59 @@ client.on('interactionCreate', async interaction => {
 				
 			}
 		}
+		break;
+
+	case 'quote':
+		if (!quoteBusy) {
+			quoteBusy = true
+			//readFile('./quotes.json', (err, result) => {
+				const { quotes } = require('./quotes.json')
+				//if (err) console.error(err)
+				const theChoosenOne = quotes[Math.floor((Math.random() * quotes.length) + 1) - 1]
+				//var hahYouLose = []
+				const quoteEmbed = new MessageEmbed()
+					.setTitle('Who said this?')
+					.setDescription(theChoosenOne.quote)
+					.setFooter('You have 20 seconds, and only one try')
+					.setColor('GREEN')
+				interaction.reply({embeds: [quoteEmbed]})
+				var stopIt = false
+				let timeOut = setTimeout(() => {
+					stopIt = true
+					interaction.editReply({content: 'This quizz is finished.', embeds: []})
+					interaction.channel.send({content: 'The quizz is finished. The answer was ' + theChoosenOne.character, embeds: []})
+					quoteBusy = false
+				}, 20000)
+				var answers = []
+				quotes.forEach(quote => {
+					answers.push(quote.character.toLowerCase())
+				})
+				const filter = quizzAnswer => quizzAnswer.author.id != client.user.id && answers.includes(quizzAnswer.content.toLowerCase())
+				function guess() {
+					interaction.channel.awaitMessages({filter,  max: 1 }).then(quizzAnswer => {
+						if(stopIt) {
+							return;
+						}
+						//if (!hahYouLose.includes(quizzAnswer.first()?.author.id)) {
+							if (quizzAnswer.first().content.toLowerCase() == theChoosenOne.character.toLowerCase()) {
+								quizzAnswer.first().reply('Congratulation! This is correct!')
+								clearTimeout(timeOut)
+								quoteBusy = false
+								stopIt = true
+							} else {
+								quizzAnswer.first().reply('Well... no, this is wrong.')
+								guess()
+								//hahYouLose.push(quizzAnswer.first().author.id)
+							}
+						//}
+					})
+				}
+				guess()
+			//})
+		}
+		break;
+	
+	
 	}
 })
 
