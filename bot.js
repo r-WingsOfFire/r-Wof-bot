@@ -16,7 +16,6 @@ if(tokenBuffer == undefined) {
 	tokenBuffer = token
 }
 var token = tokenBuffer
-console.log(token)
 var prefix = '+'
 try {
 	{prefix} require('./config.json')
@@ -428,6 +427,7 @@ async function fetchOCs() {
 
 client.once('ready', () => {
 	rWingsOfFireServer = client.guilds.resolve('716601325269549127')
+	rWingsOfFireServer.channels.resolve('724790540721455144').send('I am now online!')
 	client.user.setUsername(`r/WOF Bot (${prefix})`)
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`)
 	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true)
@@ -534,18 +534,6 @@ client.on('messageCreate', (message) => {
 
 			case 'idiot':
 				channel.send('Here is an idiot for you: ' + user.tag)
-				break
-
-			case 'sunny':
-				readFile('./quotes.json', (err, result) => {
-					if (err) return console.error(err)
-					const sunnyQuotes = JSON.parse(result).quotes.filter(quote => quote.character == 'Sunny')
-					channel.send(new MessageEmbed()
-						.setDescription('"' + sunnyQuotes[randInt(0, sunnyQuotes.length)].quote + '"')
-						.setFooter('-Sunny')
-						.setColor('GOLD')
-					)
-				})
 				break
 
 			case 'snipe':
@@ -1814,7 +1802,16 @@ client.on('interactionCreate', async interaction => {
 		}
 		break;
 	
-	
+	case 'sunny':
+		const { quotes } = require('./quotes.json')
+		const sunnyQuotes = quotes.filter(quote => quote.character == 'Sunny')
+		interaction.reply({embeds: [new MessageEmbed()
+			.setDescription('"' + sunnyQuotes[randInt(0, sunnyQuotes.length)].quote + '"')
+			.setFooter('-Sunny')
+			.setColor('GOLD')]
+		})
+		break
+
 	}
 })
 
