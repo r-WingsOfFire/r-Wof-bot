@@ -445,7 +445,7 @@ client.once('ready', async () => {
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true);
-	fetchOCs().then(n => {console.log(n);});
+	setInterval(fetchOCs, 30000);
 	setInterval(() => {
 		stalking.all().forEach((stalk) => {
 			stalk.data.forEach((stalked, index) => {
