@@ -88,342 +88,352 @@ function searchInMessage(message, text, word = true) {
 	return output;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchOCs() {
 	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
 	var ocChannel = rWingsOfFireServer.channels.resolve('854858811101937704');
 	var lastMessage = Array.from((await ocChannel.messages.fetch({ limit: 100 })).sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
 	var lastMessageTimestamp = lastMessage[0].createdTimestamp;
-	var limit = 0;
-	if(ocs.all().length === 0)
-		limit = ocChannel.createdTimestamp;
-	else
-		limit = (await ocChannel.messages.fetch(ocs.all()[0].data.message.Snowflake)).id;
-	/*let mess = await ocChannel.messages.fetch({ limit: 100 })
-	limit = mess.get('901743692749086720').createdTimestamp*/
-	let messages = await ocChannel.messages.fetch({ limit: 100 });
-	messages = Array.from(messages.sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
-	var message = messages[0];
-	var name = '';
-	var indexAdd = 0;
-	var index = 0;
-	do {
-		if(!messages[index + indexAdd].content.toLowerCase().includes(' name')) {
-			if (messages[index + indexAdd].content.toLowerCase().includes('name and common nicknames')) {
-				name = searchInMessage(messages[index + indexAdd], 'name and common nicknames', false);
-			} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknams')) {
-				name = searchInMessage(messages[index + indexAdd], 'name and common and nicknams', false);
-			} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknames')) {
-				name = searchInMessage(messages[index + indexAdd], 'name and common and nicknames', false);
-			} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common nickname')) {
-				name = searchInMessage(messages[index + indexAdd], 'name and common nickname', false);
-			} else if (messages[index + indexAdd].content.toLowerCase().includes('name')) {
-				name = searchInMessage(messages[index + indexAdd], 'name', false);
-			}
-		}
-		indexAdd++;
-	} while(name === '');
-	var nameArr = name.split(';')[0]
-		.split(',')[0]
-		.split('|')[0]
-		.split(' or ')[0]
-		.split('(')[0]
-		.split('*').join('')
-		.split('-').join(' ')
-		.split('  ').join(' ')
-		.split(' ');
-	if(nameArr[0] == '') nameArr.shift();
-	if(nameArr[-1] == '') nameArr.pop();
-	nameArr = nameArr.join(' ').split(' ');
-	nameArr.forEach((namePart, i) => {
-		if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+	var skipFetch = false;
+	await ocs.all().forEach(oc => {
+		ocChannel.messages.fetch().then((msg) => {
+			if(msg.sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp).get(oc.data.message.Snowflake) === lastMessageTimestamp) skipFetch = true;
+		});
 	});
-	name = nameArr.join(' ');
-	ocs.set(`${name}.message.Snowflake`, message.id);
-	ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`);
-	if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url);
-	if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username);
-	if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, Number(searchInMessage(message, 'age')));
-	if(!searchInMessage(message,'gender').includes('N/A')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
-	if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
-	if(!searchInMessage(message, 'tribes', false).includes('N/A')) {
-		var tribes = [];
-		tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
-			v.toLowerCase().includes('mud')
-			|| v.toLowerCase().includes('night')
-			|| v.toLowerCase().includes('sand')
-			|| v.toLowerCase().includes('leaf')
-			|| v.toLowerCase().includes('silk')
-			|| v.toLowerCase().includes('ice')
-			|| v.toLowerCase().includes('sea')
-			|| v.toLowerCase().includes('sky')
-			|| v.toLowerCase().includes('hive')
-			|| v.toLowerCase().includes('rain')
-		).join(' ').split('0').join('')
-			.split('1').join('')
-			.split('2').join('')
-			.split('3').join('')
-			.split('4').join('')
-			.split('5').join('')
-			.split('6').join('')
-			.split('7').join('')
-			.split('8').join('')
-			.split('9').join('')
-			.split('/').join(',')
-			.split('|').join(',')
-			.split('&').join(',')
-			.split('+').join(',')
-			.split(',').join(' ')
-			.split(' ');
-		var finalTribes = [];
-		tribes.forEach(tribe => {
-			if (tribe.toLowerCase().includes('mud')) {
-				finalTribes.push('mudwing');
-			} else if (tribe.toLowerCase().includes('sand')) {
-				finalTribes.push('sandwing');
-			} else if (tribe.toLowerCase().includes('night')) {
-				finalTribes.push('nightwing');
-			} else if (tribe.toLowerCase().includes('sea')) {
-				finalTribes.push('seawing');
-			} else if (tribe.toLowerCase().includes('sky')) {
-				finalTribes.push('skywing');
-			} else if (tribe.toLowerCase().includes('rain')) {
-				finalTribes.push('rainwing');
-			} else if (tribe.toLowerCase().includes('ice')) {
-				finalTribes.push('icewing');
-			} else if (tribe.toLowerCase().includes('leaf')) {
-				finalTribes.push('leafwing');
-			} else if (tribe.toLowerCase().includes('hive')) {
-				finalTribes.push('hivewing');
-			} else if (tribe.toLowerCase().includes('silk')) {
-				finalTribes.push('silkwing');
-			}
-		});
-		ocs.set(`${name}.tribes`, finalTribes);
-	} else if (!searchInMessage(message, 'tribe(s)', false).includes('N/A')) {
-		tribes = [];
-		tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
-			v.toLowerCase().includes('mud')
-			|| v.toLowerCase().includes('night')
-			|| v.toLowerCase().includes('sand')
-			|| v.toLowerCase().includes('leaf')
-			|| v.toLowerCase().includes('silk')
-			|| v.toLowerCase().includes('ice')
-			|| v.toLowerCase().includes('sea')
-			|| v.toLowerCase().includes('sky')
-			|| v.toLowerCase().includes('hive')
-			|| v.toLowerCase().includes('rain')
-		).join(' ').split('0').join('')
-			.split('1').join('')
-			.split('2').join('')
-			.split('3').join('')
-			.split('4').join('')
-			.split('5').join('')
-			.split('6').join('')
-			.split('7').join('')
-			.split('8').join('')
-			.split('9').join('')
-			.split('/').join(',')
-			.split('|').join(',')
-			.split('&').join(',')
-			.split('+').join(',')
-			.split(',').join(' ')
-			.split(' ');
-		finalTribes = [];
-		tribes.forEach(tribe => {
-			if (tribe.toLowerCase().includes('mud')) {
-				finalTribes.push('mudwing');
-			} else if (tribe.toLowerCase().includes('sand')) {
-				finalTribes.push('sandwing');
-			} else if (tribe.toLowerCase().includes('night')) {
-				finalTribes.push('nightwing');
-			} else if (tribe.toLowerCase().includes('sea')) {
-				finalTribes.push('seawing');
-			} else if (tribe.toLowerCase().includes('sky')) {
-				finalTribes.push('skywing');
-			} else if (tribe.toLowerCase().includes('rain')) {
-				finalTribes.push('rainwing');
-			} else if (tribe.toLowerCase().includes('ice')) {
-				finalTribes.push('icewing');
-			} else if (tribe.toLowerCase().includes('leaf')) {
-				finalTribes.push('leafwing');
-			} else if (tribe.toLowerCase().includes('hive')) {
-				finalTribes.push('hivewing');
-			} else if (tribe.toLowerCase().includes('silk')) {
-				finalTribes.push('silkwing');
-			}
-		});
-		ocs.set(`${name}.tribes`, finalTribes);
-	} else if (!searchInMessage(message, 'tribe', false).includes('N/A')) {
-		ocs.push(`${name}.tribes`, searchInMessage(message, 'tribe'));
-	}
-
-	lastMessageTimestamp = messages[messages.length - 1].createdTimestamp;
-	lastMessage = messages[1].id;
-	do {
-		let messages = await ocChannel.messages.fetch({ limit: 100, before: lastMessage.id });
+	if(skipFetch) return 2;
+	else {
+		var limit = 0;
+		if(ocs.all().length === 0)
+			limit = ocChannel.createdTimestamp;
+		else
+			limit = (await ocChannel.messages.fetch(ocs.all()[0].data.message.Snowflake)).id;
+		/*let mess = await ocChannel.messages.fetch({ limit: 100 })
+	limit = mess.get('901743692749086720').createdTimestamp*/
+		let messages = await ocChannel.messages.fetch({ limit: 100 });
 		messages = Array.from(messages.sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
-		messages.forEach((message, index) => {
-			var name = '';
-			var indexAdd = 0;
-			do {
-				if(index + indexAdd >= 100) return;
-
-				if(!messages[index + indexAdd].content.toLowerCase().includes(' name')) {
-					if (messages[index + indexAdd].content.toLowerCase().includes('name and common nicknames')) {
-						name = searchInMessage(messages[index + indexAdd], 'name and common nicknames', false);
-					} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknams')) {
-						name = searchInMessage(messages[index + indexAdd], 'name and common and nicknams', false);
-					} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknames')) {
-						name = searchInMessage(messages[index + indexAdd], 'name and common and nicknames', false);
-					} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common nickname')) {
-						name = searchInMessage(messages[index + indexAdd], 'name and common nickname', false);
-					} else if (messages[index + indexAdd].content.toLowerCase().includes('name')) {
-						name = searchInMessage(messages[index + indexAdd], 'name', false);
-					}
+		var message = messages[0];
+		var name = '';
+		var indexAdd = 0;
+		var index = 0;
+		do {
+			if(!messages[index + indexAdd].content.toLowerCase().includes(' name')) {
+				if (messages[index + indexAdd].content.toLowerCase().includes('name and common nicknames')) {
+					name = searchInMessage(messages[index + indexAdd], 'name and common nicknames', false);
+				} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknams')) {
+					name = searchInMessage(messages[index + indexAdd], 'name and common and nicknams', false);
+				} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknames')) {
+					name = searchInMessage(messages[index + indexAdd], 'name and common and nicknames', false);
+				} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common nickname')) {
+					name = searchInMessage(messages[index + indexAdd], 'name and common nickname', false);
+				} else if (messages[index + indexAdd].content.toLowerCase().includes('name')) {
+					name = searchInMessage(messages[index + indexAdd], 'name', false);
 				}
-				indexAdd++;
-			} while(name === '');
-			var nameArr = name.split(';')[0]
-				.split(',')[0]
-				.split('|')[0]
-				.split(' or ')[0]
-				.split('(')[0]
-				.split('*').join('')
-				.split('-').join(' ')
-				.split('  ').join(' ')
-				.split(' ');
-			if(nameArr[0] == '') nameArr.shift();
-			if(nameArr[nameArr.length - 1] == '') nameArr.pop();
-			nameArr = nameArr.join(' ').split(' ');
-			nameArr.forEach((namePart, i) => {
-				if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
-			});
-			name = nameArr.join(' ');
-			ocs.set(`${name}.message.Snowflake`, message.id);
-			ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`);
-			if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url);
-			if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username);
-			if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, new Number(searchInMessage(message, 'age')));
-			if(!searchInMessage(message,'gender').includes('N/A')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
-			if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
-			if(!searchInMessage(message, 'tribes', false).includes('N/A')) {
-				var tribes = [];
-				tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
-					v.toLowerCase().includes('mud')
-					|| v.toLowerCase().includes('night')
-					|| v.toLowerCase().includes('sand')
-					|| v.toLowerCase().includes('leaf')
-					|| v.toLowerCase().includes('silk')
-					|| v.toLowerCase().includes('ice')
-					|| v.toLowerCase().includes('sea')
-					|| v.toLowerCase().includes('sky')
-					|| v.toLowerCase().includes('hive')
-					|| v.toLowerCase().includes('rain')
-				).join(' ').split('0').join('')
-					.split('1').join('')
-					.split('2').join('')
-					.split('3').join('')
-					.split('4').join('')
-					.split('5').join('')
-					.split('6').join('')
-					.split('7').join('')
-					.split('8').join('')
-					.split('9').join('')
-					.split('/').join(',')
-					.split('|').join(',')
-					.split('&').join(',')
-					.split('+').join(',')
-					.split(',').join(' ')
-					.split(' ');
-				var finalTribes = [];
-				tribes.forEach(tribe => {
-					if (tribe.toLowerCase().includes('mud')) {
-						finalTribes.push('mudwing');
-					} else if (tribe.toLowerCase().includes('sand')) {
-						finalTribes.push('sandwing');
-					} else if (tribe.toLowerCase().includes('night')) {
-						finalTribes.push('nightwing');
-					} else if (tribe.toLowerCase().includes('sea')) {
-						finalTribes.push('seawing');
-					} else if (tribe.toLowerCase().includes('sky')) {
-						finalTribes.push('skywing');
-					} else if (tribe.toLowerCase().includes('rain')) {
-						finalTribes.push('rainwing');
-					} else if (tribe.toLowerCase().includes('ice')) {
-						finalTribes.push('icewing');
-					} else if (tribe.toLowerCase().includes('leaf')) {
-						finalTribes.push('leafwing');
-					} else if (tribe.toLowerCase().includes('hive')) {
-						finalTribes.push('hivewing');
-					} else if (tribe.toLowerCase().includes('silk')) {
-						finalTribes.push('silkwing');
-					}
-				});
-				ocs.set(`${name}.tribes`, finalTribes);
-			} else if (!searchInMessage(message, 'tribe(s)', false).includes('N/A')) {
-				tribes = [];
-				tribes = searchInMessage(message, 'tribe(s)', false).split(' ').filter(v =>
-					v.toLowerCase().includes('mud')
-					|| v.toLowerCase().includes('night')
-					|| v.toLowerCase().includes('sand')
-					|| v.toLowerCase().includes('leaf')
-					|| v.toLowerCase().includes('silk')
-					|| v.toLowerCase().includes('ice')
-					|| v.toLowerCase().includes('sea')
-					|| v.toLowerCase().includes('sky')
-					|| v.toLowerCase().includes('hive')
-					|| v.toLowerCase().includes('rain')
-				).join(' ').split('0').join('')
-					.split('1').join('')
-					.split('2').join('')
-					.split('3').join('')
-					.split('4').join('')
-					.split('5').join('')
-					.split('6').join('')
-					.split('7').join('')
-					.split('8').join('')
-					.split('9').join('')
-					.split('/').join(',')
-					.split('|').join(',')
-					.split('&').join(',')
-					.split('+').join(',')
-					.split(',').join(' ')
-					.split(' ');
-				finalTribes = [];
-				tribes.forEach(tribe => {
-					if (tribe.toLowerCase().includes('mud')) {
-						finalTribes.push('mudwing');
-					} else if (tribe.toLowerCase().includes('sand')) {
-						finalTribes.push('sandwing');
-					} else if (tribe.toLowerCase().includes('night')) {
-						finalTribes.push('nightwing');
-					} else if (tribe.toLowerCase().includes('sea')) {
-						finalTribes.push('seawing');
-					} else if (tribe.toLowerCase().includes('sky')) {
-						finalTribes.push('skywing');
-					} else if (tribe.toLowerCase().includes('rain')) {
-						finalTribes.push('rainwing');
-					} else if (tribe.toLowerCase().includes('ice')) {
-						finalTribes.push('icewing');
-					} else if (tribe.toLowerCase().includes('leaf')) {
-						finalTribes.push('leafwing');
-					} else if (tribe.toLowerCase().includes('hive')) {
-						finalTribes.push('hivewing');
-					} else if (tribe.toLowerCase().includes('silk')) {
-						finalTribes.push('silkwing');
-					}
-				});
-				ocs.set(`${name}.tribes`, finalTribes);
-			} else if (!searchInMessage(message, 'tribe', false).includes('N/A')) {
-				ocs.push(`${name}.tribes`, searchInMessage(message, 'tribe'));
 			}
+			indexAdd++;
+		} while(name === '');
+		var nameArr = name.split(';')[0]
+			.split(',')[0]
+			.split('|')[0]
+			.split(' or ')[0]
+			.split('(')[0]
+			.split('*').join('')
+			.split('-').join(' ')
+			.split('  ').join(' ')
+			.split(' ');
+		if(nameArr[0] == '') nameArr.shift();
+		if(nameArr[-1] == '') nameArr.pop();
+		nameArr = nameArr.join(' ').split(' ');
+		nameArr.forEach((namePart, i) => {
+			if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
 		});
-		if (lastMessageTimestamp >= messages[messages.length - 1].createdTimestamp) return 1;
+		name = nameArr.join(' ');
+		ocs.set(`${name}.message.Snowflake`, message.id);
+		ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`);
+		if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url);
+		if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username);
+		if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, Number(searchInMessage(message, 'age')));
+		if(!searchInMessage(message,'gender').includes('N/A')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
+		if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
+		if(!searchInMessage(message, 'tribes', false).includes('N/A')) {
+			var tribes = [];
+			tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
+				v.toLowerCase().includes('mud')
+			|| v.toLowerCase().includes('night')
+			|| v.toLowerCase().includes('sand')
+			|| v.toLowerCase().includes('leaf')
+			|| v.toLowerCase().includes('silk')
+			|| v.toLowerCase().includes('ice')
+			|| v.toLowerCase().includes('sea')
+			|| v.toLowerCase().includes('sky')
+			|| v.toLowerCase().includes('hive')
+			|| v.toLowerCase().includes('rain')
+			).join(' ').split('0').join('')
+				.split('1').join('')
+				.split('2').join('')
+				.split('3').join('')
+				.split('4').join('')
+				.split('5').join('')
+				.split('6').join('')
+				.split('7').join('')
+				.split('8').join('')
+				.split('9').join('')
+				.split('/').join(',')
+				.split('|').join(',')
+				.split('&').join(',')
+				.split('+').join(',')
+				.split(',').join(' ')
+				.split(' ');
+			var finalTribes = [];
+			tribes.forEach(tribe => {
+				if (tribe.toLowerCase().includes('mud')) {
+					finalTribes.push('mudwing');
+				} else if (tribe.toLowerCase().includes('sand')) {
+					finalTribes.push('sandwing');
+				} else if (tribe.toLowerCase().includes('night')) {
+					finalTribes.push('nightwing');
+				} else if (tribe.toLowerCase().includes('sea')) {
+					finalTribes.push('seawing');
+				} else if (tribe.toLowerCase().includes('sky')) {
+					finalTribes.push('skywing');
+				} else if (tribe.toLowerCase().includes('rain')) {
+					finalTribes.push('rainwing');
+				} else if (tribe.toLowerCase().includes('ice')) {
+					finalTribes.push('icewing');
+				} else if (tribe.toLowerCase().includes('leaf')) {
+					finalTribes.push('leafwing');
+				} else if (tribe.toLowerCase().includes('hive')) {
+					finalTribes.push('hivewing');
+				} else if (tribe.toLowerCase().includes('silk')) {
+					finalTribes.push('silkwing');
+				}
+			});
+			ocs.set(`${name}.tribes`, finalTribes);
+		} else if (!searchInMessage(message, 'tribe(s)', false).includes('N/A')) {
+			tribes = [];
+			tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
+				v.toLowerCase().includes('mud')
+			|| v.toLowerCase().includes('night')
+			|| v.toLowerCase().includes('sand')
+			|| v.toLowerCase().includes('leaf')
+			|| v.toLowerCase().includes('silk')
+			|| v.toLowerCase().includes('ice')
+			|| v.toLowerCase().includes('sea')
+			|| v.toLowerCase().includes('sky')
+			|| v.toLowerCase().includes('hive')
+			|| v.toLowerCase().includes('rain')
+			).join(' ').split('0').join('')
+				.split('1').join('')
+				.split('2').join('')
+				.split('3').join('')
+				.split('4').join('')
+				.split('5').join('')
+				.split('6').join('')
+				.split('7').join('')
+				.split('8').join('')
+				.split('9').join('')
+				.split('/').join(',')
+				.split('|').join(',')
+				.split('&').join(',')
+				.split('+').join(',')
+				.split(',').join(' ')
+				.split(' ');
+			finalTribes = [];
+			tribes.forEach(tribe => {
+				if (tribe.toLowerCase().includes('mud')) {
+					finalTribes.push('mudwing');
+				} else if (tribe.toLowerCase().includes('sand')) {
+					finalTribes.push('sandwing');
+				} else if (tribe.toLowerCase().includes('night')) {
+					finalTribes.push('nightwing');
+				} else if (tribe.toLowerCase().includes('sea')) {
+					finalTribes.push('seawing');
+				} else if (tribe.toLowerCase().includes('sky')) {
+					finalTribes.push('skywing');
+				} else if (tribe.toLowerCase().includes('rain')) {
+					finalTribes.push('rainwing');
+				} else if (tribe.toLowerCase().includes('ice')) {
+					finalTribes.push('icewing');
+				} else if (tribe.toLowerCase().includes('leaf')) {
+					finalTribes.push('leafwing');
+				} else if (tribe.toLowerCase().includes('hive')) {
+					finalTribes.push('hivewing');
+				} else if (tribe.toLowerCase().includes('silk')) {
+					finalTribes.push('silkwing');
+				}
+			});
+			ocs.set(`${name}.tribes`, finalTribes);
+		} else if (!searchInMessage(message, 'tribe', false).includes('N/A')) {
+			ocs.push(`${name}.tribes`, searchInMessage(message, 'tribe'));
+		}
 
 		lastMessageTimestamp = messages[messages.length - 1].createdTimestamp;
-		lastMessage = messages[messages.length - 10].id;
-	} while (lastMessageTimestamp > limit);
-	return 0;
+		lastMessage = messages[1].id;
+		do {
+			let messages = await ocChannel.messages.fetch({ limit: 100, before: lastMessage.id });
+			messages = Array.from(messages.sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
+			messages.forEach((message, index) => {
+				var name = '';
+				var indexAdd = 0;
+				do {
+					if(index + indexAdd >= 100) return;
+
+					if(!messages[index + indexAdd].content.toLowerCase().includes(' name')) {
+						if (messages[index + indexAdd].content.toLowerCase().includes('name and common nicknames')) {
+							name = searchInMessage(messages[index + indexAdd], 'name and common nicknames', false);
+						} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknams')) {
+							name = searchInMessage(messages[index + indexAdd], 'name and common and nicknams', false);
+						} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common and nicknames')) {
+							name = searchInMessage(messages[index + indexAdd], 'name and common and nicknames', false);
+						} else if (messages[index + indexAdd].content.toLowerCase().includes('name and common nickname')) {
+							name = searchInMessage(messages[index + indexAdd], 'name and common nickname', false);
+						} else if (messages[index + indexAdd].content.toLowerCase().includes('name')) {
+							name = searchInMessage(messages[index + indexAdd], 'name', false);
+						}
+					}
+					indexAdd++;
+				} while(name === '');
+				var nameArr = name.split(';')[0]
+					.split(',')[0]
+					.split('|')[0]
+					.split(' or ')[0]
+					.split('(')[0]
+					.split('*').join('')
+					.split('-').join(' ')
+					.split('  ').join(' ')
+					.split(' ');
+				if(nameArr[0] == '') nameArr.shift();
+				if(nameArr[nameArr.length - 1] == '') nameArr.pop();
+				nameArr = nameArr.join(' ').split(' ');
+				nameArr.forEach((namePart, i) => {
+					if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+				});
+				name = nameArr.join(' ');
+				ocs.set(`${name}.message.Snowflake`, message.id);
+				ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`);
+				if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url);
+				if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username);
+				if(!searchInMessage(message,'age').includes('N/A')) ocs.set(`${name}.age`, new Number(searchInMessage(message, 'age')));
+				if(!searchInMessage(message,'gender').includes('N/A')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
+				if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
+				if(!searchInMessage(message, 'tribes', false).includes('N/A')) {
+					var tribes = [];
+					tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
+						v.toLowerCase().includes('mud')
+					|| v.toLowerCase().includes('night')
+					|| v.toLowerCase().includes('sand')
+					|| v.toLowerCase().includes('leaf')
+					|| v.toLowerCase().includes('silk')
+					|| v.toLowerCase().includes('ice')
+					|| v.toLowerCase().includes('sea')
+					|| v.toLowerCase().includes('sky')
+					|| v.toLowerCase().includes('hive')
+					|| v.toLowerCase().includes('rain')
+					).join(' ').split('0').join('')
+						.split('1').join('')
+						.split('2').join('')
+						.split('3').join('')
+						.split('4').join('')
+						.split('5').join('')
+						.split('6').join('')
+						.split('7').join('')
+						.split('8').join('')
+						.split('9').join('')
+						.split('/').join(',')
+						.split('|').join(',')
+						.split('&').join(',')
+						.split('+').join(',')
+						.split(',').join(' ')
+						.split(' ');
+					var finalTribes = [];
+					tribes.forEach(tribe => {
+						if (tribe.toLowerCase().includes('mud')) {
+							finalTribes.push('mudwing');
+						} else if (tribe.toLowerCase().includes('sand')) {
+							finalTribes.push('sandwing');
+						} else if (tribe.toLowerCase().includes('night')) {
+							finalTribes.push('nightwing');
+						} else if (tribe.toLowerCase().includes('sea')) {
+							finalTribes.push('seawing');
+						} else if (tribe.toLowerCase().includes('sky')) {
+							finalTribes.push('skywing');
+						} else if (tribe.toLowerCase().includes('rain')) {
+							finalTribes.push('rainwing');
+						} else if (tribe.toLowerCase().includes('ice')) {
+							finalTribes.push('icewing');
+						} else if (tribe.toLowerCase().includes('leaf')) {
+							finalTribes.push('leafwing');
+						} else if (tribe.toLowerCase().includes('hive')) {
+							finalTribes.push('hivewing');
+						} else if (tribe.toLowerCase().includes('silk')) {
+							finalTribes.push('silkwing');
+						}
+					});
+					ocs.set(`${name}.tribes`, finalTribes);
+				} else if (!searchInMessage(message, 'tribe(s)', false).includes('N/A')) {
+					tribes = [];
+					tribes = searchInMessage(message, 'tribe(s)', false).split(' ').filter(v =>
+						v.toLowerCase().includes('mud')
+					|| v.toLowerCase().includes('night')
+					|| v.toLowerCase().includes('sand')
+					|| v.toLowerCase().includes('leaf')
+					|| v.toLowerCase().includes('silk')
+					|| v.toLowerCase().includes('ice')
+					|| v.toLowerCase().includes('sea')
+					|| v.toLowerCase().includes('sky')
+					|| v.toLowerCase().includes('hive')
+					|| v.toLowerCase().includes('rain')
+					).join(' ').split('0').join('')
+						.split('1').join('')
+						.split('2').join('')
+						.split('3').join('')
+						.split('4').join('')
+						.split('5').join('')
+						.split('6').join('')
+						.split('7').join('')
+						.split('8').join('')
+						.split('9').join('')
+						.split('/').join(',')
+						.split('|').join(',')
+						.split('&').join(',')
+						.split('+').join(',')
+						.split(',').join(' ')
+						.split(' ');
+					finalTribes = [];
+					tribes.forEach(tribe => {
+						if (tribe.toLowerCase().includes('mud')) {
+							finalTribes.push('mudwing');
+						} else if (tribe.toLowerCase().includes('sand')) {
+							finalTribes.push('sandwing');
+						} else if (tribe.toLowerCase().includes('night')) {
+							finalTribes.push('nightwing');
+						} else if (tribe.toLowerCase().includes('sea')) {
+							finalTribes.push('seawing');
+						} else if (tribe.toLowerCase().includes('sky')) {
+							finalTribes.push('skywing');
+						} else if (tribe.toLowerCase().includes('rain')) {
+							finalTribes.push('rainwing');
+						} else if (tribe.toLowerCase().includes('ice')) {
+							finalTribes.push('icewing');
+						} else if (tribe.toLowerCase().includes('leaf')) {
+							finalTribes.push('leafwing');
+						} else if (tribe.toLowerCase().includes('hive')) {
+							finalTribes.push('hivewing');
+						} else if (tribe.toLowerCase().includes('silk')) {
+							finalTribes.push('silkwing');
+						}
+					});
+					ocs.set(`${name}.tribes`, finalTribes);
+				} else if (!searchInMessage(message, 'tribe', false).includes('N/A')) {
+					ocs.push(`${name}.tribes`, searchInMessage(message, 'tribe'));
+				}
+			});
+			if (lastMessageTimestamp >= messages[messages.length - 1].createdTimestamp) return 1;
+
+			lastMessageTimestamp = messages[messages.length - 1].createdTimestamp;
+			lastMessage = messages[messages.length - 10].id;
+		} while (lastMessageTimestamp > limit);
+		return 0;
+	}
 }
 
 function randomPantala() {
@@ -445,7 +455,7 @@ client.once('ready', async () => {
 	client.user.setUsername(`r/WOF Bot (${prefix})`);
 	console.log('[' + ('0' + new Date(Date.now()).getHours()).slice(-2) + ':' + ('0' + new Date(Date.now()).getMinutes()).slice(-2) + ':' + ('0' + new Date(Date.now()).getSeconds()).slice(-2) + `] Logged in as ${client.user.tag}; ready!`);
 	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true);
-	setInterval(fetchOCs, 30000);
+	//setInterval(fetchOCs, 30000);
 	setInterval(() => {
 		stalking.all().forEach((stalk) => {
 			stalk.data.forEach((stalked, index) => {
