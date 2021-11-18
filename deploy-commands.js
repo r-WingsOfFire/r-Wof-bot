@@ -11,6 +11,10 @@ const commands = [
 	new SlashCommandBuilder().setName('sunny').setDescription('get a nice quote from sunny'),
 	new SlashCommandBuilder().setName('fuck').setDescription('Fuck.').setDefaultPermission(false),
 	new SlashCommandBuilder().setName('fac').setDescription('flips a coin'),
+	new SlashCommandBuilder().setName('ocmessage').setDescription('Add a message declaring an oc to the database. This option is automatic.').addStringOption(option =>
+		option.setRequired(true)
+			.setDescription('The link or the id to the message')
+			.setName('msg')),
 	new SlashCommandBuilder().setName('hybridgen').setDescription('Randomly generates a hybrid combination you can use!').addBooleanOption(option =>
 		option.setName('pantala')
 			.setDescription('whether or not should pantalan tribes be possible.')

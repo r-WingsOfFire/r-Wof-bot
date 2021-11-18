@@ -58,7 +58,7 @@ function toFirstUppercase(str) {
 }
 
 /** Searches for a text in a message
- * @param {Message} message the message to search in
+ * @param {Discord.Message} message the message to search in
  * @param {String} text The text to look for
  * @param {bool} word If true, only returns the next word.
  * @returns {String} The next word or the end of the line
@@ -433,6 +433,184 @@ async function fetchOCs() {
 			lastMessage = messages[messages.length - 10].id;
 		} while (lastMessageTimestamp > limit);
 		return 0;
+	}
+}
+
+/**
+ * 
+ * @param {Discord.Message} message 
+ */
+async function addOc(message) {
+	ocs = new table('OC');
+	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
+	var ocChannel = rWingsOfFireServer.channels.resolve('854858811101937704');
+
+	var name = '';
+	var indexAdd = 0;
+	const messagesFetched = Array.from((await ocChannel.messages.fetch({ before: message.id, limit: 10 })).sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
+	
+	if(message.content.toLowerCase().includes('name') && message.content.toLowerCase().includes(':')) {
+		if (message.content.toLowerCase().includes('name and common nicknames')) {
+			name = searchInMessage(message, 'name and common nicknames', false);
+		} else if (message.content.toLowerCase().includes('name and common and nicknams')) {
+			name = searchInMessage(message, 'name and common and nicknams', false);
+		} else if (message.content.toLowerCase().includes('name and common and nicknames')) {
+			name = searchInMessage(message, 'name and common and nicknames', false);
+		} else if (message.content.toLowerCase().includes('name and common nickname')) {
+			name = searchInMessage(message, 'name and common nickname', false);
+		} else if (message.content.toLowerCase().includes('name')) {
+			name = searchInMessage(message, 'name', false);
+		}
+	} else {
+		while(name === '') {
+			if(messagesFetched[indexAdd].content.toLowerCase().includes('name') && message.content.toLowerCase().includes(':')) {
+				if (messagesFetched[indexAdd].content.toLowerCase().includes('name and common nicknames')) {
+					name = searchInMessage(messagesFetched[indexAdd], 'name and common nicknames', false);
+				} else if (messagesFetched[indexAdd].content.toLowerCase().includes('name and common and nicknams')) {
+					name = searchInMessage(messagesFetched[indexAdd], 'name and common and nicknams', false);
+				} else if (messagesFetched[indexAdd].content.toLowerCase().includes('name and common and nicknames')) {
+					name = searchInMessage(messagesFetched[indexAdd], 'name and common and nicknames', false);
+				} else if (messagesFetched[indexAdd].content.toLowerCase().includes('name and common nickname')) {
+					name = searchInMessage(messagesFetched[indexAdd], 'name and common nickname', false);
+				} else if (messagesFetched[indexAdd].content.toLowerCase().includes('name')) {
+					name = searchInMessage(messagesFetched[indexAdd], 'name', false);
+				}
+			}
+			indexAdd++;
+		}
+	}	
+	var nameArr = name.split(';')[0]
+		.split(',')[0]
+		.split('|')[0]
+		.split(' or ')[0]
+		.split('(')[0]
+		.split('*').join('')
+		.split('-').join(' ')
+		.split('  ').join(' ')
+		.split(' ');
+	while(nameArr[0] === '') nameArr.shift();
+	while(nameArr[nameArr.length - 1] === '') nameArr.pop();
+	nameArr.forEach((namePart, i) => {
+		if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+	});
+	name = nameArr.join(' ');
+	ocs.set(`${name}.message.Snowflake`, message.id);
+	ocs.set(`${name}.message.URL`, `https://discord.com/channels/716601325269549127/854858811101937704/${message.id}`);
+	if(message.embeds.length > 0) ocs.set(`${name}.image`, message.embeds[0].url);
+	if(message.mentions.users.size > 0) ocs.set(`${name}.owner`, message.mentions.users.first().username);
+	if(message.content.toLowerCase().includes('age')) ocs.set(`${name}.age`, Number(searchInMessage(message, 'age')));
+	if(message.content.toLowerCase().includes('gender')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
+	if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
+	if(message.content.toLowerCase().includes('tribes')) {
+		var tribes = [];
+		tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
+			v.toLowerCase().includes('mud')
+			|| v.toLowerCase().includes('night')
+			|| v.toLowerCase().includes('sand')
+			|| v.toLowerCase().includes('leaf')
+			|| v.toLowerCase().includes('silk')
+			|| v.toLowerCase().includes('ice')
+			|| v.toLowerCase().includes('sea')
+			|| v.toLowerCase().includes('sky')
+			|| v.toLowerCase().includes('hive')
+			|| v.toLowerCase().includes('rain')
+		).join(' ').split('0').join('')
+			.split('1').join('')
+			.split('2').join('')
+			.split('3').join('')
+			.split('4').join('')
+			.split('5').join('')
+			.split('6').join('')
+			.split('7').join('')
+			.split('8').join('')
+			.split('9').join('')
+			.split('/').join(',')
+			.split('|').join(',')
+			.split('&').join(',')
+			.split('+').join(',')
+			.split(',').join(' ')
+			.split(' ');
+		var finalTribes = [];
+		tribes.forEach(tribe => {
+			if (tribe.toLowerCase().includes('mud')) {
+				finalTribes.push('mudwing');
+			} else if (tribe.toLowerCase().includes('sand')) {
+				finalTribes.push('sandwing');
+			} else if (tribe.toLowerCase().includes('night')) {
+				finalTribes.push('nightwing');
+			} else if (tribe.toLowerCase().includes('sea')) {
+				finalTribes.push('seawing');
+			} else if (tribe.toLowerCase().includes('sky')) {
+				finalTribes.push('skywing');
+			} else if (tribe.toLowerCase().includes('rain')) {
+				finalTribes.push('rainwing');
+			} else if (tribe.toLowerCase().includes('ice')) {
+				finalTribes.push('icewing');
+			} else if (tribe.toLowerCase().includes('leaf')) {
+				finalTribes.push('leafwing');
+			} else if (tribe.toLowerCase().includes('hive')) {
+				finalTribes.push('hivewing');
+			} else if (tribe.toLowerCase().includes('silk')) {
+				finalTribes.push('silkwing');
+			}
+		});
+		ocs.set(`${name}.tribes`, finalTribes);
+	} else if (message.content.toLowerCase().includes('tribe(s)')) {
+		tribes = [];
+		tribes = searchInMessage(message, 'tribe(s)', false).split(' ').filter(v =>
+			v.toLowerCase().includes('mud')
+			|| v.toLowerCase().includes('night')
+			|| v.toLowerCase().includes('sand')
+			|| v.toLowerCase().includes('leaf')
+			|| v.toLowerCase().includes('silk')
+			|| v.toLowerCase().includes('ice')
+			|| v.toLowerCase().includes('sea')
+			|| v.toLowerCase().includes('sky')
+			|| v.toLowerCase().includes('hive')
+			|| v.toLowerCase().includes('rain')
+		).join(' ').split('0').join('')
+			.split('1').join('')
+			.split('2').join('')
+			.split('3').join('')
+			.split('4').join('')
+			.split('5').join('')
+			.split('6').join('')
+			.split('7').join('')
+			.split('8').join('')
+			.split('9').join('')
+			.split('/').join(',')
+			.split('|').join(',')
+			.split('&').join(',')
+			.split('+').join(',')
+			.split(',').join(' ')
+			.split(' ');
+		finalTribes = [];
+		tribes.forEach(tribe => {
+			if (tribe.toLowerCase().includes('mud')) {
+				finalTribes.push('mudwing');
+			} else if (tribe.toLowerCase().includes('sand')) {
+				finalTribes.push('sandwing');
+			} else if (tribe.toLowerCase().includes('night')) {
+				finalTribes.push('nightwing');
+			} else if (tribe.toLowerCase().includes('sea')) {
+				finalTribes.push('seawing');
+			} else if (tribe.toLowerCase().includes('sky')) {
+				finalTribes.push('skywing');
+			} else if (tribe.toLowerCase().includes('rain')) {
+				finalTribes.push('rainwing');
+			} else if (tribe.toLowerCase().includes('ice')) {
+				finalTribes.push('icewing');
+			} else if (tribe.toLowerCase().includes('leaf')) {
+				finalTribes.push('leafwing');
+			} else if (tribe.toLowerCase().includes('hive')) {
+				finalTribes.push('hivewing');
+			} else if (tribe.toLowerCase().includes('silk')) {
+				finalTribes.push('silkwing');
+			}
+		});
+		ocs.set(`${name}.tribes`, finalTribes);
+	} else if (!searchInMessage(message, 'tribe', false).includes('N/A')) {
+		ocs.push(`${name}.tribes`, searchInMessage(message, 'tribe'));
 	}
 }
 
@@ -1453,6 +1631,7 @@ client.on('interactionCreate', async interaction => {
 		break;
 
 	case 'oc':
+		ocs = new table('OC');
 		var ocArr = [];
 		var oc = '';
 		interaction.options.getString('name').split(' ').forEach((namePart, i) => {
@@ -1461,75 +1640,76 @@ client.on('interactionCreate', async interaction => {
 		oc = ocArr.join(' ');
 			
 		if(ocs.has(oc))	{
-			if(ocs.has(oc))	{
-				switch(ocs.get(`${ocs}.tribes[0]`)) {
-				case 'skywing':
-					color = 'RED';
-					break;
+			switch(ocs.get(`${ocs}.tribes[0]`)) {
+			case 'skywing':
+				color = 'RED';
+				break;
 
-				case 'seawing':
-					color = 'NAVY';
-					break;
+			case 'seawing':
+				color = 'NAVY';
+				break;
 
-				case 'sandwing':
-					color = 'GOLD';
-					break;
+			case 'sandwing':
+				color = 'GOLD';
+				break;
 							
-				case 'nightwing':
-					color = 'DARK_PURPLE';
-					break;
+			case 'nightwing':
+				color = 'DARK_PURPLE';
+				break;
 							
-				case 'icewing':
-					color = [221, 255, 255];
-					break;
+			case 'icewing':
+				color = [221, 255, 255];
+				break;
 							
-				case 'mudwing':
-					color = [112, 84, 62];
-					break;
+			case 'mudwing':
+				color = [112, 84, 62];
+				break;
 							
-				case 'rainwing':
-					color = 'RANDOM';
-					break;
+			case 'rainwing':
+				color = 'RANDOM';
+				break;
 							
-				case 'hivewing':
-					color = 'DEFAULT';
-					break;
+			case 'hivewing':
+				color = 'DEFAULT';
+				break;
 							
-				case 'silkwing':
-					color = 'RANDOM';
-					break;
+			case 'silkwing':
+				color = 'RANDOM';
+				break;
 							
-				case 'leafwing':
-					color = [48, 183, 0];
-					break;
-							
-				}
-				try {
-					let embed = new MessageEmbed()
-						.setTitle(oc)
-						.setColor(color)
-						.setAuthor(ocs.get(`${oc}.owner`) | 'unavailable')
-						.setURL(ocs.get(`${oc}.message.URL`) | 'https://discord.com/channels/716601325269549127/854858811101937704')
-						.setImage(ocs.get(`${oc}.image`) | 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg')
-						.setFooter('This sheet might not be 100% accurate. If there is an error, please immediately report it to <@373515998000840714>')
-						.addField('Tribe(s)', ocs.get(`${oc}.tribes`).join(' / ') | 'unavailable', true)
-						.addField('Age', ocs.get(`${oc}.age`) | 'unavailable', true)
-						.addField('Gender', ocs.get(`${oc}.gender`) | 'unavailable', true);
-					await interaction.reply({ 'embeds': [embed], 'ephemeral': false });
-				} catch (e) {
-					console.log(ocs.get(`${oc}.owner`),
-						ocs.get(`${oc}.message.URL`),
-						ocs.get(`${oc}.image`),
-						ocs.get(`${oc}.tribes`).join(' / '),
-						ocs.get(`${oc}.age`),
-						ocs.get(`${oc}.gender`));
-					console.warn(e);
-					ocs.delete(oc);
-				}
-			} else {
-				await interaction.reply('This oc is invalid. Please try again.');
+			case 'leafwing':
+				color = [48, 183, 0];
+				break;
+				
+			default:
+				color = 'DEFAULT';
+				break;
 			}
-		}	
+			try {
+				let embed = new MessageEmbed()
+					.setTitle(oc)
+					.setColor(color)
+					.setAuthor(ocs.get(`${oc}.owner`) || 'unavailable')
+					.setURL(ocs.get(`${oc}.message.URL`) || 'https://discord.com/channels/716601325269549127/854858811101937704')
+					.setImage(ocs.get(`${oc}.image`) || 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg')
+					.setFooter('This sheet might not be 100% accurate. If there is an error, please immediately report it to <@373515998000840714>')
+					.addField('Tribe(s)', ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable', true)
+					.addField('Age', String(ocs.get(`${oc}.age`)) || 'unavailable', true)
+					.addField('Gender', ocs.get(`${oc}.gender`) || 'unavailable', true);
+				await interaction.reply({ 'embeds': [embed], 'ephemeral': false });
+			} catch (e) {
+				console.log(ocs.get(`${oc}.owner`),
+					ocs.get(`${oc}.message.URL`),
+					ocs.get(`${oc}.image`),
+					ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable',
+					ocs.get(`${oc}.age`),
+					ocs.get(`${oc}.gender`));
+				console.warn(e);
+				//ocs.delete(oc);
+			}
+		} else {
+			await interaction.reply('This oc is invalid. Please try again.');
+		}
 		break;
 
 	case 'editoc':
@@ -1853,6 +2033,19 @@ client.on('interactionCreate', async interaction => {
 		});
 
 		break;
+	
+	case 'ocmessage':
+		let msg = interaction.options.getString('msg');
+
+		var message;
+		if(msg.includes('/')) {
+			message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1]);
+		} else {
+			message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg);
+		}
+
+		await addOc(message);
+		await interaction.reply('The message was successfully added to the database! If there are other messages about that oc, please insert them too!');
 	}
 });
 
