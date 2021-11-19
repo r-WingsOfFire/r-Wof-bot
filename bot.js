@@ -2051,6 +2051,29 @@ client.on('interactionCreate', async interaction => {
 
 		await addOc(message);
 		await interaction.reply('The message was successfully added to the database! If there are other messages about that oc, please insert them too!');
+		break;
+
+
+	case 'help':
+		let command = interaction.options.getString('cmd', false);
+		if(command != null)
+			interaction.reply(new Discord.MessageEmbed()
+				.setTitle('Help')
+				.setColor('ORANGE')
+				.setFooter('Use /help cmd:<command> for more informations on that command!')
+				.addFields([{ name: 'kill', value: 'Kills the bot. (Only available to bot-helper role)', inline: false },
+					{ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.', inline: false },
+					{ name: 'snek', value: 'snek.', inline: false },
+					{ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.', inline: false },
+					{ name: 'oc', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.', inline: false },
+					{ name: 'editoc', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.', inline: false },
+					{ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!', inline: false },
+					{ name: 'fac,\nflip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!', inline: false },
+					{ name: 'hybridgen', value: 'A hybrid generator for you!', inline: false },
+					{ name: 'ocmessage', value: 'Adds a message to the database', inline: false },
+					{ name: 'help', valuse: 'Shows this message!' }]
+				)
+			);
 	}
 });
 
