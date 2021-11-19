@@ -1631,250 +1631,268 @@ client.on('interactionCreate', async interaction => {
 		break;
 
 	case 'oc':
-		ocs = new table('OC');
-		var ocArr = [];
-		var oc = '';
-		interaction.options.getString('name').split(' ').forEach((namePart, i) => {
-			ocArr[i] = toFirstUppercase(namePart);
-		});
-		oc = ocArr.join(' ');
-			
-		if(ocs.has(oc))	{
-			switch(ocs.get(`${ocs}.tribes[0]`)) {
-			case 'skywing':
-				color = 'RED';
-				break;
-
-			case 'seawing':
-				color = 'NAVY';
-				break;
-
-			case 'sandwing':
-				color = 'GOLD';
-				break;
-							
-			case 'nightwing':
-				color = 'DARK_PURPLE';
-				break;
-							
-			case 'icewing':
-				color = [221, 255, 255];
-				break;
-							
-			case 'mudwing':
-				color = [112, 84, 62];
-				break;
-							
-			case 'rainwing':
-				color = 'RANDOM';
-				break;
-							
-			case 'hivewing':
-				color = 'DEFAULT';
-				break;
-							
-			case 'silkwing':
-				color = 'RANDOM';
-				break;
-							
-			case 'leafwing':
-				color = [48, 183, 0];
-				break;
-				
-			default:
-				color = 'DEFAULT';
-				break;
-			}
-			try {
-				let embed = new MessageEmbed()
-					.setTitle(oc)
-					.setColor(color)
-					.setAuthor(ocs.get(`${oc}.owner`) || 'unavailable')
-					.setURL(ocs.get(`${oc}.message.URL`) || 'https://discord.com/channels/716601325269549127/854858811101937704')
-					.setFooter('This sheet might not be 100% accurate. If there is an error, please immediately report it to <@373515998000840714>')
-					.addField('Tribe(s)', ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable', true)
-					.addField('Age', String(ocs.get(`${oc}.age`)) || 'unavailable', true)
-					.addField('Gender', ocs.get(`${oc}.gender`) || 'unavailable', true);
-				if(ocs.has(`${oc}.image`)) embed.setImage(ocs.get(`${oc}.image`) || 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg');
-				await interaction.reply({ 'embeds': [embed], 'ephemeral': false });
-			} catch (e) {
-				console.log(ocs.get(`${oc}.owner`),
-					ocs.get(`${oc}.message.URL`),
-					ocs.get(`${oc}.image`),
-					ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable',
-					ocs.get(`${oc}.age`),
-					ocs.get(`${oc}.gender`));
-				console.warn(e);
-				//ocs.delete(oc);
-			}
-		} else {
-			await interaction.reply({ embeds:[new Discord.MessageEmbed()
-				.setDescription('This oc is invalid. Please try again.')
-				.setFooter('Did you add your oc to the database yet? Please check /help cmd:ocmessage to do so!')
-				.setColor('RED')
-				.setTitle('Oc invalid.')]
+		switch(interaction.options.getSubcommand()) {
+		case 'get':
+			ocs = new table('OC');
+			var ocArr = [];
+			var oc = '';
+			interaction.options.getString('name').split(' ').forEach((namePart, i) => {
+				ocArr[i] = toFirstUppercase(namePart);
 			});
-		}
-		break;
+			oc = ocArr.join(' ');
+				
+			if(ocs.has(oc))	{
+				switch(ocs.get(`${ocs}.tribes[0]`)) {
+				case 'skywing':
+					color = 'RED';
+					break;
 
-	case 'editoc':
-		var name = interaction.options.getString('name');
-		var nameArr = name.split(';')[0]
-			.split(',')[0]
-			.split('|')[0]
-			.split(' or ')[0]
-			.split('(')[0]
-			.split('*').join('')
-			.split('-').join(' ')
-			.split('  ').join(' ')
-			.split(' ');
-		if(nameArr[0] == '') nameArr.shift();
-		if(nameArr[nameArr.length - 1] == '') nameArr.pop();
-		nameArr = nameArr.join(' ').split(' ');
-		nameArr.forEach((namePart, i) => {
-			if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
-		});
-		name = nameArr.join(' ');
-		var key = interaction.options.getString('key');
-		var	value = interaction.options.getString('value');
+				case 'seawing':
+					color = 'NAVY';
+					break;
 
-		if(key === 'deltribe') {
-			if(ocs.has(name)) {
-				if (ocs.get(name + '.owner') != interaction.user.username || ocs.get(name + '.owner') != undefined) {
-					interaction.reply('You do not have the premissions to edit that oc!');
-					return;
+				case 'sandwing':
+					color = 'GOLD';
+					break;
+								
+				case 'nightwing':
+					color = 'DARK_PURPLE';
+					break;
+								
+				case 'icewing':
+					color = [221, 255, 255];
+					break;
+								
+				case 'mudwing':
+					color = [112, 84, 62];
+					break;
+								
+				case 'rainwing':
+					color = 'RANDOM';
+					break;
+								
+				case 'hivewing':
+					color = 'DEFAULT';
+					break;
+								
+				case 'silkwing':
+					color = 'RANDOM';
+					break;
+								
+				case 'leafwing':
+					color = [48, 183, 0];
+					break;
+					
+				default:
+					color = 'DEFAULT';
+					break;
 				}
-				if(ocs.get(`${name}.tribes`).includes(value.toLowerCase())) {
-					var array = ocs.get(`${name}.tribes`);
-					array.splice(array.indexOf(value), 1);
-					ocs.set(name + '.tribes', array);
-					interaction.reply('The tribe was successfully removed!');
-				} else {
-					await interaction.reply(`The oc you specified does not have the ${value} tribe!`);
+				try {
+					let embed = new MessageEmbed()
+						.setTitle(oc)
+						.setColor(color)
+						.setAuthor(ocs.get(`${oc}.owner`) || 'unavailable')
+						.setURL(ocs.get(`${oc}.message.URL`) || 'https://discord.com/channels/716601325269549127/854858811101937704')
+						.setFooter('This sheet might not be 100% accurate. If there is an error, please immediately report it to <@373515998000840714>')
+						.addField('Tribe(s)', ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable', true)
+						.addField('Age', String(ocs.get(`${oc}.age`)) || 'unavailable', true)
+						.addField('Gender', ocs.get(`${oc}.gender`) || 'unavailable', true);
+					if(ocs.has(`${oc}.image`)) embed.setImage(ocs.get(`${oc}.image`) || 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg');
+					await interaction.reply({ 'embeds': [embed], 'ephemeral': false });
+				} catch (e) {
+					console.log(ocs.get(`${oc}.owner`),
+						ocs.get(`${oc}.message.URL`),
+						ocs.get(`${oc}.image`),
+						ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable',
+						ocs.get(`${oc}.age`),
+						ocs.get(`${oc}.gender`));
+					console.warn(e);
+					//ocs.delete(oc);
 				}
 			} else {
-				await interaction.reply('The oc you specified is not in the database!');
+				await interaction.reply({ embeds:[new Discord.MessageEmbed()
+					.setDescription('This oc is invalid. Please try again.')
+					.setFooter('Did you add your oc to the database yet? Please check /help cmd:ocmessage to do so!')
+					.setColor('RED')
+					.setTitle('Oc invalid.')]
+				});
 			}
-		} else {
-			if(ocs.has(name)) {
-				if (ocs.get(name + '.owner') != interaction.user.username && ocs.get(name + '.owner') != undefined && !interaction.member.roles.cache.has('795414220707463188') && !interaction.member.roles.cache.has('762526998274113548')) {
-					interaction.reply('You do not have the premissions to edit that oc!');
-					console.log(interaction.user.username);
-					return;
-				}
-				if(key === 'tribes') {
-					var tribe = '';
-					if (tribe.toLowerCase().includes('mud')) {
-						tribe = 'mudwing';
-					} else if (tribe.toLowerCase().includes('sand')) {
-						tribe = 'sandwing';
-					} else if (tribe.toLowerCase().includes('night')) {
-						tribe = 'nightwing';
-					} else if (tribe.toLowerCase().includes('sea')) {
-						tribe = 'seawing';
-					} else if (tribe.toLowerCase().includes('sky')) {
-						tribe = 'skywing';
-					} else if (tribe.toLowerCase().includes('rain')) {
-						tribe = 'rainwing';
-					} else if (tribe.toLowerCase().includes('ice')) {
-						tribe = 'icewing';
-					} else if (tribe.toLowerCase().includes('leaf')) {
-						tribe = 'leafwing';
-					} else if (tribe.toLowerCase().includes('hive')) {
-						tribe = 'hivewing';
-					} else if (tribe.toLowerCase().includes('silk')) {
-						tribe = 'silkwing';
+			break;
+		
+		case 'edit':
+			var name = interaction.options.getString('name');
+			var nameArr = name.split(';')[0]
+				.split(',')[0]
+				.split('|')[0]
+				.split(' or ')[0]
+				.split('(')[0]
+				.split('*').join('')
+				.split('-').join(' ')
+				.split('  ').join(' ')
+				.split(' ');
+			if(nameArr[0] == '') nameArr.shift();
+			if(nameArr[nameArr.length - 1] == '') nameArr.pop();
+			nameArr = nameArr.join(' ').split(' ');
+			nameArr.forEach((namePart, i) => {
+				if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+			});
+			name = nameArr.join(' ');
+			var key = interaction.options.getString('key');
+			var	value = interaction.options.getString('value');
+
+			if(key === 'deltribe') {
+				if(ocs.has(name)) {
+					if (ocs.get(name + '.owner') != interaction.user.username || ocs.get(name + '.owner') != undefined) {
+						interaction.reply('You do not have the premissions to edit that oc!');
+						return;
+					}
+					if(ocs.get(`${name}.tribes`).includes(value.toLowerCase())) {
+						var array = ocs.get(`${name}.tribes`);
+						array.splice(array.indexOf(value), 1);
+						ocs.set(name + '.tribes', array);
+						interaction.reply('The tribe was successfully removed!');
 					} else {
-						interaction.reply('The tribe is invalid!');
+						await interaction.reply(`The oc you specified does not have the ${value} tribe!`);
 					}
-					if(ocs.get(name + '.tribes').includes(tribe)) {
-						interaction.reply('The oc already has this tribe!');
+				} else {
+					await interaction.reply('The oc you specified is not in the database!');
+				}
+			} else {
+				if(ocs.has(name)) {
+					if (ocs.get(name + '.owner') != interaction.user.username && ocs.get(name + '.owner') != undefined && !interaction.member.roles.cache.has('795414220707463188') && !interaction.member.roles.cache.has('762526998274113548')) {
+						interaction.reply('You do not have the premissions to edit that oc!');
+						console.log(interaction.user.username);
+						return;
 					}
-				} else if (key === 'owner') {
-					ocs.set(`${name}.owner`, client.users.resolve(value.slice(3, -1)).username);
-					interaction.reply('The oc was successfully edited!');
-				} else if(key === 'age') {
-					if(!isNaN(value)) {
-						ocs.set(name + '.' + key, new Number(value));
+					if(key === 'tribes') {
+						var tribe = '';
+						if (tribe.toLowerCase().includes('mud')) {
+							tribe = 'mudwing';
+						} else if (tribe.toLowerCase().includes('sand')) {
+							tribe = 'sandwing';
+						} else if (tribe.toLowerCase().includes('night')) {
+							tribe = 'nightwing';
+						} else if (tribe.toLowerCase().includes('sea')) {
+							tribe = 'seawing';
+						} else if (tribe.toLowerCase().includes('sky')) {
+							tribe = 'skywing';
+						} else if (tribe.toLowerCase().includes('rain')) {
+							tribe = 'rainwing';
+						} else if (tribe.toLowerCase().includes('ice')) {
+							tribe = 'icewing';
+						} else if (tribe.toLowerCase().includes('leaf')) {
+							tribe = 'leafwing';
+						} else if (tribe.toLowerCase().includes('hive')) {
+							tribe = 'hivewing';
+						} else if (tribe.toLowerCase().includes('silk')) {
+							tribe = 'silkwing';
+						} else {
+							interaction.reply('The tribe is invalid!');
+						}
+						if(ocs.get(name + '.tribes').includes(tribe)) {
+							interaction.reply('The oc already has this tribe!');
+						}
+					} else if (key === 'owner') {
+						ocs.set(`${name}.owner`, client.users.resolve(value.slice(3, -1)).username);
+						interaction.reply('The oc was successfully edited!');
+					} else if(key === 'age') {
+						if(!isNaN(value)) {
+							ocs.set(name + '.' + key, new Number(value));
+							interaction.reply('The oc was successfully edited!');
+						}
+						else interaction.reply('Please insert a number');
+					} else {
+						ocs.set(name + '.' + key, value);
 						interaction.reply('The oc was successfully edited!');
 					}
-					else interaction.reply('Please insert a number');
 				} else {
-					ocs.set(name + '.' + key, value);
-					interaction.reply('The oc was successfully edited!');
-				}
-			} else {
-				let buttons = new Discord.MessageActionRow()
-					.addComponents(
-						new Discord.MessageButton()
-							.setLabel('Yes!')
-							.setStyle('PRIMARY')
-							.setCustomId('yes')
-					).addComponents(
-						new Discord.MessageButton()
-							.setLabel('No...')
-							.setStyle('PRIMARY')
-							.setCustomId('no')
-					);
-				let reply = await interaction.reply({ content: 'This oc is not in the database! Do you want to create one?', components: [buttons], fetchReply: true });
-				reply.awaitMessageComponent({ componentType: 'BUTTON', time: 15000, filter: interact => interact.user.id === interaction.user.id }).then(interactionB => {
-					if(interactionB.customId === 'yes') {
-						if(key === 'tribes') {
-							if (tribe.toLowerCase().includes('mud')) {
-								ocs.push(name + '.tribes', 'mudwing');
+					let buttons = new Discord.MessageActionRow()
+						.addComponents(
+							new Discord.MessageButton()
+								.setLabel('Yes!')
+								.setStyle('PRIMARY')
+								.setCustomId('yes')
+						).addComponents(
+							new Discord.MessageButton()
+								.setLabel('No...')
+								.setStyle('PRIMARY')
+								.setCustomId('no')
+						);
+					let reply = await interaction.reply({ content: 'This oc is not in the database! Do you want to create one?', components: [buttons], fetchReply: true });
+					reply.awaitMessageComponent({ componentType: 'BUTTON', time: 15000, filter: interact => interact.user.id === interaction.user.id }).then(interactionB => {
+						if(interactionB.customId === 'yes') {
+							if(key === 'tribes') {
+								if (tribe.toLowerCase().includes('mud')) {
+									ocs.push(name + '.tribes', 'mudwing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('sand')) {
+									ocs.push(name + '.tribes', 'sandwing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('night')) {
+									ocs.push(name + '.tribes', 'nightwing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('sea')) {
+									ocs.push(name + '.tribes', 'seawing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('sky')) {
+									ocs.push(name + '.tribes', 'skywing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('rain')) {
+									ocs.push(name + '.tribes', 'rainwing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('ice')) {
+									ocs.push(name + '.tribes', 'icewing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('leaf')) {
+									ocs.push(name + '.tribes', 'leafwing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('hive')) {
+									ocs.push(name + '.tribes', 'hivewing');
+									interactionB.update('The oc was successfully added!');
+								} else if (tribe.toLowerCase().includes('silk')) {
+									ocs.push(name + '.tribes', 'silkwing');
+									interactionB.update('The oc was successfully added!');
+								} else {
+									interactionB.update('The tribe is invalid!');
+								}
+							} else if(key === 'age') {
+								if(!isNaN(value)) {
+									ocs.set(name + '.age', new Number(value));
+									interactionB.update('The oc was successfully added!');
+								}
+								else interaction.reply('Please insert a number');
+							} else if (key === 'owner') {
+								ocs.set(name + '.owner', client.users.resolve(value.slice(3, -1)).username);
 								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('sand')) {
-								ocs.push(name + '.tribes', 'sandwing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('night')) {
-								ocs.push(name + '.tribes', 'nightwing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('sea')) {
-								ocs.push(name + '.tribes', 'seawing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('sky')) {
-								ocs.push(name + '.tribes', 'skywing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('rain')) {
-								ocs.push(name + '.tribes', 'rainwing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('ice')) {
-								ocs.push(name + '.tribes', 'icewing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('leaf')) {
-								ocs.push(name + '.tribes', 'leafwing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('hive')) {
-								ocs.push(name + '.tribes', 'hivewing');
-								interactionB.update('The oc was successfully added!');
-							} else if (tribe.toLowerCase().includes('silk')) {
-								ocs.push(name + '.tribes', 'silkwing');
-								interactionB.update('The oc was successfully added!');
+							} else if(key === 'message') {
+								ocs.set(name + '.message.URL', value);
+								ocs.set(name + '.message.Snowflake', value.split('/')[value.split('/').length - 1]);
 							} else {
-								interactionB.update('The tribe is invalid!');
-							}
-						} else if(key === 'age') {
-							if(!isNaN(value)) {
-								ocs.set(name + '.age', new Number(value));
+								ocs.set(name + '.' + key, value);
 								interactionB.update('The oc was successfully added!');
 							}
-							else interaction.reply('Please insert a number');
-						} else if (key === 'owner') {
-							ocs.set(name + '.owner', client.users.resolve(value.slice(3, -1)).username);
-							interactionB.update('The oc was successfully added!');
-						} else if(key === 'message') {
-							ocs.set(name + '.message.URL', value);
-							ocs.set(name + '.message.Snowflake', value.split('/')[value.split('/').length - 1]);
 						} else {
-							ocs.set(name + '.' + key, value);
-							interactionB.update('The oc was successfully added!');
+							interactionB.update('Alright, aborting...');
 						}
-					} else {
-						interactionB.update('Alright, aborting...');
-					}
-				});
+					});
 				
+				}
 			}
+			break;
+
+		case 'ocmessage':
+			let msg = interaction.options.getString('msg');
+
+			var message;
+			if(msg.includes('/')) {
+				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1]);
+			} else {
+				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg);
+			}
+
+			await addOc(message);
+			await interaction.reply('The message was successfully added to the database! If there are other messages about that oc, please insert them too!');
+			break;
 		}
 		break;
 
@@ -2038,19 +2056,28 @@ client.on('interactionCreate', async interaction => {
 		});
 
 		break;
-	
-	case 'ocmessage':
-		let msg = interaction.options.getString('msg');
 
-		var message;
-		if(msg.includes('/')) {
-			message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1]);
-		} else {
-			message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg);
-		}
 
-		await addOc(message);
-		await interaction.reply('The message was successfully added to the database! If there are other messages about that oc, please insert them too!');
+	case 'help':
+		let command = interaction.options.getString('cmd', false);
+		if(command != null)
+			interaction.reply(new Discord.MessageEmbed()
+				.setTitle('Help')
+				.setColor('ORANGE')
+				.setFooter('Use /help cmd:<command> for more informations on that command!')
+				.addFields([{ name: 'kill', value: 'Kills the bot. (Only available to bot-helper role)', inline: false },
+					{ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.', inline: false },
+					{ name: 'snek', value: 'snek.', inline: false },
+					{ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.', inline: false },
+					{ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.', inline: false },
+					{ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.', inline: false },
+					{ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!', inline: false },
+					{ name: 'fac,\nflip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!', inline: false },
+					{ name: 'hybridgen', value: 'A hybrid generator for you!', inline: false },
+					{ name: 'oc message', value: 'Adds a message to the database', inline: false },
+					{ name: 'help', valuse: 'Shows this message!' }]
+				)
+			);
 	}
 });
 

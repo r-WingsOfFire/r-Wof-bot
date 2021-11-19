@@ -11,10 +11,9 @@ const commands = [
 	new SlashCommandBuilder().setName('sunny').setDescription('get a nice quote from sunny'),
 	new SlashCommandBuilder().setName('fuck').setDescription('Fuck.').setDefaultPermission(false),
 	new SlashCommandBuilder().setName('fac').setDescription('flips a coin'),
-	new SlashCommandBuilder().setName('ocmessage').setDescription('Add a message declaring an oc to the database. This option is automatic.').addStringOption(option =>
-		option.setRequired(true)
-			.setDescription('The link or the id to the message')
-			.setName('msg')),
+	new SlashCommandBuilder().setName('help').setDescription('Shows some help').addStringOption(option => 
+		option.setName('cmd').setDescription('The name of the command, if you want detailed infos.')
+	),
 	new SlashCommandBuilder().setName('hybridgen').setDescription('Randomly generates a hybrid combination you can use!').addBooleanOption(option =>
 		option.setName('pantala')
 			.setDescription('whether or not should pantalan tribes be possible.')
@@ -27,31 +26,38 @@ const commands = [
 		option.setName('user')
 			.setDescription('The user you want to stalk')
 			.setRequired(true)),
-	new SlashCommandBuilder().setName('oc').setDescription('Get infos about the specified oc').addStringOption(option =>
-		option.setName('name')
-			.setDescription('The name of the OC')
-			.setRequired(true)
+	new SlashCommandBuilder().setName('oc').setDescription('Interact with the oc database').addSubcommand(subcommand => 
+		subcommand.addStringOption(option =>
+			option.setName('name')
+				.setDescription('The name of the OC')
+				.setRequired(true)
+		).setName('get').setDescription('Shows info about a user')
+	).addSubcommand(subcommand =>
+		subcommand.setName('message').addStringOption(option => 
+			option.setName('msg').setDescription('The id of the message or its url').setRequired(true)
+		).setDescription('Add a message to the database')
+	).addSubcommand(subcommand => 
+		subcommand.setName('edit').setDescription('Edit an oc or attributes to the oc.').addStringOption(option =>
+			option.setName('name')
+				.setDescription('The name of the OC')
+				.setRequired(true)
+		).addStringOption(option => 
+			option.setName('key')
+				.setDescription('The name of the attribute')
+				.setRequired(true)
+				.addChoices([['owner', 'owner'],
+					['age', 'age'], 
+					['gender', 'gender'], 
+					['tribe', 'tribes'], 
+					['message', 'message'],
+					['delete a tribe', 'deltribe']])
+		).addStringOption(option => 
+			option.setDescription('The value of the attribute')
+				.setName('value')
+				.setRequired(true)
+		)
 	),
 	new SlashCommandBuilder().setName('quote').setDescription('Quote quizz!'),
-	new SlashCommandBuilder().setName('editoc').setDescription('Edit an oc or attributes to the oc.').addStringOption(option =>
-		option.setName('name')
-			.setDescription('The name of the OC')
-			.setRequired(true)
-	).addStringOption(option => 
-		option.setName('key')
-			.setDescription('The name of the attribute')
-			.setRequired(true)
-			.addChoices([['owner', 'owner'],
-				['age', 'age'], 
-				['gender', 'gender'], 
-				['tribe', 'tribes'], 
-				['message', 'message'],
-				['delete a tribe', 'deltribe']])
-	).addStringOption(option => 
-		option.setDescription('The value of the attribute')
-			.setName('value')
-			.setRequired(true)
-	),
 ]
 	.map(command => command.toJSON());
 
