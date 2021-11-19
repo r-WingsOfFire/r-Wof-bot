@@ -1691,11 +1691,11 @@ client.on('interactionCreate', async interaction => {
 					.setColor(color)
 					.setAuthor(ocs.get(`${oc}.owner`) || 'unavailable')
 					.setURL(ocs.get(`${oc}.message.URL`) || 'https://discord.com/channels/716601325269549127/854858811101937704')
-					.setImage(ocs.get(`${oc}.image`) || 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg')
 					.setFooter('This sheet might not be 100% accurate. If there is an error, please immediately report it to <@373515998000840714>')
 					.addField('Tribe(s)', ocs.get(`${oc}.tribes`)?.join(' / ') || 'unavailable', true)
 					.addField('Age', String(ocs.get(`${oc}.age`)) || 'unavailable', true)
 					.addField('Gender', ocs.get(`${oc}.gender`) || 'unavailable', true);
+				if(ocs.has(`${oc}.image`)) embed.setImage(ocs.get(`${oc}.image`) || 'https://nelowvision.com/wp-content/uploads/2018/11/Picture-Unavailable.jpg');
 				await interaction.reply({ 'embeds': [embed], 'ephemeral': false });
 			} catch (e) {
 				console.log(ocs.get(`${oc}.owner`),
@@ -1708,7 +1708,12 @@ client.on('interactionCreate', async interaction => {
 				//ocs.delete(oc);
 			}
 		} else {
-			await interaction.reply('This oc is invalid. Please try again.');
+			await interaction.reply({ embeds:[new Discord.MessageEmbed()
+				.setDescription('This oc is invalid. Please try again.')
+				.setFooter('Did you add your oc to the database yet? Please check /help cmd:ocmessage to do so!')
+				.setColor('RED')
+				.setTitle('Oc invalid.')]
+			});
 		}
 		break;
 
