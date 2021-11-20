@@ -22,7 +22,6 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
-          npm install -g forever
         
       - name: Run bot
         shell: bash
