@@ -82,9 +82,6 @@
         "no-inner-declarations": [
             "off"
         ],
-        "no-shadow": [
-            "error"
-        ],
         "prefer-const":[
             "warn"
         ],

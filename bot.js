@@ -1,34 +1,29 @@
 const Discord = require('discord.js');
 const { Client, Intents, MessageEmbed } = Discord;
-const client = new Client({
-	intents: [
-		Intents.FLAGS.GUILDS,
-		Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MEMBERS,
-		Intents.FLAGS.GUILD_PRESENCES
-	]
-});
-var prefix = '+';
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
 
 const { table } = require('quick.db');
-var totalMessages = new table('totalMessage');
 var stalking = new table('stalk');
 var ocs = new table('OC');
 
-var token = '';
-var tokenBuffer = '';
-const { exit, env } = require('process');
-require('dotenv')?.config(); // For compatibility with windows
+var quoteBusy = false;
 
-// Fetch token from evironment variable or from config file if env var not available
-tokenBuffer = env.token;
+var rWingsOfFireServer;
+
+const process = require('process');
+const exit = process.exit;
+var tokenBuffer = process.env.token;
+var token = '';
+var prefix = '+';
+
+require('dotenv').config();
+
 if(tokenBuffer == undefined) {
 	token = require('./config.json').token;
 	tokenBuffer = token;
 }
 token = tokenBuffer;
 
-// Fetch prefix from config file. Uses + if config file not available
 try {
 	{prefix;} require('./config.json');
 } catch (e) {
@@ -37,25 +32,20 @@ try {
 	console.log(`prefix: ${prefix}`);
 }
 
-// Used for hybridgen
 const pytribes = ['skywing', 'seawing', 'icewing', 'nightwing', 'sandwing', 'mudwing', 'rainwing'];
 const patribes = ['leafwing', 'hivewing', 'silkwing'];
 
-// Used to check if the bot can start a new quote quizz
-var quoteBusy = false;
-
-// Not yet initialized because it is not logged in and therefore unable to fetch guilds
-var rWingsOfFireServer;
-
-/** Transforms a string to another string but with the first letter being uppercase.
+/**
+ * Transforms a string to another string but with the first letter being uppercase.
  * @param {String} str the base string
  * @returns {String} the transformed string
  */
 function toFirstUppercase(str) {
+	var bufferArray = [''];
 	if (str == '') return;
 
 	str = str.toLowerCase();
-	var bufferArray = str.split('');
+	bufferArray = str.split('');
 	bufferArray[0] = bufferArray[0].toUpperCase();
 	return bufferArray.join('');
 }
@@ -67,17 +57,18 @@ function toFirstUppercase(str) {
  * @returns {String} The next word or the end of the line
 */
 function searchInMessage(message, text, word = true) {
+	var foundInLine = false;
 	var output = '';
 	if(message.content.toLowerCase().includes(text.toLowerCase())) {
 		message.content.split('\n').forEach(line => {
 			if (line.toLowerCase().includes(text.toLowerCase()) && output === '' && !line.toLowerCase().includes(' name ')) {
 				if(word) {
-					var foundInLine = false;
 					line.split(' ').forEach(words => {
 						if (words.toLowerCase().includes(text.toLowerCase())) foundInLine = true;
 						if (text.toLowerCase().includes(words.toLowerCase())) foundInLine = true;
 						if (!(words.toLowerCase().includes(text.toLowerCase()) || words.toLowerCase().includes(':') || words.toLowerCase().includes('resubmit') || words.toLowerCase().includes('resub')) && foundInLine && output === '')
 							output = words;
+
 					});
 				} else
 					output = line.toLowerCase().split(text.toLowerCase()).join('').split(':').join('');
@@ -90,17 +81,22 @@ function searchInMessage(message, text, word = true) {
 	return output;
 }
 
-/** Adds an oc to the database
+/**
  *
- * @param {Discord.Message} message The message to gather infos from
+ * @param {Discord.Message} message
  */
 async function addOc(message) {
-	ocs = new table('OC');
-	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
-	var ocChannel = rWingsOfFireServer.channels.resolve('854858811101937704');
-
 	var name = '';
 	var indexAdd = 0;
+	var ocChannel;
+	var nameArr = [''];
+	var tribes = [];
+	var finalTribes = [];
+
+	ocs = new table('OC');
+	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
+	ocChannel = rWingsOfFireServer.channels.resolve('854858811101937704');
+
 	const messagesFetched = Array.from((await ocChannel.messages.fetch({ before: message.id, limit: 10 })).sort((msg1, msg2) => msg2.createdTimestamp - msg1.createdTimestamp),([, value]) => (value));
 
 	if(message.content.toLowerCase().includes('name') && message.content.toLowerCase().includes(':')) {
@@ -133,7 +129,7 @@ async function addOc(message) {
 			indexAdd++;
 		}
 	}
-	var nameArr = name.split(';')[0]
+	nameArr = name.split(';')[0]
 		.split(',')[0]
 		.split('|')[0]
 		.split(' or ')[0]
@@ -156,7 +152,6 @@ async function addOc(message) {
 	if(message.content.toLowerCase().includes('gender')) ocs.set(`${name}.gender`, searchInMessage(message, 'gender'));
 	if(message.attachments.size > 0) ocs.set(`${name}.image`, message.attachments.first().url);
 	if(message.content.toLowerCase().includes('tribes')) {
-		var tribes = [];
 		tribes = searchInMessage(message, 'tribes', false).split(' ').filter(v =>
 			v.toLowerCase().includes('mud')
 			|| v.toLowerCase().includes('night')
@@ -184,7 +179,6 @@ async function addOc(message) {
 			.split('+').join(',')
 			.split(',').join(' ')
 			.split(' ');
-		var finalTribes = [];
 		tribes.forEach(tribe => {
 			if (tribe.toLowerCase().includes('mud'))
 				finalTribes.push('mudwing');
@@ -260,6 +254,7 @@ async function addOc(message) {
 				finalTribes.push('hivewing');
 			else if (tribe.toLowerCase().includes('silk'))
 				finalTribes.push('silkwing');
+
 		});
 		ocs.set(`${name}.tribes`, finalTribes);
 	} else if (!searchInMessage(message, 'tribe', false).includes('N/A'))
@@ -267,47 +262,27 @@ async function addOc(message) {
 
 }
 
-/** Picks a random tribe from pantala
- *
- * @returns {String} The random tribe
- */
 function randomPantala() {
 	return patribes[Math.floor(Math.random() * patribes.length)];
 }
 
-/** Picks a random tribe from pyrrhia
- *
- * @returns {String} The tribe
- */
 function randomPyrrhia() {
 	return pytribes[Math.floor(Math.random() * pytribes.length)];
 }
 
-/** Picks a random tribe
- *
- * @returns {String} The tribe
- */
 function randomTribe() {
 	if(Math.random() < 0.5) return randomPyrrhia();
 	else return randomPantala();
 }
 
-/** Kinda like a dice.
- *
- * @param {Number} min The lowest number possible
- * @param {Number} max The highest number possible
- * @returns {Number} A pseudo-random nuber in the range [min ]max
- */
-function randInt(min, max) {
-	return Math.floor(Math.random() * max - min) + min;
-}
-
-// Executes when the bot is logged in
 client.once('ready', async () => {
-	rWingsOfFireServer = await client.guilds.fetch('716601325269549127'); // Sets the wings of fire server
-	client.user.setUsername('r/WOF Bot'); // Sets the bot username
-	console.log(`[${(`0${  new Date(Date.now()).getHours()}`).slice(-2)}:${(`0${  new Date(Date.now()).getMinutes()}`).slice(-2)}:${(`0${  new Date(Date.now()).getSeconds()}`).slice(-2)}] Logged in as ${client.user.tag}; ready!`); // Logs the date and username
-	setInterval(() => { // Checks for stalked command
+	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
+	client.user.setUsername(`r/WOF Bot (${prefix})`);
+	console.log(`[${  (`0${  new Date(Date.now()).getHours()}`).slice(-2)  }:${  (`0${  new Date(Date.now()).getMinutes()}`).slice(-2)  }:${  (`0${  new Date(Date.now()).getSeconds()}`).slice(-2)  }] Logged in as ${client.user.tag}; ready!`);
+	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true);
+	setInterval(() => {
+		var stalkArray = '';
+
 		stalking.all().forEach((stalk) => {
 			stalk.data.forEach((stalked, index) => {
 				rWingsOfFireServer.members.fetch({ withPresences: true }).then(fetchedMembers => {
@@ -315,7 +290,7 @@ client.once('ready', async () => {
 					console.log(fetchedMembers.get(stalked).presence);
 					if(totalOnline.has(fetchedMembers.get(stalked).id)) {
 						fetchedMembers.get(stalk.ID).send(`${fetchedMembers.get(stalked).user.username} is online!`);
-						var stalkArray = stalking.get(`${stalk.ID}`);
+						stalkArray = stalking.get(`${stalk.ID}`);
 						console.log(stalking.get(`${stalk.ID}`));
 						try {
 							stalkArray.splice(index, 1);
@@ -329,10 +304,10 @@ client.once('ready', async () => {
 			});
 		});
 	}, 5000);
-
-	// Gives permissions to specific commands
 	if (!client.application?.owner) await client.application?.fetch();
+
 	const command = await client.guilds.cache.get('716601325269549127')?.commands.fetch('910250822779162714');
+
 	const permissions = [
 		{
 			id:         '795414220707463188',
@@ -345,227 +320,42 @@ client.once('ready', async () => {
 			permission: true,
 		},
 	];
+
 	await command.permissions.add({ permissions });
 });
 
-client.on('messageCreate', (message) => { // Deprecated, migrating to 'interactionCreate'
-	if (!message.author.bot) {
-		var user = message.author;
-		var channel = message.channel;
-
-		// Qibli is written Qibli.
-		if (message.content.toLowerCase().includes('quibli')) {
-			message.reply('it is spelled Qibli.');
-			console.log(`${user.username  } misspelled qibli`);
-		}
-		if (channel.type === 'text' && message.content.startsWith(prefix)) {
-			var command = message.content.toLowerCase().slice(prefix.length).split(' ')[0];
-			var server = message.guild;
-
-			switch (command) {
-
-			case 'emotes':
-				// eslint-disable-next-line no-case-declarations
-				let staticEmojis = [message.guild.emojis.cache.filter(e => !e.animated).array().slice(0, 30).join(' '), message.guild.emojis.cache.filter(e => !e.animated).array().slice(30).join(' ')];
-				// eslint-disable-next-line no-case-declarations
-				let animated = message.guild.emojis.cache.filter(e => e.animated).array().join(' ');
-				channel.send(
-					new MessageEmbed()
-						.setTitle(`${server.name  }'s emotes!`)
-						.addFields(
-							{ name: 'Static', value: staticEmojis[0] },
-							{ name: '_ _', value: staticEmojis[1] },
-							{ name: 'Animated', value: animated }
-						)
-						.setColor('RANDOM')
-				);
-				break;
-
-			default:
-				if(message.content.toLowerCase().startsWith(`${prefix}log`))
-					console.log(`${user.username  } wanted to log the message: ${message.content.slice(6)}`);
-				else if (message.content.toLowerCase().startsWith(`${prefix}enlarge `)) {
-					var msgArray = message.content.toLowerCase().split(' ');
-					channel.send(new MessageEmbed().setImage(server.emojis.resolve(msgArray[1].slice(-19, -1)).url).setColor('RANDOM'));
-				} else if (message.content.startsWith(`${prefix}poll `)) {
-					var content = message.content.split(' ');
-					content.shift();
-					message.delete();
-					if (content[0].toLowerCase() == 'thumbs') {
-						channel.send(new MessageEmbed()
-							.setColor('GREEN')
-							.setTitle('Poll')
-							.setFooter(`Poll made by user ${  user.username}`)
-							.setDescription(content.slice(1).join(' ')))
-							.then(poll => {
-								poll.react('👍');
-								poll.react('👎');
-							});
-					} else if (content[0].toLowerCase() == 'numbers') {
-						channel.send(new MessageEmbed()
-							.setColor('GREEN')
-							.setTitle('Poll')
-							.setFooter(`Poll made by user ${  user.username}`)
-							.setDescription(content.slice(1).join(' ')))
-							.then(poll => {
-								poll.react('1️⃣');
-								poll.react('2️⃣');
-								poll.react('3️⃣');
-								poll.react('4️⃣');
-								poll.react('5️⃣');
-								poll.react('6️⃣');
-								poll.react('7️⃣');
-								poll.react('8️⃣');
-								poll.react('9️⃣');
-								poll.react('🔟');
-							});
-
-					}
-
-					console.log(`poll created in #${  message.channel.name  } by ${  message.author.username}`);
-				} else if (message.content.toLowerCase().startsWith(`${prefix}rn `) || message.content.toLowerCase().startsWith(`${prefix  }randomnumber `)) {
-					const randomNumber = Math.floor((Math.random() * (new Number(message.content.split(' ')[2]) - new Number(message.content.split(' ')[1]))) + 1) + new Number(message.content.split(' ')[1]);
-					message.channel.send(`Here is a pseudo-random number for you: ${  randomNumber}`);
-				} else if (message.content.toLowerCase().startsWith(`${prefix}whois `)) {
-					const whoisEmbed = new MessageEmbed()
-						.setColor('RED')
-						.setTitle(`Who is ${  message.content.split(' ').slice(1).join(' ')  }?`)
-						.setDescription('Find this out!')
-						.setURL(`https://wingsoffire.fandom.com/wiki/${  message.content.split(' ').slice(1).join('_')}`)
-						.setThumbnail(`https://wingsoffire.fandom.com/wiki/${  message.content.split(' ').slice(1).join('_')}`)
-						.setFooter('The link isn\'t correct? Double check the case and the orthograph. Or maybe this entry just don\'t exist...');
-					message.reply(whoisEmbed);
-					console.log(`${user.username  } didn't know who ${  message.content.split(' ').slice(1).join(' ')  } was, but now they do!`);
-				} else if (message.content.toLowerCase().startsWith(`${prefix}whatis `)) {
-					const whoisEmbed = new MessageEmbed()
-						.setColor('RED')
-						.setTitle(`What is the ${  message.content.split(' ').slice(1).join(' ')  }?`)
-						.setDescription('Find this out!')
-						.setURL(`https://wingsoffire.fandom.com/wiki/${  message.content.split(' ').slice(1).join('_')}`)
-						.setThumbnail(`https://wingsoffire.fandom.com/wiki/${  message.content.split(' ').slice(1).join('_')}`)
-						.setFooter('The link isn\'t correct? Double check the case and the orthograph. Or maybe this entry just don\'t exist...');
-					message.reply(whoisEmbed);
-					console.log(`${user.username  } didn't know what ${  message.content.split(' ').slice(1).join(' ')  } were, but now they do!`);
-				} else if (message.content.toLowerCase().startsWith(`${prefix}oc `)) {
-					var found = false;
-					server.channels.resolve('754470277634719845').messages.fetch({ limit: 100 })
-						.then(oldMsg => {
-							oldMsg.each(mess => {
-								if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${message.content.toLowerCase().split(' ').slice(1).join(' ')} `)))) {
-									message.reply('Oc found!');
-									channel.send(mess.url);
-									found = true;
-								}
-							});
-							if (!found) {
-								server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg.last().id })
-									.then(oldMsg2 => {
-										oldMsg2.each(mess => {
-											if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-												message.reply('Oc found!');
-												channel.send(mess.url);
-												found = true;
-											}
-										});
-										if (!found) {
-											server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-												.then(oldMsg3 => {
-													oldMsg3.each(mess => {
-														if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-															message.reply('Oc found!');
-															channel.send(mess.url);
-															found = true;
-														}
-													});
-													if (!found) {
-														server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg3.last().id })
-															.then(oldMsg4 => {
-																oldMsg4.each(mess => {
-																	if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-																		message.reply('Oc found!');
-																		channel.send(mess.url);
-																		found = true;
-																	}
-																});
-																if (!found) {
-																	server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																		.then(oldMsg5 => {
-																			oldMsg5.each(mess => {
-																				if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-																					message.reply('Oc found!');
-																					channel.send(mess.url);
-																					found = true;
-																				}
-																			});
-																			if (!found) {
-																				server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																					.then(oldMsg6 => {
-																						oldMsg6.each(mess => {
-																							if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-																								message.reply('Oc found!');
-																								channel.send(mess.url);
-																								found = true;
-																							}
-																						});
-																						if (!found) {
-																							server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																								.then(oldMsg7 => {
-																									oldMsg7.each(mess => {
-																										if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-																											message.reply('Oc found!');
-																											channel.send(mess.url);
-																											found = true;
-																										}
-																									});
-																									if (!found) {
-																										server.channels.resolve('754470277634719845').messages.fetch({ limit: 100, before: oldMsg2.last().id })
-																											.then(oldMsg8 => {
-																												oldMsg8.each(mess => {
-																													if (mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  }\n`) || mess.content.toLowerCase().includes(`name: ${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `) || (mess.content.toLowerCase().includes(`name:${  message.content.toLowerCase().split(' ').slice(1).join(' ')  } `)))) {
-																														message.reply('Oc found!');
-																														channel.send(mess.url);
-																														found = true;
-																													}
-																												});
-																												if (!found)
-																													message.reply('Oc not found. The submission is maybe too old, or you misstyped the name. Please check both of the possibilities. Please note that the submission has to include "name: <oc\'s name>.');
-
-																											});
-																									}
-																								});
-																						}
-																					});
-																			}
-																		});
-																}
-															});
-													}
-												});
-										}
-									});
-							}
-						});
-				} else if (message.content.toLowerCase().startsWith(`${prefix}setmessagecount `) && (server.members.resolve(user.id).hasPermission('MANAGE_MESSAGES') || server.members.resolve(user.id).roles.cache.has('795414220707463188'))) {
-					if (message.mentions.members.size == 1 && message.content.split(' ').length == 3 && !isNaN(message.content.split(' ')[2]))
-						totalMessages.set(message.mentions.members.first().id, new Number(message.content.split(' ')[2]));
-					else
-						message.reply('Syntax incorrect. Please try again.');
-
-				}
-				break;
-			}
-
-		}
-	}
-});
+/**
+ * Kinda like a dice.
+ * @param {Number} min The lowest number possible
+ * @param {Number} max The highest number possible
+ * @returns {Number} A pseudo-random nuber in the range [min ]max
+ */
+function randInt(min, max) {
+	return Math.floor(Math.random() * max - min) + min;
+}
 
 client.on('interactionCreate', async interaction => {
-	if(!interaction.isCommand()) return; // Check if the interaction is a command
+	var color = '';
+	var ping = 0;
+	var stalked;
+	var ocArr = [];
+	var oc = '';
+	var name = '';
+	var nameArr = [''];
+	var key = '';
+	var value = '';
+	var array = [];
+	var tribe = '';
+	var message;
+	var stopIt = false;
+	var answers = [];
+	var random = Math.random();
+	var first = '';
+	var second = '';
 
-	var color = ''; // For embeds colors;
+	if(!interaction.isCommand()) return;
 
 	switch(interaction.commandName) {
-	// Kill the bot
 	case 'kill':
 		if (interaction.member.roles.resolve('795414220707463188')) {
 			await interaction.reply('Alright, the bot is logging out...')
@@ -583,9 +373,8 @@ client.on('interactionCreate', async interaction => {
 
 		break;
 
-	// Get bot latency
 	case 'ping':
-		var ping = new Date(Date.now()) - interaction.createdAt;
+		ping = new Date(Date.now()) - interaction.createdAt;
 
 		if(ping >= 0) {
 			if(ping <= 500) color = 'GREEN';
@@ -596,21 +385,18 @@ client.on('interactionCreate', async interaction => {
 			const PingEmbed = new MessageEmbed()
 				.setColor(color)
 				.setTitle('Pong! :ping_pong:')
-				.setDescription(`Down ping: ${  ping  }ms`);
-			let upPing = new Date(Date.now()) - (await interaction.reply({ 'embeds': [PingEmbed], fetchReply: true })).createdTimestamp;
-			interaction.editReply({ embeds: [PingEmbed.setDescription(`Down ping: ${ping}ms\nUp ping: ${upPing}`)] });
+				.setDescription(`${ping  }ms`);
+			await interaction.reply({ 'embeds': [PingEmbed] });
 		} else {
 			const PingEmbed = new MessageEmbed()
 				.setColor('RANDOM')
 				.setTitle('Pong? :ping_pong:')
-				.setDescription(`Emmm it is negative? Down ping: ${ping} ms...`);
-			let upPing = new Date(Date.now()) - (await interaction.reply({ 'embeds': [PingEmbed], fetchReply: true })).createdTimestamp;
-			interaction.editReply({ embeds: [PingEmbed.setDescription(`Emmm it is negative? \nDown ping: ${ping} ms\nUp ping: ${upPing}`)] });
+				.setDescription(`Emmm it is negative? ${ping} ms...`);
+			await interaction.reply({ 'embeds': [PingEmbed] });
 		}
 		console.log(`${interaction.user.username  } used ping`);
 		break;
 
-	// Snek
 	case 'snek':
 		await interaction.reply({
 			files: [{
@@ -621,9 +407,8 @@ client.on('interactionCreate', async interaction => {
 		console.log(`${interaction.user.username  } used snek`);
 		break;
 
-	// Get notified when specified user logs in
 	case 'stalk':
-		var stalked = interaction.options.getUser('user');
+		stalked = interaction.options.getUser('user');
 		await interaction.reply({ 'content': `You are now stalking ${stalked.username}. You will be notified when they log on.`, 'ephemeral': true });
 		stalking.push(interaction.user.id, stalked.id);
 		break;
@@ -632,8 +417,6 @@ client.on('interactionCreate', async interaction => {
 		switch(interaction.options.getSubcommand()) {
 		case 'get':
 			ocs = new table('OC');
-			var ocArr = [];
-			var oc = '';
 			interaction.options.getString('name').split(' ').forEach((namePart, i) => {
 				ocArr[i] = toFirstUppercase(namePart);
 			});
@@ -686,7 +469,7 @@ client.on('interactionCreate', async interaction => {
 					break;
 				}
 				try {
-					let embed = new MessageEmbed()
+					const embed = new MessageEmbed()
 						.setTitle(oc)
 						.setColor(color)
 						.setAuthor(ocs.get(`${oc}.owner`) || 'unavailable')
@@ -718,8 +501,8 @@ client.on('interactionCreate', async interaction => {
 			break;
 
 		case 'edit':
-			var name = interaction.options.getString('name');
-			var nameArr = name.split(';')[0]
+			name = interaction.options.getString('name');
+			nameArr = name.split(';')[0]
 				.split(',')[0]
 				.split('|')[0]
 				.split(' or ')[0]
@@ -735,8 +518,8 @@ client.on('interactionCreate', async interaction => {
 				if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
 			});
 			name = nameArr.join(' ');
-			var key = interaction.options.getString('key');
-			var	value = interaction.options.getString('value');
+			key = interaction.options.getString('key');
+			value = interaction.options.getString('value');
 
 			if(key === 'deltribe') {
 				if(ocs.has(name)) {
@@ -745,7 +528,7 @@ client.on('interactionCreate', async interaction => {
 						return;
 					}
 					if(ocs.get(`${name}.tribes`).includes(value.toLowerCase())) {
-						var array = ocs.get(`${name}.tribes`);
+						array = ocs.get(`${name}.tribes`);
 						array.splice(array.indexOf(value), 1);
 						ocs.set(`${name  }.tribes`, array);
 						interaction.reply('The tribe was successfully removed!');
@@ -763,7 +546,6 @@ client.on('interactionCreate', async interaction => {
 						return;
 					}
 					if(key === 'tribes') {
-						var tribe = '';
 						if (tribe.toLowerCase().includes('mud'))
 							tribe = 'mudwing';
 						else if (tribe.toLowerCase().includes('sand'))
@@ -804,7 +586,7 @@ client.on('interactionCreate', async interaction => {
 						interaction.reply('The oc was successfully edited!');
 					}
 				} else {
-					let buttons = new Discord.MessageActionRow()
+					const buttons = new Discord.MessageActionRow()
 						.addComponents(
 							new Discord.MessageButton()
 								.setLabel('Yes!')
@@ -816,7 +598,7 @@ client.on('interactionCreate', async interaction => {
 								.setStyle('PRIMARY')
 								.setCustomId('no')
 						);
-					let reply = await interaction.reply({ content: 'This oc is not in the database! Do you want to create one?', components: [buttons], fetchReply: true });
+					const reply = await interaction.reply({ content: 'This oc is not in the database! Do you want to create one?', components: [buttons], fetchReply: true });
 					reply.awaitMessageComponent({ componentType: 'BUTTON', time: 15000, filter: interact => interact.user.id === interaction.user.id }).then(interactionB => {
 						if(interactionB.customId === 'yes') {
 							if(key === 'tribes') {
@@ -879,19 +661,18 @@ client.on('interactionCreate', async interaction => {
 			break;
 
 		case 'message':
-			let msg = interaction.options.getString('msg');
+			const msg = interaction.options.getString('msg');
 
-			var message;
 			if(msg.includes('/')) {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1])
 					.catch(e => {
-						interaction.reply('<@!373515998000840714>, an error occured!');
+						interaction.reply('This message does not exits!');
 						console.error(e);
 					});
 			} else {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg)
 					.catch(e => {
-						interaction.reply('<@!373515998000840714>, an error occured!');
+						interaction.reply('This message does not exits!');
 						console.error(e);
 					});
 			}
@@ -913,14 +694,12 @@ client.on('interactionCreate', async interaction => {
 				.setFooter('You have 20 seconds, and only one try')
 				.setColor('GREEN');
 			interaction.reply({ embeds: [quoteEmbed] });
-			var stopIt = false;
-			let timeOut = setTimeout(() => {
+			const timeOut = setTimeout(() => {
 				stopIt = true;
 				interaction.editReply({ content: 'This quizz is finished.', embeds: [] });
 				interaction.channel.send({ content: `The quizz is finished. The answer was ${  theChoosenOne.character}`, embeds: [] });
 				quoteBusy = false;
 			}, 20000);
-			var answers = [];
 			quotes.forEach(quote => {
 				answers.push(quote.character.toLowerCase());
 			});
@@ -962,7 +741,6 @@ client.on('interactionCreate', async interaction => {
 
 	case 'fac':
 	case 'flipacoin':
-		var random = Math.random();
 		if(random < 0.5) {
 			interaction.reply({ embeds: [new MessageEmbed().setDescription('It\'s tails!')
 				.setTitle('The coin says...')
@@ -987,10 +765,8 @@ client.on('interactionCreate', async interaction => {
 		break;
 
 	case 'hybridgen':
-		let pyrrhian = interaction.options.getBoolean('pyrrhia');
-		let pantalan = interaction.options.getBoolean('pantala');
-		var first = '';
-		var second = '';
+		const pyrrhian = interaction.options.getBoolean('pyrrhia');
+		const pantalan = interaction.options.getBoolean('pantala');
 
 		console.log(pyrrhian);
 		console.log(pantalan);
@@ -1064,25 +840,25 @@ client.on('interactionCreate', async interaction => {
 		break;
 
 	case 'help':
-		let command = interaction.options.getString('cmd', false);
+		const command = interaction.options.getString('cmd', false);
 		if(command === null)
 		{try{
-			let embed = new Discord.MessageEmbed()
+			const embed = new Discord.MessageEmbed()
 				.setTitle('Help')
 				.setColor('ORANGE')
 				.setFooter('Use /help cmd:<command> for more informations on that command!')
-				.addField('kill', 'Kills the bot. (Only available to bot-helper role)')
-				.addField('ping', 'Get the time delay between when you send the message and when the bot detects it.')
-				.addField('snek', 'snek.')
-				.addField('stalk', 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' )
-				.addField('oc get', 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' )
-				.addField('oc edit', 'Allows for the owner of the oc to edit in the database in case the data is wrong.' )
-				.addField('quote', 'Starts a quizz about a quote. Guess the character who said that quote!' )
-				.addField('fac, flip a coin', 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' )
-				.addField('hybridgen', 'A hybrid generator for you!' )
-				.addField('oc message', 'Adds a message to the database' )
-				.addField('help', 'Shows this message!' );
-			interaction.reply({ embeds: [embed] });
+				.addField({ name: 'kill', value: /* 'Kills the bot. (Only available to bot-helper role)'*/'hi' })
+				.addField({ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.' })
+				.addField({ name: 'snek', value: 'snek.' })
+				.addField({ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' })
+				.addField({ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' })
+				.addField({ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.' })
+				.addField({ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!' })
+				.addField({ name: 'fac, flip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' })
+				.addField({ name: 'hybridgen', value: 'A hybrid generator for you!' })
+				.addField({ name: 'oc message', value: 'Adds a message to the database' })
+				.addField({ name: 'help', valuse: 'Shows this message!' });
+			interaction.reply(embed);
 		} catch (e) {
 			console.warn(e);
 		}}
