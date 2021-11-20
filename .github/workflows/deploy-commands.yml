@@ -26,4 +26,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: node deploy-commands.js
+    - run: npm ci
+    - run: npm run build --if-present
+    - env:
+          token: ${{ secrets.TOKEN }}
+      run: node deploy-commands.js
