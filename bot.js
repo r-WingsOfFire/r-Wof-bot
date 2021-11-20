@@ -1890,13 +1890,13 @@ client.on('interactionCreate', async interaction => {
 			if(msg.includes('/')) {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1])
 					.catch(e => {
-						interaction.reply('This message does not exits!');
+						interaction.reply('<@!373515998000840714>, an error occured!');
 						console.error(e);
 					});
 			} else {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg)
 					.catch(e => {
-						interaction.reply('This message does not exits!');
+						interaction.reply('<@!373515998000840714>, an error occured!');
 						console.error(e);
 					});
 			}
