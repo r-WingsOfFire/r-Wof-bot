@@ -1880,14 +1880,22 @@ client.on('interactionCreate', async interaction => {
 			}
 			break;
 
-		case 'ocmessage':
+		case 'message':
 			let msg = interaction.options.getString('msg');
 
 			var message;
 			if(msg.includes('/')) {
-				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1]);
+				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1])
+					.catch(e => {
+						interaction.reply('This message does not exits!');
+						console.error(e);
+					});
 			} else {
-				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg);
+				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg)
+					.catch(e => {
+						interaction.reply('This message does not exits!');
+						console.error(e);
+					});
 			}
 
 			await addOc(message);
@@ -2060,24 +2068,27 @@ client.on('interactionCreate', async interaction => {
 
 	case 'help':
 		let command = interaction.options.getString('cmd', false);
-		if(command != null)
-			interaction.reply(new Discord.MessageEmbed()
-				.setTitle('Help')
-				.setColor('ORANGE')
-				.setFooter('Use /help cmd:<command> for more informations on that command!')
-				.addFields([{ name: 'kill', value: 'Kills the bot. (Only available to bot-helper role)', inline: false },
-					{ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.', inline: false },
-					{ name: 'snek', value: 'snek.', inline: false },
-					{ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.', inline: false },
-					{ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.', inline: false },
-					{ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.', inline: false },
-					{ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!', inline: false },
-					{ name: 'fac,\nflip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!', inline: false },
-					{ name: 'hybridgen', value: 'A hybrid generator for you!', inline: false },
-					{ name: 'oc message', value: 'Adds a message to the database', inline: false },
-					{ name: 'help', valuse: 'Shows this message!' }]
-				)
-			);
+		if(command === null)
+			try{
+				let embed = new Discord.MessageEmbed()
+					.setTitle('Help')
+					.setColor('ORANGE')
+					.setFooter('Use /help cmd:<command> for more informations on that command!')
+					//.addField({ name: 'kill', value: /*'Kills the bot. (Only available to bot-helper role)'*/'hi' })
+					.addField({ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.' })
+					.addField({ name: 'snek', value: 'snek.' })
+					.addField({ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' })
+					.addField({ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' })
+					.addField({ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.' })
+					.addField({ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!' })
+					.addField({ name: 'fac, flip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' })
+					.addField({ name: 'hybridgen', value: 'A hybrid generator for you!' })
+					.addField({ name: 'oc message', value: 'Adds a message to the database' })
+					.addField({ name: 'help', valuse: 'Shows this message!' });
+				interaction.reply(embed);
+			} catch (e) {
+				console.warn(e);
+			}
 	}
 });
 
