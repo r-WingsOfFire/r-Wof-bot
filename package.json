@@ -4,6 +4,8 @@
   "description": "a custom discord bot for the r/wings of fire discord server",
   "main": "bot.js",
   "dependencies": {
+    "@discordjs/builders": "^0.8.2",
+    "@discordjs/rest": "^0.1.0-canary.0",
     "acorn-jsx": "^5.3.2",
     "agent-base": "^6.0.2",
     "ansi-align": "^3.0.1",
@@ -14,7 +16,9 @@
     "better-sqlite3": "^7.4.4",
     "chownr": "^2.0.0",
     "core-util-is": "^1.0.3",
-    "discord.js": "^13.2.0",
+    "discord-api-types": "^0.24.0",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
     "emoji-regex": "^8.0.0",
     "esquery": "^1.4.0",
     "file-entry-cache": "^6.0.1",
@@ -59,14 +63,21 @@
     "ws": "^7.5.5"
   },
   "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.16.3",
+    "@babel/preset-env": "^7.16.0",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
     "eslint": "^7.32.0",
     "nodemon": "^2.0.12"
   },
-    "optionalDependencies": {
+  "optionalDependencies": {
     "fsevents": "^2.0.7"
   },
   "scripts": {
-    "test": "node -c"
+    "test": "node deploy-commands.js; nodemon .",
+    "run": "node deploy-commands.js; node ."
   },
   "repository": {
     "type": "git",

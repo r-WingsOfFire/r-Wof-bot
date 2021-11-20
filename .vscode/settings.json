@@ -1,4 +1,13 @@
 {
     "codewindProfiling.showProfiling": true,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Tables",
+            "database": "${workspaceFolder:r-Wof-bot}/json.sqlite"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }

@@ -4,5 +4,5 @@
 .vscode
 .DS_Store
 node_modules
-.env
 config.json
+.env
