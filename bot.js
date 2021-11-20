@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-case-declarations */
+require('dotenv')?.config();
 const Discord = require('discord.js');
 const { Client, Intents, MessageEmbed } = Discord;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
@@ -1602,14 +1603,16 @@ client.on('interactionCreate', async interaction => {
 			const PingEmbed = new MessageEmbed()
 				.setColor(color)
 				.setTitle('Pong! :ping_pong:')
-				.setDescription(ping + 'ms');
-			await interaction.reply({ 'embeds': [PingEmbed] });
+				.setDescription('Down ping: ' + ping + 'ms');
+			let upPing = new Date(Date.now()) - (await interaction.reply({ 'embeds': [PingEmbed], fetchReply: true })).createdTimestamp;
+			interaction.editReply({ embeds: [PingEmbed.setDescription(`Down ping: ${ping}ms\nUp ping: ${upPing}`)] });
 		} else {
 			const PingEmbed = new MessageEmbed()
 				.setColor('RANDOM')
 				.setTitle('Pong? :ping_pong:')
-				.setDescription(`Emmm it is negative? ${ping} ms...`);
-			await interaction.reply({ 'embeds': [PingEmbed] });
+				.setDescription(`Emmm it is negative? Down ping: ${ping} ms...`);
+			let upPing = new Date(Date.now()) - (await interaction.reply({ 'embeds': [PingEmbed], fetchReply: true })).createdTimestamp;
+			interaction.editReply({ embeds: [PingEmbed.setDescription(`Emmm it is negative? \nDown ping: ${ping} ms\nUp ping: ${upPing}`)] });
 		}
 		console.log(interaction.user.username + ' used ping');
 		break;
