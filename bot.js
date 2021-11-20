@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-case-declarations */
+require('dotenv')?.config();
 const Discord = require('discord.js');
 const { Client, Intents, MessageEmbed } = Discord;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
@@ -1887,13 +1888,13 @@ client.on('interactionCreate', async interaction => {
 			if(msg.includes('/')) {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg.split('/')[msg.split('/').length - 1])
 					.catch(e => {
-						interaction.reply('This message does not exits!');
+						interaction.reply('<@!373515998000840714>, an error occured!');
 						console.error(e);
 					});
 			} else {
 				message = await rWingsOfFireServer.channels.resolve('854858811101937704').messages.fetch(msg)
 					.catch(e => {
-						interaction.reply('This message does not exits!');
+						interaction.reply('<@!373515998000840714>, an error occured!');
 						console.error(e);
 					});
 			}
