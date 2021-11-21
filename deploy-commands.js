@@ -9,7 +9,10 @@ require('dotenv')?.config();
 
 var tokenBuffer = process.env.token;
 if(tokenBuffer == undefined) {
-	const { token } = require('./config.json');
+	try 
+		const { token } = require('./config.json');
+	catch (e)
+		console.error(e);
 	tokenBuffer = token;
 }
 var token = tokenBuffer;
