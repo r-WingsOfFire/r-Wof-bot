@@ -2,8 +2,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId } = require('./config.json');
+const clientId = '771945913044303912';
+const guildId = '716601325269549127';
 const process  = require('process');
+require('dotenv')?.config();
 
 var tokenBuffer = process.env.token;
 if(tokenBuffer == undefined) {
@@ -11,6 +13,8 @@ if(tokenBuffer == undefined) {
 	tokenBuffer = token;
 }
 var token = tokenBuffer;
+
+
 
 const commands = [
 	new SlashCommandBuilder().setName('ping').setDescription('Replies with pong and sends the ping of the bot'),
