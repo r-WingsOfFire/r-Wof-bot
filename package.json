@@ -5,7 +5,7 @@
   "main": "bot.js",
   "dependencies": {
     "@discordjs/builders": "^0.8.2",
-    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/rest": "^0.1.1-canary.0",
     "acorn-jsx": "^5.3.2",
     "agent-base": "^6.0.2",
     "ansi-align": "^3.0.1",
