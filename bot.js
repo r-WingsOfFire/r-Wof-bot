@@ -841,27 +841,29 @@ client.on('interactionCreate', async interaction => {
 
 	case 'help':
 		const command = interaction.options.getString('cmd', false);
-		if(command === null)
-		{try{
-			const embed = new Discord.MessageEmbed()
-				.setTitle('Help')
-				.setColor('ORANGE')
-				.setFooter('Use /help cmd:<command> for more informations on that command!')
-				.addField({ name: 'kill', value: /* 'Kills the bot. (Only available to bot-helper role)'*/'hi' })
-				.addField({ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.' })
-				.addField({ name: 'snek', value: 'snek.' })
-				.addField({ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' })
-				.addField({ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' })
-				.addField({ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.' })
-				.addField({ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!' })
-				.addField({ name: 'fac, flip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' })
-				.addField({ name: 'hybridgen', value: 'A hybrid generator for you!' })
-				.addField({ name: 'oc message', value: 'Adds a message to the database' })
-				.addField({ name: 'help', valuse: 'Shows this message!' });
-			interaction.reply(embed);
-		} catch (e) {
-			console.warn(e);
-		}}
+		if(command === null) {
+			try{
+				const embed = new Discord.MessageEmbed()
+					.setTitle('Help')
+					.setColor('ORANGE')
+					.setFooter('Use /help cmd:<command> for more informations on that command!')
+					.addField({ name: 'kill', value: /* 'Kills the bot. (Only available to bot-helper role)'*/'hi' })
+					.addField({ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.' })
+					.addField({ name: 'snek', value: 'snek.' })
+					.addField({ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' })
+					.addField({ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' })
+					.addField({ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.' })
+					.addField({ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!' })
+					.addField({ name: 'fac, flip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' })
+					.addField({ name: 'hybridgen', value: 'A hybrid generator for you!' })
+					.addField({ name: 'oc message', value: 'Adds a message to the database' })
+					.addField({ name: 'help', valuse: 'Shows this message!' });
+				interaction.reply(embed);
+			} catch (e) {
+				console.warn(e);
+			}
+		} else
+			interaction.reply('Coming soon!');
 	}
 });
 

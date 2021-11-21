@@ -77,7 +77,8 @@
   },
   "scripts": {
     "test": "node deploy-commands.js; nodemon .",
-    "run": "node deploy-commands.js; node ."
+    "run": "node deploy-commands.js; node .",
+    "start": "node deploy-commands.js; node ."
   },
   "repository": {
     "type": "git",
