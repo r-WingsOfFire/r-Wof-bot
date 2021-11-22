@@ -1,15 +1,19 @@
+// Declare constants for discord.js
 const Discord = require('discord.js');
 const { Client, Intents, MessageEmbed } = Discord;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
 
+// Declare constants for databases
 const { table } = require('quick.db');
 var stalking = new table('stalk');
 var ocs = new table('OC');
 
-var quoteBusy = false;
+var quoteBusy = false; // False if the bot can post a new quizz quote
 
-var rWingsOfFireServer;
+var rWingsOfFireServer; // Not yet declared, as the bot isn't logged in yet
 
+// Token and prefix
+// Prefix is deprecated, will soon be removed
 const process = require('process');
 const exit = process.exit;
 var tokenBuffer = process.env.token;
