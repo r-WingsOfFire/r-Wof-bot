@@ -1,9 +1,9 @@
-// Declare constants for discord.js
+// MARK: Declare constants for discord.js
 const Discord = require('discord.js');
 const { Client, Intents, MessageEmbed } = Discord;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
 
-// Declare constants for databases
+// MARK: Declare constants for databases
 const { table } = require('quick.db');
 var stalking = new table('stalk');
 var ocs = new table('OC');
@@ -12,13 +12,11 @@ var quoteBusy = false; // False if the bot can post a new quizz quote
 
 var rWingsOfFireServer; // Not yet declared, as the bot isn't logged in yet
 
-// Token and prefix
-// Prefix is deprecated, will soon be removed
+// MARK: Token declaraction
 const process = require('process');
 const exit = process.exit;
 var tokenBuffer = process.env.token;
 var token = '';
-var prefix = '+';
 
 require('dotenv').config();
 
@@ -28,17 +26,11 @@ if(tokenBuffer == undefined) {
 }
 token = tokenBuffer;
 
-try {
-	{prefix;} require('./config.json');
-} catch (e) {
-	console.log(e);
-} finally {
-	console.log(`prefix: ${prefix}`);
-}
-
+// Tribes constants
 const pytribes = ['skywing', 'seawing', 'icewing', 'nightwing', 'sandwing', 'mudwing', 'rainwing'];
 const patribes = ['leafwing', 'hivewing', 'silkwing'];
 
+// MARK: Functions
 /**
  * Transforms a string to another string but with the first letter being uppercase.
  * @param {String} str the base string
@@ -85,7 +77,7 @@ function searchInMessage(message, text, word = true) {
 	return output;
 }
 
-/**
+/** Fetches an oc from a discord message.
  *
  * @param {Discord.Message} message
  */
@@ -266,24 +258,48 @@ async function addOc(message) {
 
 }
 
+/** Picks a random tribe from Pantala
+ * @returns {String} The tribe that got picked
+ */
 function randomPantala() {
 	return patribes[Math.floor(Math.random() * patribes.length)];
 }
 
+/** Picks a random tribe from Pyrrhia
+ * @returns {String} The tribe that got picked
+ */
 function randomPyrrhia() {
 	return pytribes[Math.floor(Math.random() * pytribes.length)];
 }
 
+/** Picks a random tribe
+ * @returns {String} The tribe that got picked
+ */
 function randomTribe() {
 	if(Math.random() < 0.5) return randomPyrrhia();
 	else return randomPantala();
 }
 
+/** Chooses a random integer
+ * @param {Number} min The lowest number possible
+ * @param {Number} max The highest number possible
+ * @returns {Number} A pseudo-random number in the range [min ]max
+ */
+function randInt(min, max) {
+	return Math.floor(Math.random() * max - min) + min;
+}
+
+// MARK: Executes once the bot is logged in
 client.once('ready', async () => {
+	// We initialize the variable here, once the bot is logged in
 	rWingsOfFireServer = client.guilds.resolve('716601325269549127');
-	client.user.setUsername(`r/WOF Bot (${prefix})`);
+
+	client.user.setUsername('r/WOF Bot');
+
+	// Logs the date and the username
 	console.log(`[${  (`0${  new Date(Date.now()).getHours()}`).slice(-2)  }:${  (`0${  new Date(Date.now()).getMinutes()}`).slice(-2)  }:${  (`0${  new Date(Date.now()).getSeconds()}`).slice(-2)  }] Logged in as ${client.user.tag}; ready!`);
-	rWingsOfFireServer.roles.resolve('795414220707463188').setMentionable(true);
+
+	// Checks for stalked people in the database
 	setInterval(() => {
 		var stalkArray = '';
 
@@ -308,10 +324,10 @@ client.once('ready', async () => {
 			});
 		});
 	}, 5000);
+
+	// Sets perms for commands
 	if (!client.application?.owner) await client.application?.fetch();
-
 	const command = await client.guilds.cache.get('716601325269549127')?.commands.fetch('910250822779162714');
-
 	const permissions = [
 		{
 			id:         '795414220707463188',
@@ -324,42 +340,63 @@ client.once('ready', async () => {
 			permission: true,
 		},
 	];
-
 	await command.permissions.add({ permissions });
 });
 
-/**
- * Kinda like a dice.
- * @param {Number} min The lowest number possible
- * @param {Number} max The highest number possible
- * @returns {Number} A pseudo-random nuber in the range [min ]max
- */
-function randInt(min, max) {
-	return Math.floor(Math.random() * max - min) + min;
-}
-
+// MARK: Executes when an interaction is created
+// * An interaction can be a button pressed, a slash command executed, and so on
 client.on('interactionCreate', async interaction => {
-	var color = '';
+	// MARK: Variable decalations
+
+	// Color of the embeds
+	var color = 'DEFAULT';
+
+	// Variable for ping, in ms
 	var ping = 0;
+
+	// The user about to be stalked
 	var stalked;
+
+	/** /oc get:
+	 * 	* OcArr,	name Arr: 	An array that stores the name of the oc, split at spaces
+	 * 	* Oc,		name: 		The name of the oc itself
+	*/
 	var ocArr = [];
 	var oc = '';
 	var name = '';
 	var nameArr = [''];
+
+	// /oc edit:
+	//	* Key:		The name of the attribute to edit
+	//	* Value:	The value to write in
 	var key = '';
 	var value = '';
-	var array = [];
+
+	// The tribe(s) of the oc
+	var ocTribeArray = [];
+	// The first tribe of the oc, used for color
 	var tribe = '';
+
+	// The message of the oc approvement
 	var message;
+
+	// Used to stop a loop in /quote
 	var stopIt = false;
+	// The possible answers of /quote, used to determine if a message is an answer or completely unrelated
 	var answers = [];
+
+	// A random number, used to flip a coin
 	var random = Math.random();
-	var first = '';
-	var second = '';
+
+	// The first tribe of the hybrid generated
+	var firstHybridTribe = '';
+	// The second tribe of the hybrid generated
+	var secondHybridTribe = '';
 
 	if(!interaction.isCommand()) return;
 
 	switch(interaction.commandName) {
+	// Kills the bot
 	case 'kill':
 		if (interaction.member.roles.resolve('795414220707463188')) {
 			await interaction.reply('Alright, the bot is logging out...')
@@ -377,6 +414,7 @@ client.on('interactionCreate', async interaction => {
 
 		break;
 
+	// Returns the bot's ping
 	case 'ping':
 		ping = new Date(Date.now()) - interaction.createdAt;
 
@@ -401,6 +439,7 @@ client.on('interactionCreate', async interaction => {
 		console.log(`${interaction.user.username  } used ping`);
 		break;
 
+	// Snek
 	case 'snek':
 		await interaction.reply({
 			files: [{
@@ -411,22 +450,29 @@ client.on('interactionCreate', async interaction => {
 		console.log(`${interaction.user.username  } used snek`);
 		break;
 
+	// Get notified when a user logs in
+	// See the setInterval() in Client.on("ready")
+	// TODO: Setup heroku database
 	case 'stalk':
 		stalked = interaction.options.getUser('user');
 		await interaction.reply({ 'content': `You are now stalking ${stalked.username}. You will be notified when they log on.`, 'ephemeral': true });
 		stalking.push(interaction.user.id, stalked.id);
 		break;
 
+	// Multiple functions for oc rp purposes
+	// TODO: Setup heroku database
 	case 'oc':
 		switch(interaction.options.getSubcommand()) {
+
+		// Get informations about an oc in the database
 		case 'get':
-			ocs = new table('OC');
 			interaction.options.getString('name').split(' ').forEach((namePart, i) => {
 				ocArr[i] = toFirstUppercase(namePart);
 			});
 			oc = ocArr.join(' ');
 
 			if(ocs.has(oc))	{
+				// Get tribe color
 				switch(ocs.get(`${ocs}.tribes[0]`)) {
 				case 'skywing':
 					color = 'RED';
@@ -492,7 +538,6 @@ client.on('interactionCreate', async interaction => {
 						ocs.get(`${oc}.age`),
 						ocs.get(`${oc}.gender`));
 					console.warn(e);
-					// Ocs.delete(oc);
 				}
 			} else {
 				await interaction.reply({ embeds: [new Discord.MessageEmbed()
@@ -504,6 +549,7 @@ client.on('interactionCreate', async interaction => {
 			}
 			break;
 
+		// Self-explanatory, edits an oc in the database
 		case 'edit':
 			name = interaction.options.getString('name');
 			nameArr = name.split(';')[0]
@@ -532,9 +578,9 @@ client.on('interactionCreate', async interaction => {
 						return;
 					}
 					if(ocs.get(`${name}.tribes`).includes(value.toLowerCase())) {
-						array = ocs.get(`${name}.tribes`);
-						array.splice(array.indexOf(value), 1);
-						ocs.set(`${name  }.tribes`, array);
+						ocTribeArray = ocs.get(`${name}.tribes`);
+						ocTribeArray.splice(ocTribeArray.indexOf(value), 1);
+						ocs.set(`${name  }.tribes`, ocTribeArray);
 						interaction.reply('The tribe was successfully removed!');
 					} else
 						await interaction.reply(`The oc you specified does not have the ${value} tribe!`);
@@ -664,6 +710,7 @@ client.on('interactionCreate', async interaction => {
 			}
 			break;
 
+		// Fetches a message content and puts it in the database
 		case 'message':
 			const msg = interaction.options.getString('msg');
 
@@ -687,10 +734,16 @@ client.on('interactionCreate', async interaction => {
 		}
 		break;
 
+	// Start a quote quizz
 	case 'quote':
+		// If a quizz already is running, do not execute the command.
 		if (!quoteBusy) {
 			quoteBusy = true;
+
+			// Get the quizz quotes
 			const { quotes } = require('./quotes.json');
+
+			// Choose one randomly
 			const theChoosenOne = quotes[Math.floor((Math.random() * quotes.length) + 1) - 1];
 			const quoteEmbed = new MessageEmbed()
 				.setTitle('Who said this?')
@@ -726,9 +779,11 @@ client.on('interactionCreate', async interaction => {
 				});
 			}
 			guess();
-		}
+		} else
+			interaction.reply('A quizz is already running! Please wait for it to finish before starting another one!');
 		break;
 
+	// Get an inspiring quote from sunny!
 	case 'sunny':
 		const { quotes } = require('./quotes.json');
 		const sunnyQuotes = quotes.filter(quote => quote.character == 'Sunny');
@@ -739,10 +794,12 @@ client.on('interactionCreate', async interaction => {
 		});
 		break;
 
+	// Replies with fuck. Because why not.
 	case 'fuck' :
 		interaction.reply('fuck');
 		break;
 
+	// Flips a coin
 	case 'fac':
 	case 'flipacoin':
 		if(random < 0.5) {
@@ -764,10 +821,12 @@ client.on('interactionCreate', async interaction => {
 
 		break;
 
+	// Try it yourself!
 	case 'idiot':
 		interaction.reply(`Here is an idiot for you: ${  interaction.user.tag}`);
 		break;
 
+	// Random and customisable hybrid generator
 	case 'hybridgen':
 		const pyrrhian = interaction.options.getBoolean('pyrrhia');
 		const pantalan = interaction.options.getBoolean('pantala');
@@ -776,23 +835,26 @@ client.on('interactionCreate', async interaction => {
 		console.log(pantalan);
 
 		if(pyrrhian && pantalan) {
-			first = randomTribe();
+			firstHybridTribe = randomTribe();
 			do
-				second = randomTribe();
-			while (first === second);
+				secondHybridTribe = randomTribe();
+			while (firstHybridTribe === secondHybridTribe);
 		} else if (pyrrhian && !pantalan) {
-			first = randomPyrrhia();
+			firstHybridTribe = randomPyrrhia();
 			do
-				second = randomPyrrhia();
-			while (first === second);
+				secondHybridTribe = randomPyrrhia();
+			while (firstHybridTribe === secondHybridTribe);
 		} else if (!pyrrhian && pantalan) {
-			first = randomPantala();
+			firstHybridTribe = randomPantala();
 			do
-				second = randomPantala();
-			while (first === second);
+				secondHybridTribe = randomPantala();
+			while (firstHybridTribe === secondHybridTribe);
+		} else if (!pyrrhian && !pantalan) {
+			await interaction.reply('Please select at least one of the options!');
+			break;
 		}
 
-		switch(first) {
+		switch(firstHybridTribe) {
 		case 'skywing':
 			color = 'RED';
 			break;
@@ -837,12 +899,14 @@ client.on('interactionCreate', async interaction => {
 
 		interaction.reply({ embeds: [new MessageEmbed()
 			.setTitle('I suggest...')
-			.setDescription(`${first} x ${second}. What do you think about it?`)
+			.setDescription(`${firstHybridTribe} x ${secondHybridTribe}. What do you think about it?`)
 			.setColor(color)]
 		});
 
 		break;
 
+	// Prints a help message
+	// ! WIP
 	case 'help':
 		const command = interaction.options.getString('cmd', false);
 		if(command === null) {
@@ -871,4 +935,16 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
+// Loging in
+// ! Do not remove !
+/**
+ * * The token can be found at https://discord.com/developers/applications/771945913044303912/bot
+ * * Put the token in a config.json file as following:
+ * {
+ * 	"token": "token here (with quotation marks!)"
+ * }
+ * * You can also use an environment variable named token
+ * * Or you can use dotenv. Put the following in your .env file:
+ * token=<token here, without the brackets>
+*/
 client.login(token);
