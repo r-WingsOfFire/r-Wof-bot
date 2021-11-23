@@ -712,6 +712,7 @@ client.on('interactionCreate', async interaction => {
 
 		// Fetches a message content and puts it in the database
 		case 'message':
+			await interaction.reply('This command puts your oc in my database; However, when there is a change in my code, an old version of the database will be loaded. Therefore, your oc may be removed from the database. This will be fixed in around february of 2022.') // Litterally waiting for my credit card so i can put it in heroku and use their database 
 			const msg = interaction.options.getString('msg');
 
 			if(msg.includes('/')) {
