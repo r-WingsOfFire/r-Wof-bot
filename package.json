@@ -95,6 +95,9 @@
   "bugs": {
     "url": "https://github.com/r-WingsOfFire/r-Wof-bot/issues"
   },
+  "engines":{
+      "node":"17.0.1"
+   },
   "homepage": "https://github.com/r-WingsOfFire/r-Wof-bot#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
