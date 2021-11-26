@@ -18,17 +18,18 @@ const exit = process.exit;
 var tokenBuffer = process.env.token;
 var token = '';
 
+// MARK: Heroku support
 var express = require('express');
 var app     = express();
 
 app.set('port', (process.env.PORT || 5000));
 
-//For avoidong Heroku $PORT error
+// to avoid Heroku $PORT error
 app.get('/', function(request, response) {
-    var result = 'App is running'
-    response.send(result);
+	var result = 'App is running';
+	response.send(result);
 }).listen(app.get('port'), function() {
-    console.log('App is running, server is listening on port ', app.get('port'));
+	console.log('App is running, server is listening on port ', app.get('port'));
 });
 
 require('dotenv').config();
@@ -725,7 +726,7 @@ client.on('interactionCreate', async interaction => {
 
 		// Fetches a message content and puts it in the database
 		case 'message':
-			await interaction.reply('This command puts your oc in my database; However, when there is a change in my code, an old version of the database will be loaded. Therefore, your oc may be removed from the database. This will be fixed in around february of 2022.') // Litterally waiting for my credit card so i can put it in heroku and use their database 
+			await interaction.reply('This command puts your oc in my database; However, when there is a change in my code, an old version of the database will be loaded. Therefore, your oc may be removed from the database. This will be fixed in around february of 2022.'); // Litterally waiting for my credit card so i can put it in heroku and use their database
 			const msg = interaction.options.getString('msg');
 
 			if(msg.includes('/')) {
