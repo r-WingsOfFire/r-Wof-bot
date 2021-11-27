@@ -765,12 +765,17 @@ client.on('interactionCreate', async interaction => {
 				.setDescription(theChoosenOne.quote)
 				.setFooter('You have 20 seconds, and only one try')
 				.setColor('GREEN');
-			interaction.reply({ embeds: [quoteEmbed] });
+			await interaction.reply({ embeds: [quoteEmbed] });
 			const timeOut = setTimeout(() => {
 				stopIt = true;
 				interaction.editReply({ content: 'This quizz is finished.', embeds: [] });
-				interaction.channel.send({ content: `The quizz is finished. The answer was ${  theChoosenOne.character}`, embeds: [] });
+				interaction.channel.send({ content: `Time's up! The answer was ${  theChoosenOne.character}!`, embeds: [] });
 				quoteBusy = false;
+				const quizzEndedEmbed = new MessageEmbed()
+					.setTitle('Quizz ended')
+					.setDescription('This quizz has ended! If you want to try it out, please use the /quote command!')
+					.setColor('GREEN');
+				interaction.editReply({ embeds: [quizzEndedEmbed] });
 			}, 20000);
 			quotes.forEach(quote => {
 				answers.push(quote.character.toLowerCase());
@@ -781,12 +786,16 @@ client.on('interactionCreate', async interaction => {
 				interaction.channel.awaitMessages({ filter,  max: 1 }).then(quizzAnswer => {
 					if(stopIt)
 						return;
-
 					if (quizzAnswer.first().content.toLowerCase() == theChoosenOne.character.toLowerCase()) {
 						quizzAnswer.first().reply('Congratulation! This is correct!');
 						clearTimeout(timeOut);
 						quoteBusy = false;
 						stopIt = true;
+						const quizzEndedEmbed = new MessageEmbed()
+							.setTitle('Quizz ended')
+							.setDescription('This quizz has ended! If you want to try it out, please use the /quote command!')
+							.setColor('GREEN');
+						interaction.editReply({ embeds: [quizzEndedEmbed] });
 					} else {
 						quizzAnswer.first().reply('Well... no, this is wrong.');
 						guess();
