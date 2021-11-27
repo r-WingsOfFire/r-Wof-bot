@@ -765,7 +765,7 @@ client.on('interactionCreate', async interaction => {
 				.setDescription(theChoosenOne.quote)
 				.setFooter('You have 20 seconds, and only one try')
 				.setColor('GREEN');
-			interaction.reply({ embeds: [quoteEmbed] });
+			await interaction.reply({ embeds: [quoteEmbed] });
 			const timeOut = setTimeout(() => {
 				stopIt = true;
 				interaction.editReply({ content: 'This quizz is finished.', embeds: [] });
@@ -794,6 +794,11 @@ client.on('interactionCreate', async interaction => {
 				});
 			}
 			guess();
+			const quizzEndedEmbed = new MessageEmbed()
+				.setTitle('Quizz ended')
+				.setDescription('This quizz has ended! If you want to try it out, please use the /quote command!')
+				.setColor('GREEN');
+			interaction.editReply({ embeds: [quizzEndedEmbed] });
 		} else
 			interaction.reply('A quizz is already running! Please wait for it to finish before starting another one!');
 		break;
