@@ -773,7 +773,8 @@ client.on('interactionCreate', async interaction => {
 				quoteBusy = false;
 				const quizzEndedEmbed = new MessageEmbed()
 					.setTitle('Quizz ended')
-					.setDescription('This quizz has ended! If you want to try it out, please use the /quote command!')
+					.setDescription('This quizz has ended!')
+					.setFooter('If you want to try that out, use the /quote command!')
 					.setColor('GREEN');
 				interaction.editReply({ embeds: [quizzEndedEmbed] });
 			}, 20000);
@@ -793,11 +794,12 @@ client.on('interactionCreate', async interaction => {
 						stopIt = true;
 						const quizzEndedEmbed = new MessageEmbed()
 							.setTitle('Quizz ended')
-							.setDescription('This quizz has ended! If you want to try it out, please use the /quote command!')
+							.setDescription('This quizz has ended!')
+							.setFooter('If you want to try that out, use the /quote command!')
 							.setColor('GREEN');
 						interaction.editReply({ embeds: [quizzEndedEmbed] });
 					} else {
-						quizzAnswer.first().reply('Well... no, this is wrong.');
+						quizzAnswer.first().reply('Nope, this is wrong!');
 						guess();
 					}
 				});
