@@ -21,6 +21,7 @@ var token = '';
 // MARK: Heroku support
 var express = require('express');
 var app     = express();
+var http = require('http');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -406,6 +407,9 @@ client.on('interactionCreate', async interaction => {
 	var firstHybridTribe = '';
 	// The second tribe of the hybrid generated
 	var secondHybridTribe = '';
+
+	// Prevents heroku app going to sleep while in active use
+	http.get('https://r-wof-bot.herokuapp.com');
 
 	if(!interaction.isCommand()) return;
 
@@ -933,6 +937,7 @@ client.on('interactionCreate', async interaction => {
 
 	// Prints a help message
 	// ! WIP
+	// TODO: Help command
 	case 'help':
 		const command = interaction.options.getString('cmd', false);
 		if(command === null) {
