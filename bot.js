@@ -429,6 +429,7 @@ client.once('ready', async () => {
 	];
 	await command.permissions.add({ permissions });
 
+	// Finds the last reddit post, and stores its id
 	https.get('https://www.reddit.com/r/WingsOfFire/new.json', (res) => {
 		res.setEncoding('utf8');
 		let rawData = '';
@@ -444,6 +445,7 @@ client.once('ready', async () => {
 		});
 	});
 
+	// checks for reddit posts every 30 seconds.
 	setInterval(() => {
 		console.log(lastRedditPostId);
 		https.get(`https://www.reddit.com/r/WingsOfFire/new.json?before=t3_${lastRedditPostId}`, (res) => {
@@ -465,7 +467,7 @@ client.once('ready', async () => {
 				}
 			});
 		});
-	}, 5000);
+	}, 30000);
 });
 
 // MARK: Executes when an interaction is created
