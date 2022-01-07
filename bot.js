@@ -352,6 +352,7 @@ function getRedditPost(id) {
  */
 function postDataProcess(data) {
 	let finalEmbed = new Discord.MessageEmbed();
+	finalEmbed.author = `u/${data.author}`;
 
 	client.guilds.resolve('716601325269549127').members.resolve('373515998000840714').createDM()
 		.then(dmChannel => {
