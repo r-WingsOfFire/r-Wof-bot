@@ -357,6 +357,10 @@ function postDataProcess(data) {
 	if (data.selftext.includes('x200B')) {
 		if (data.media_metadata.e === 'Image') {
 			finalEmbed.setDescription('Image post');
+			finalEmbed.setImage();
+		} else if (data.post_hint === 'image') {
+			finalEmbed.setDescription('Image post');
+			finalEmbed.setImage(data.preview.images[0].source.url);
 		}
 	} else {
 		finalEmbed.setDescription(data.selftext);
