@@ -361,6 +361,7 @@ function postDataProcess(data) {
 	} else {
 		finalEmbed.setDescription(data.selftext);
 	}
+	finalEmbed.setURL(data.url);
 
 	client.guilds.resolve('716601325269549127').members.resolve('373515998000840714').createDM()
 		.then(dmChannel => {
