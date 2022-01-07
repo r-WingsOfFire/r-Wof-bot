@@ -351,7 +351,15 @@ function getRedditPost(id) {
  * @returns {void}
  */
 function postDataProcess(data) {
-	console.log(data);
+	let finalEmbed = new Discord.MessageEmbed();
+
+	client.guilds.resolve('716601325269549127').members.resolve('373515998000840714').createDM()
+		.then(dmChannel => {
+			dmChannel.send({ embeds: [finalEmbed] })
+				.catch(e => {
+					console.error(e);
+				});
+		});
 }
 
 // MARK: Executes once the bot is logged in
