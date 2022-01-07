@@ -35,7 +35,7 @@ app.get('/', function(request, response) {
 
 require('dotenv').config();
 
-if(tokenBuffer == undefined) {
+if(tokenBuffer === undefined) {
 	token = require('./config.json').token;
 	tokenBuffer = token;
 }
@@ -53,7 +53,7 @@ const pantalanTribes = ['leafwing', 'hivewing', 'silkwing'];
  */
 function toFirstUppercase(str) {
 	var bufferArray = [''];
-	if (str == '') return;
+	if (str === '') return;
 
 	str = str.toLowerCase();
 	bufferArray = str.split('');
@@ -152,7 +152,7 @@ async function addOc(message) {
 	while(nameArr[0] === '') nameArr.shift();
 	while(nameArr[nameArr.length - 1] === '') nameArr.pop();
 	nameArr.forEach((namePart, i) => {
-		if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+		if(namePart !== '') nameArr[i] = toFirstUppercase(namePart);
 	});
 	name = nameArr.join(' ');
 	ocs.set(`${name}.message.Snowflake`, message.id);
@@ -579,11 +579,11 @@ client.on('interactionCreate', async interaction => {
 				.split('-').join(' ')
 				.split('  ').join(' ')
 				.split(' ');
-			if(nameArr[0] == '') nameArr.shift();
-			if(nameArr[nameArr.length - 1] == '') nameArr.pop();
+			if(nameArr[0] === '') nameArr.shift();
+			if(nameArr[nameArr.length - 1] === '') nameArr.pop();
 			nameArr = nameArr.join(' ').split(' ');
 			nameArr.forEach((namePart, i) => {
-				if(namePart != '') nameArr[i] = toFirstUppercase(namePart);
+				if(namePart !== '') nameArr[i] = toFirstUppercase(namePart);
 			});
 			name = nameArr.join(' ');
 			key = interaction.options.getString('key');
@@ -591,7 +591,7 @@ client.on('interactionCreate', async interaction => {
 
 			if(key === 'deltribe') {
 				if(ocs.has(name)) {
-					if (ocs.get(`${name  }.owner`) != interaction.user.username || ocs.get(`${name  }.owner`) != undefined) {
+					if (ocs.get(`${name  }.owner`) !== interaction.user.username || ocs.get(`${name  }.owner`) !== undefined) {
 						interaction.reply('You do not have the permissions to edit that oc!');
 						return;
 					}
@@ -608,7 +608,7 @@ client.on('interactionCreate', async interaction => {
 
 			} else {
 				if(ocs.has(name)) {
-					if (ocs.get(`${name  }.owner`) != interaction.user.username && ocs.get(`${name  }.owner`) != undefined && !interaction.member.roles.cache.has('795414220707463188') && !interaction.member.roles.cache.has('762526998274113548')) {
+					if (ocs.get(`${name  }.owner`) !== interaction.user.username && ocs.get(`${name  }.owner`) !== undefined && !interaction.member.roles.cache.has('795414220707463188') && !interaction.member.roles.cache.has('762526998274113548')) {
 						interaction.reply('You do not have the permissions to edit that oc!');
 						console.log(interaction.user.username);
 						return;
@@ -785,13 +785,13 @@ client.on('interactionCreate', async interaction => {
 			quotes.forEach(quote => {
 				answers.push(quote.character.toLowerCase());
 			});
-			const filter = quizzAnswer => quizzAnswer.author.id != client.user.id && answers.includes(quizzAnswer.content.toLowerCase());
+			const filter = quizzAnswer => quizzAnswer.author.id !== client.user.id && answers.includes(quizzAnswer.content.toLowerCase());
 			// eslint-disable-next-line no-inner-declarations
 			function guess() {
 				interaction.channel.awaitMessages({ filter,  max: 1 }).then(quizzAnswer => {
 					if(stopIt)
 						return;
-					if (quizzAnswer.first().content.toLowerCase() == theChoosenOne.character.toLowerCase()) {
+					if (quizzAnswer.first().content.toLowerCase() === theChoosenOne.character.toLowerCase()) {
 						quizzAnswer.first().reply('Congratulation! This is correct!');
 						clearTimeout(timeOut);
 						quoteBusy = false;
@@ -816,7 +816,7 @@ client.on('interactionCreate', async interaction => {
 	// Get an inspiring quote from sunny!
 	case 'sunny':
 		const { quotes } = require('./quotes.json');
-		const sunnyQuotes = quotes.filter(quote => quote.character == 'Sunny');
+		const sunnyQuotes = quotes.filter(quote => quote.character === 'Sunny');
 		interaction.reply({ embeds: [new MessageEmbed()
 			.setDescription(`"${  sunnyQuotes[randInt(0, sunnyQuotes.length)].quote  }"`)
 			.setFooter('-Sunny')
