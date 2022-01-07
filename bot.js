@@ -12,6 +12,8 @@ var quoteBusy = false; // False if the bot can post a new quizz quote
 
 var rWingsOfFireServer; // Not yet declared, as the bot isn't logged in yet
 
+var lastRedditPostId = '';
+
 // MARK: Token declaration
 const process = require('process');
 const exit = process.exit;
@@ -21,7 +23,7 @@ var token = '';
 // MARK: Heroku support
 var express = require('express');
 var app = express();
-//var http = require('http');
+var https = require('https');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -318,6 +320,40 @@ function randInt(min, max) {
 	return Math.floor(Math.random() * max - min) + min;
 }
 
+/** Fetches a reddit post
+ * @returns {void} nothing
+ */
+function getRedditPost(id) {
+	https.get(`https://www.reddit.com/r/WingsOfFire/comments/${id}/.json`, {
+		headers: {
+			'User-Agent': 'RWingsOfFire by dindin100'
+		}
+	}, (res) => {
+		res.setEncoding('utf8');
+		let rawData = '';
+		res.on('data', (chunk) => {
+			rawData += chunk;
+		});
+		res.on('end', () => {
+			try {
+				postDataProcess(JSON.parse(rawData)[0].data.children[0].data);
+				res.resume();
+			} catch (e) {
+				console.error(e.message);
+				res.resume();
+			}
+		});
+	});
+}
+
+/** Processes the data from the reddit post and sends it in the channel
+ * @param {any} data The post data
+ * @returns {void}
+ */
+function postDataProcess(data) {
+	console.log(data);
+}
+
 // MARK: Executes once the bot is logged in
 client.once('ready', async () => {
 	// We initialize the variable here, once the bot is logged in
@@ -370,6 +406,44 @@ client.once('ready', async () => {
 		},
 	];
 	await command.permissions.add({ permissions });
+
+	https.get('https://www.reddit.com/r/WingsOfFire/new.json', (res) => {
+		res.setEncoding('utf8');
+		let rawData = '';
+		res.on('data', (chunk) => {
+			rawData += chunk;
+		});
+		res.on('end', () => {
+			try {
+				lastRedditPostId = JSON.parse(rawData).data.children[0].data.id;
+			} catch (e) {
+				console.error(e.message);
+			}
+		});
+	});
+
+	setInterval(() => {
+		console.log(lastRedditPostId);
+		https.get(`https://www.reddit.com/r/WingsOfFire/new.json?before=t3_${lastRedditPostId}`, (res) => {
+			res.setEncoding('utf8');
+			let rawData = '';
+			res.on('data', (chunk) => {
+				rawData += chunk;
+			});
+			res.on('end', () => {
+				try {
+					if (JSON.parse(rawData).data.children.length === 0) return;
+
+					JSON.parse(rawData).data.children.forEach(post => {
+						getRedditPost(post.data.id);
+					});
+					lastRedditPostId = JSON.parse(rawData).data.children[0].data.id;
+				} catch (e) {
+					console.error(e.message);
+				}
+			});
+		});
+	}, 5000);
 });
 
 // MARK: Executes when an interaction is created
