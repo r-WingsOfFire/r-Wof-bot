@@ -12,7 +12,7 @@ var quoteBusy = false; // False if the bot can post a new quizz quote
 
 var rWingsOfFireServer; // Not yet declared, as the bot isn't logged in yet
 
-// MARK: Token declaraction
+// MARK: Token declaration
 const process = require('process');
 const exit = process.exit;
 var tokenBuffer = process.env.token;
@@ -42,8 +42,8 @@ if(tokenBuffer == undefined) {
 token = tokenBuffer;
 
 // Tribes constants
-const pytribes = ['skywing', 'seawing', 'icewing', 'nightwing', 'sandwing', 'mudwing', 'rainwing'];
-const patribes = ['leafwing', 'hivewing', 'silkwing'];
+const pyhrrianTribes = ['skywing', 'seawing', 'icewing', 'nightwing', 'sandwing', 'mudwing', 'rainwing'];
+const pantalanTribes = ['leafwing', 'hivewing', 'silkwing'];
 
 // MARK: Functions
 /**
@@ -277,14 +277,14 @@ async function addOc(message) {
  * @returns {String} The tribe that got picked
  */
 function randomPantala() {
-	return patribes[Math.floor(Math.random() * patribes.length)];
+	return pantalanTribes[Math.floor(Math.random() * pantalanTribes.length)];
 }
 
 /** Picks a random tribe from Pyrrhia
  * @returns {String} The tribe that got picked
  */
 function randomPyrrhia() {
-	return pytribes[Math.floor(Math.random() * pytribes.length)];
+	return pyhrrianTribes[Math.floor(Math.random() * pyhrrianTribes.length)];
 }
 
 /** Picks a random tribe
@@ -340,7 +340,7 @@ client.once('ready', async () => {
 		});
 	}, 5000);
 
-	// Sets perms for commands
+	// Sets permissions for commands
 	if (!client.application?.owner) await client.application?.fetch();
 	const command = await client.guilds.cache.get('716601325269549127')?.commands.fetch('910250822779162714');
 	const permissions = [
@@ -361,7 +361,7 @@ client.once('ready', async () => {
 // MARK: Executes when an interaction is created
 // * An interaction can be a button pressed, a slash command executed, and so on
 client.on('interactionCreate', async interaction => {
-	// MARK: Variable decalations
+	// MARK: Variable declarations
 
 	// Color of the embeds
 	var color = 'DEFAULT';
@@ -419,7 +419,7 @@ client.on('interactionCreate', async interaction => {
 		if (interaction.member.roles.resolve('795414220707463188')) {
 			await interaction.reply('Alright, the bot is logging out...')
 				.catch((e) => {
-					console.error(`tf is going on? an error occured... check that out:\n${  e}`);
+					console.error(`tf is going on? an error occurred... check that out:\n${  e}`);
 				})
 				.then(() => {
 					var killer = interaction.user.username;
@@ -482,7 +482,7 @@ client.on('interactionCreate', async interaction => {
 	case 'oc':
 		switch(interaction.options.getSubcommand()) {
 
-		// Get informations about an oc in the database
+		// Get information about an oc in the database
 		case 'get':
 			interaction.options.getString('name').split(' ').forEach((namePart, i) => {
 				ocArr[i] = toFirstUppercase(namePart);
@@ -592,7 +592,7 @@ client.on('interactionCreate', async interaction => {
 			if(key === 'deltribe') {
 				if(ocs.has(name)) {
 					if (ocs.get(`${name  }.owner`) != interaction.user.username || ocs.get(`${name  }.owner`) != undefined) {
-						interaction.reply('You do not have the premissions to edit that oc!');
+						interaction.reply('You do not have the permissions to edit that oc!');
 						return;
 					}
 					if(ocs.get(`${name}.tribes`).includes(value.toLowerCase())) {
@@ -609,7 +609,7 @@ client.on('interactionCreate', async interaction => {
 			} else {
 				if(ocs.has(name)) {
 					if (ocs.get(`${name  }.owner`) != interaction.user.username && ocs.get(`${name  }.owner`) != undefined && !interaction.member.roles.cache.has('795414220707463188') && !interaction.member.roles.cache.has('762526998274113548')) {
-						interaction.reply('You do not have the premissions to edit that oc!');
+						interaction.reply('You do not have the permissions to edit that oc!');
 						console.log(interaction.user.username);
 						return;
 					}
@@ -730,7 +730,7 @@ client.on('interactionCreate', async interaction => {
 
 		// Fetches a message content and puts it in the database
 		case 'message':
-			await interaction.reply('This command puts your oc in my database; However, when there is a change in my code, an old version of the database will be loaded. Therefore, your oc may be removed from the database. This will be fixed in around february of 2022.'); // Litterally waiting for my credit card so i can put it in heroku and use their database
+			await interaction.reply('This command puts your oc in my database.');
 			const msg = interaction.options.getString('msg');
 
 			if(msg.includes('/')) {
@@ -847,7 +847,7 @@ client.on('interactionCreate', async interaction => {
 			});
 		} else
 			interaction.reply('It\'s... Oh, well the piece landed on its edge...');
-			// Almost impossibe, but still funny
+			// Almost impossible, but still funny
 
 		break;
 
@@ -945,18 +945,18 @@ client.on('interactionCreate', async interaction => {
 				const embed = new Discord.MessageEmbed()
 					.setTitle('Help')
 					.setColor('ORANGE')
-					.setFooter('Use /help cmd:<command> for more informations on that command!')
+					.setFooter('Use /help cmd:<command> for more information on that command!')
 					.addField({ name: 'kill', value: /* 'Kills the bot. (Only available to bot-helper role)'*/'hi' })
 					.addField({ name: 'ping', value: 'Get the time delay between when you send the message and when the bot detects it.' })
 					.addField({ name: 'snek', value: 'snek.' })
-					.addField({ name: 'stalk', value: 'Get notified when the user whith the specified id logs in. Only works with this server\'s members.' })
+					.addField({ name: 'stalk', value: 'Get notified when the user with the specified id logs in. Only works with this server\'s members.' })
 					.addField({ name: 'oc get', value: 'Get infos about an oc. Needs to have fetched the oc to the database from the message beforehand. See /help cmd:ocmessage.' })
 					.addField({ name: 'oc edit', value: 'Allows for the owner of the oc to edit in the database in case the data is wrong.' })
 					.addField({ name: 'quote', value: 'Starts a quizz about a quote. Guess the character who said that quote!' })
 					.addField({ name: 'fac, flip a coin', value: 'Flips a swiss coin. Warning: There is 1 in 100000000000000000 chance that the piece lands on its side. Be careful!' })
 					.addField({ name: 'hybridgen', value: 'A hybrid generator for you!' })
 					.addField({ name: 'oc message', value: 'Adds a message to the database' })
-					.addField({ name: 'help', valuse: 'Shows this message!' });
+					.addField({ name: 'help', value: 'Shows this message!' });
 				interaction.reply(embed);
 			} catch (e) {
 				console.warn(e);
@@ -966,7 +966,7 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-// Loging in
+// Logging in
 // ! Do not remove !
 /**
  * * The token can be found at https://discord.com/developers/applications/771945913044303912/bot
