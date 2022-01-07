@@ -354,6 +354,13 @@ function postDataProcess(data) {
 	let finalEmbed = new Discord.MessageEmbed();
 	finalEmbed.setAuthor(`u/${data.author}`);
 	finalEmbed.setTitle(data.title);
+	if (data.selftext.includes('x200B')) {
+		if (data.media_metadata.e === 'Image') {
+			finalEmbed.setDescription('Image post');
+		}
+	} else {
+		finalEmbed.setDescription(data.selftext);
+	}
 
 	client.guilds.resolve('716601325269549127').members.resolve('373515998000840714').createDM()
 		.then(dmChannel => {
