@@ -374,6 +374,14 @@ function postDataProcess(data) {
 					console.error(e);
 				});
 		});
+
+	//Switch to this one when ready
+	/* client.guilds.resolve('716601325269549127').channels.resolve('716617066261643314')
+		.send({ embeds: [finalEmbed] })
+				.catch(e => {
+					console.error(e);
+				});
+		}); */
 }
 
 // MARK: Executes once the bot is logged in
