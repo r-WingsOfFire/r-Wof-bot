@@ -1,0 +1,41 @@
+{
+  "name": "wodbot",
+  "version": "1.0.0",
+  "description": "A discord bot for the World of dragons podcast server",
+  "main": "index.ts",
+  "scripts": {
+    "start": "npx ts-node index.ts",
+    "publish": "node deploy-commands.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dindin-nibnib/WodBot.git"
+  },
+  "keywords": [
+    "world",
+    "of",
+    "dragons",
+    "podcast",
+    "wodpod",
+    "discord",
+    "bot"
+  ],
+  "author": "dindin-nibnib",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/dindin-nibnib/WodBot/issues"
+  },
+  "homepage": "https://github.com/dindin-nibnib/WodBot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.15.0",
+    "@discordjs/rest": "^0.5.0",
+    "@types/node": "^17.0.42",
+    "discord-api-types": "^0.33.5",
+    "discord.js": "^13.8.0",
+    "discordx": "^9.7.3",
+    "dotenv": "^16.0.1",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
+  }
+}

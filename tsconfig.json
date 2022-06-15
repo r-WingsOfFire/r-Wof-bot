@@ -1,0 +1,27 @@
+{
+  "typeAcquisition": {
+    "enable": true
+  },
+  "compilerOptions": {
+    "baseUrl": "./",
+    "module": "CommonJS",
+    "target": "ES2022",
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "strict": true,
+    "outDir": "build",
+    "emitDecoratorMetadata": true, // required
+    "experimentalDecorators": true, // required
+    "declaration": false,
+    "importHelpers": true, // required
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "ES2021",
+      "esnext.asynciterable"
+    ],
+    "moduleResolution": "node"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
