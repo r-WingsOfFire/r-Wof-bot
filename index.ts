@@ -9,9 +9,6 @@ import Discord = require("discord.js");
 import Discordx = require("discordx");
 import dotenv = require('dotenv');
 
-/* It's getting the voreChannelId property from the config.json file. */
-const { voreChannelId } = require("./config.json");
-
 dotenv.config();
 
 /* It's getting the token from the .env file. */
