@@ -61,6 +61,20 @@ client.on('interactionCreate', async interaction => {
     /* It's checking if the interaction is a command. If it isn't, it returns. */
     if (!interaction.isCommand()) return;
 
+    if (interaction.commandName == "reload") {
+        const commandsPath = path.join(__dirname, 'commands');
+        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+        /* It's importing all the commands from the commands folder. */
+        for (const file of commandFiles) {
+            const filePath = path.join(commandsPath, file);
+            const command = require(filePath);
+            // Set a new item in the Collection
+            // With the key as the command name and the value as the exported module
+            client.commands.set(command.data.name, command);
+        }
+        return;
+    }
     /* It's getting the command from the client's commands collection. */
     const command = client.commands.get(interaction.commandName);
 
