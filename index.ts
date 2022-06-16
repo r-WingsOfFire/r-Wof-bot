@@ -62,6 +62,13 @@ client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
     if (interaction.commandName == "reload") {
+        interaction.reply({
+            embeds: [
+                new Discord.MessageEmbed()
+                .setColor("GOLD")
+                .setTitle("Reloading!")
+            ]
+        })
         const commandsPath = path.join(__dirname, 'commands');
         const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -73,6 +80,8 @@ client.on('interactionCreate', async interaction => {
             // With the key as the command name and the value as the exported module
             client.commands.set(command.data.name, command);
         }
+        client.destroy();
+        client.login(token);
         return;
     }
     /* It's getting the command from the client's commands collection. */
