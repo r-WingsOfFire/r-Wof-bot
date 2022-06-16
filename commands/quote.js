@@ -90,7 +90,16 @@ module.exports = {
         quizzAnswer.first().content.toLowerCase() ===
         theChoosenOne.character.toLowerCase()
       ) {
-        quizzAnswer.first().reply("Congratulation! This is correct!");
+        quizzAnswer
+          .first()
+          .reply({
+            embeds: [
+              new Discord.MessageEmbed()
+                .setDescription("Congratulation! This is correct!")
+                .setTitle("Answered correctly!")
+                .setColor("GREEN"),
+            ],
+          });
         clearTimeout(timeOut);
         client.quoteBusy = false;
         stopIt = true;
