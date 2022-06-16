@@ -28,6 +28,7 @@ class Client extends Discordx.Client {
         data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
         execute(interaction: Discord.CommandInteraction<Discord.CacheType>, client: Client): Promise<void>;
     }>();
+    quoteBusy = false;
 }
 
 // Create a new client instance
