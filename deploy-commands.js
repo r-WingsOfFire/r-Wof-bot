@@ -1,6 +1,6 @@
 /* It's importing the required modules. */
-const fs = require("node:fs");
-const path = require("node:path");
+const fs = require("fs");
+const path = require("path");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 var { clientId, guildId } = require("./config.json");
