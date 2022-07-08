@@ -1,6 +1,6 @@
 /* It's importing the required modules. */
-import fs = require('node:fs');
-import path = require('node:path');
+import fs = require('fs');
+import path = require('path');
 
 import { SlashCommandBuilder } from '@discordjs/builders';
 import "reflect-metadata";
@@ -65,8 +65,8 @@ client.on('interactionCreate', async interaction => {
         interaction.reply({
             embeds: [
                 new Discord.MessageEmbed()
-                .setColor("GOLD")
-                .setTitle("Reloading!")
+                    .setColor("GOLD")
+                    .setTitle("Reloading!")
             ]
         })
         const commandsPath = path.join(__dirname, 'commands');
@@ -87,7 +87,7 @@ client.on('interactionCreate', async interaction => {
     /* It's getting the command from the client's commands collection. */
     const command = client.commands.get(interaction.commandName);
 
-   /* It's checking if the command exists. If it doesn't, it returns. */
+    /* It's checking if the command exists. If it doesn't, it returns. */
     if (!command) return;
 
     /* It's trying to execute the command, and if it fails, it will reply with an error message. */
