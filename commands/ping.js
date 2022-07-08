@@ -21,7 +21,7 @@ module.exports = {
    * @returns nuthin
    */
   async execute(interaction, client) {
-    var ping = interaction.createdTimestamp - Date.now();
+    var ping = Date.now() - interaction.createdTimestamp;
 
     if (ping >= 0) {
       if (ping <= 500) color = "GREEN";
