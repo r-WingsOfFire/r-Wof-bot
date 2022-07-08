@@ -114,3 +114,6 @@ package-lock.json
 
 # token (KEEP IT PRIVATE)
 .env
+
+# start script
+start.bat
