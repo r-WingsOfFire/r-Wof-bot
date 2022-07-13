@@ -24,11 +24,6 @@ module.exports = {
                 .setDescription("The name of your oc")
                 .setRequired(true)
         )
-        .addIntegerOption(option =>
-            option.setName("age")
-                .setDescription("The age of your oc")
-                .setRequired(true)
-        )
         .addStringOption(option =>
             option.setName("pronouns")
                 .setDescription("The pronouns of your oc")
@@ -46,6 +41,19 @@ module.exports = {
      * @returns nuthin
      */
     async execute(interaction, client) {
+        const messageLink = interaction.options.getString("url");
+        const messageId = messageLink.split('/')[messageLink.split('/').length - 1];
+        const resolvedMessage = await client.channels.resolve("854858811101937704").messages.fetch(messageId);
+        const messageContent = resolvedMessage.content.split("\n");
+        messageContent.map((line, index) => {
+            messageContent[index] = line.toLowerCase();
+        });
+
+        const age = messageContent.filter(line => line.includes("age: "))[0].split("age: ")[1];
+        if (!age) {
+            interaction.reply({ embeds: [new MessageEmbed().setColor("RED").setTitle("Error!").setDescription("Error parsing property: Age. Age is undefined, or is not labelled age: in message (case insensitive)")] });
+        }
+
         var con = mysql.createConnection({
             host: "g61ai.myd.infomaniak.com",
             user: "g61ai_beucodi",
@@ -97,7 +105,7 @@ module.exports = {
                 if (result.length == 0) {
                     var sql = "INSERT INTO oc VALUES (null, ?,?,?,?,?)";
                     var options = interaction.options
-                    con.query(sql, [options.getString("name"), options.getString("pronouns"), options.getInteger("age"), resultWriter, options.getString("url")], (err, res) => {
+                    con.query(sql, [options.getString("name"), options.getString("pronouns"), age, resultWriter, options.getString("url")], (err, res) => {
                         if (err) throw err
                         dun();
                     })
