@@ -34,7 +34,6 @@
     "crypto": "^1.0.1",
     "discord-api-types": "^0.33.5",
     "discord.js": "^13.8.1",
-    "discordx": "^9.7.3",
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13"
   },
