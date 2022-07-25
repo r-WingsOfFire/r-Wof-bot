@@ -10,10 +10,11 @@
     "sourceMap": true,
     "strict": true,
     "outDir": "build",
-    "emitDecoratorMetadata": true, // required
-    "experimentalDecorators": true, // required
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "declaration": false,
-    "importHelpers": true, // required
+    "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ESNext", "ESNext.AsyncIterable"],
     "moduleResolution": "node"

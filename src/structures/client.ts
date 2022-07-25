@@ -3,6 +3,10 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discordx from "discordx";
 import * as fs from "fs";
 import * as path from "path";
+import globCB from "glob";
+import { promisify } from "util";
+
+const glob = promisify(globCB);
 
 interface CommandFunction {
   (
@@ -19,6 +23,7 @@ interface Command {
 export class Client extends Discordx.Client {
   public commands = new Discord.Collection<string, Command>();
   public quoteBusy = false;
+  private commandsPath: string;
 
   public constructor(private dir: string) {
     super({
@@ -28,17 +33,18 @@ export class Client extends Discordx.Client {
         Discord.Intents.FLAGS.GUILD_MESSAGES,
       ],
     });
+
+    this.commandsPath = path.join(this.dir, "commands");
   }
 
   public async load(): Promise<void> {
-    const commandsPath = path.join(this.dir, "commands");
-    const commandFiles = fs
-      .readdirSync(commandsPath)
-      .filter((file) => path.extname(file) === ".js");
+    const commandFiles = await glob(
+      path.join(this.commandsPath, "**", "*.{ts,js}")
+    );
 
     /* It's importing all the commands from the commands folder. */
     for (const file of commandFiles) {
-      const filePath = path.join(commandsPath, file);
+      const filePath = path.join(this.commandsPath, file);
       const command: Command = await import(filePath);
       // Set a new item in the Collection
       // With the key as the command name and the value as the exported module
