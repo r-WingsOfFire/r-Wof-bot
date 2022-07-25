@@ -7,7 +7,7 @@ export default {
     .setName("flipacoin")
     .setDescription("Flips a swiss coin"),
   async execute(interaction, client) {
-    let random = Math.random();
+    const random = Math.random();
     if (random < 0.5) {
       interaction.reply({
         embeds: [
