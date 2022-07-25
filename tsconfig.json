@@ -15,13 +15,9 @@
     "declaration": false,
     "importHelpers": true, // required
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "ES2021",
-      "esnext.asynciterable"
-    ],
+    "lib": ["ES2021", "esnext.asynciterable"],
     "moduleResolution": "node"
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "include": "./src/**/*.ts",
+  "exclude": ["node_modules"]
 }
