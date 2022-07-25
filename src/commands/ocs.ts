@@ -23,7 +23,7 @@ export default {
       database: "g61ai_r_wof_bot",
     });
 
-    con.connect(function (err) {
+    con.connect((err) => {
       if (err) throw err;
       console.log("Connected!");
 
