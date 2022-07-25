@@ -43,9 +43,12 @@ export default {
           console.log(res[0]);
 
           embed.setTitle(`${name}:`);
-          embed.addField("Name", name);
-          if (res[0].pronouns) embed.addField("Pronouns", res[0].pronouns);
-          embed.addField("Age", `${res[0].age}`);
+          embed.addFields(
+            { name: "Name", value: name },
+            { name: "Age", value: res[0].age },
+            { name: "Pronouns", value: res[0].pronouns ?? "Unspecified" }
+          );
+
           if (res[0].url) embed.setURL(res[0].url);
         } else {
           embed.setTitle(`${name} isn't registered!`);

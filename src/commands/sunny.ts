@@ -17,7 +17,7 @@ export default {
           .setDescription(
             `"${sunnyQuotes[randomInteger(0, sunnyQuotes.length)].quote}"`
           )
-          .setFooter("-Sunny")
+          .setFooter({ text: "-Sunny" })
           .setColor("GOLD"),
       ],
     });
