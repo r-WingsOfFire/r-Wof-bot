@@ -8,7 +8,7 @@ config();
 const token = process.env.TOKEN;
 
 if (token === undefined) {
-  process.exit(1);
+  throw new Error("Missing token");
 }
 
 const client = new Client(clientOptions as ClientOptions, __dirname);
