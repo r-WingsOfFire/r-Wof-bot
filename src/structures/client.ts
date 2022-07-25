@@ -33,6 +33,8 @@ export class Client<T extends boolean = boolean> extends Discord.Client<T> {
       const command: Command = file.default ?? file;
 
       this.commands.set(command.data.name, command);
+
+      console.log(`Loaded command ${command.data.name}`);
     }
 
     for (const path of eventFiles) {
@@ -41,6 +43,8 @@ export class Client<T extends boolean = boolean> extends Discord.Client<T> {
       const event: GenericEvent = file.default ?? file;
 
       this.on(event.event, event.execute.bind(null, this as Client<true>));
+
+      console.log(`Loaded event ${event.event}`);
     }
 
     const applicationCommandData = this.commands.map((command) =>
