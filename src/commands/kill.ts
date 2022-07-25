@@ -9,7 +9,7 @@ export default {
     console.log("kill");
     /* It's checking if the user has the role with the ID 795414220707463188. If they don't, it's
     sending a message to the user saying that they don't have the permissions to do that. */
-    if (!interaction.member?.roles.resolve("795414220707463188")) {
+    if (!interaction.member?.roles.cache.has("795414220707463188")) {
       interaction.reply({
         ephemeral: true,
         content: "You don't have the permissions to do that!",
