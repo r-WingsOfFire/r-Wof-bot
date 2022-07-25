@@ -1,7 +1,7 @@
 import type { Command } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
-import * as MySQL from "mysql";
+import { connection } from "../util/sql";
 
 export default {
   data: new SlashCommandBuilder()
@@ -72,27 +72,15 @@ export default {
       });
     }
 
-    const con = MySQL.createConnection({
-      host: "g61ai.myd.infomaniak.com",
-      user: "g61ai_beucodi",
-      password: process.env.DBPWD,
-      database: "g61ai_r_wof_bot",
-    });
-
-    con.connect((err) => {
-      if (err) throw err;
-      console.log("Connected!");
-    });
-
     const sql = "SELECT id FROM rper WHERE snowflake = ?";
 
-    con.query(sql, [interaction.user.id], (err, res) => {
+    connection.query(sql, [interaction.user.id], (err, res) => {
       if (err) throw err;
 
       if (res.length === 0) {
         console.log("Undef!");
         let sql = "INSERT INTO rper VALUES (null, ?, ?)";
-        con.query(
+        connection.query(
           sql,
           [interaction.user.id, interaction.user.tag],
           (err, res) => {
@@ -100,7 +88,7 @@ export default {
 
             sql = "SELECT id FROM rper WHERE snowflake LIKE ?";
 
-            con.query(sql, [interaction.user.id], (err, res) => {
+            connection.query(sql, [interaction.user.id], (err, res) => {
               if (err) throw err;
               res;
 
@@ -116,32 +104,38 @@ export default {
 
     function insertOC(resultWriter: string) {
       const sql = "SELECT id FROM oc WHERE writer = ? AND name LIKE ?";
-      con.query(sql, [resultWriter, name], (err, result) => {
+      connection.query(sql, [resultWriter, name], (err, result) => {
         if (err) throw err;
 
         if (result.length === 0) {
           const sql = "INSERT INTO oc VALUES (null, ?,?,?,?,?)";
 
-          con.query(sql, [name, pronouns, age, resultWriter, url], (err) => {
-            if (err) throw err;
-            dun();
-          });
+          connection.query(
+            sql,
+            [name, pronouns, age, resultWriter, url],
+            (err) => {
+              if (err) throw err;
+              done();
+            }
+          );
         } else {
           const sql =
             "update oc set age = ?, pronouns = ?, url = ? WHERE writer = ? AND name LIKE ?";
 
-          con.query(sql, [age, pronouns, url, resultWriter, name], (err) => {
-            if (err) throw err;
-            dun();
-          });
+          connection.query(
+            sql,
+            [age, pronouns, url, resultWriter, name],
+            (err) => {
+              if (err) throw err;
+              done();
+            }
+          );
         }
       });
     }
 
-    function dun() {
+    function done() {
       interaction.reply("Added your oc into the database!");
-
-      con.end();
     }
   },
 } as Command;

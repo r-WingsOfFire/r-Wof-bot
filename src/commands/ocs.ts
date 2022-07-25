@@ -1,7 +1,7 @@
 import type { Command } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
-import * as MySQL from "mysql";
+import { connection } from "../util/sql";
 
 export default {
   data: new SlashCommandBuilder()
@@ -16,52 +16,32 @@ export default {
         .setRequired(false)
     ),
   async execute(interaction, client) {
-    const con = MySQL.createConnection({
-      host: "g61ai.myd.infomaniak.com",
-      user: "g61ai_beucodi",
-      password: process.env.DBPWD,
-      database: "g61ai_r_wof_bot",
-    });
+    const sql =
+      "SELECT oc.name, oc.url FROM oc INNER JOIN rper r ON (r.id = oc.writer) WHERE r.snowflake LIKE ?";
+    const user = interaction.options.getUser("writer") ?? interaction.user;
 
-    con.connect((err) => {
+    connection.query(sql, [user.id], (err, res: any[]) => {
       if (err) throw err;
-      console.log("Connected!");
 
-      query();
-    });
+      const reply = new Discord.MessageEmbed();
 
-    function query() {
-      const sql =
-        "SELECT oc.name, oc.url FROM oc INNER JOIN rper r ON (r.id = oc.writer) WHERE r.snowflake LIKE ?";
-      const user = interaction.options.getUser("writer") ?? interaction.user;
+      if (res.length > 0) {
+        reply
+          .setTitle(`List of the ocs for ${user.username}:`)
+          .setDescription("");
 
-      con.query(sql, [user.id], (err, res: any[]) => {
-        if (err) throw err;
+        console.log(res);
 
-        const reply = new Discord.MessageEmbed();
-
-        if (res.length > 0) {
-          reply
-            .setTitle(`List of the ocs for ${user.username}:`)
-            .setDescription("");
-
-          console.log(res);
-
-          res.forEach((OC) => {
-            reply.setDescription(
-              reply.description + `[${OC.name}](${OC.url})\n`
-            );
-          });
-        } else {
-          reply.setTitle(`${user.username} doesn't have any oc registered!`);
-        }
-
-        interaction.reply({
-          embeds: [reply],
+        res.forEach((OC) => {
+          reply.setDescription(reply.description + `[${OC.name}](${OC.url})\n`);
         });
+      } else {
+        reply.setTitle(`${user.username} doesn't have any oc registered!`);
+      }
 
-        con.end();
+      interaction.reply({
+        embeds: [reply],
       });
-    }
+    });
   },
 } as Command;

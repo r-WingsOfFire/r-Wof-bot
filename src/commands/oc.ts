@@ -1,7 +1,7 @@
 import type { Command } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
-import MySQL from "mysql";
+import { connection } from "../util/sql";
 
 export default {
   data: new SlashCommandBuilder()
@@ -14,52 +14,34 @@ export default {
         .setRequired(true)
     ),
   async execute(interaction, client) {
-    const con = MySQL.createConnection({
-      host: "g61ai.myd.infomaniak.com",
-      user: "g61ai_beucodi",
-      password: process.env.DBPWD,
-      database: "g61ai_r_wof_bot",
-    });
+    const sql = "SELECT * FROM oc WHERE name LIKE ?";
+    const name = interaction.options.getString("name", true);
 
-    con.connect((err) => {
+    connection.query(sql, [name], (err, res) => {
       if (err) throw err;
-      console.log("Connected!");
 
-      query();
-    });
-
-    function query() {
-      const sql = "SELECT * FROM oc WHERE name LIKE ?";
-      const name = interaction.options.getString("name", true);
-
-      con.query(sql, [name], (err, res) => {
-        if (err) throw err;
-
-        const embed = new Discord.MessageEmbed().setFooter({
-          text: "Register your oc with /oc-register!",
-        });
-
-        if (res.length > 0) {
-          console.log(res[0]);
-
-          embed.setTitle(`${name}:`);
-          embed.addFields(
-            { name: "Name", value: name },
-            { name: "Age", value: res[0].age },
-            { name: "Pronouns", value: res[0].pronouns ?? "Unspecified" }
-          );
-
-          if (res[0].url) embed.setURL(res[0].url);
-        } else {
-          embed.setTitle(`${name} isn't registered!`);
-        }
-
-        interaction.reply({
-          embeds: [embed],
-        });
-
-        con.end();
+      const embed = new Discord.MessageEmbed().setFooter({
+        text: "Register your oc with /oc-register!",
       });
-    }
+
+      if (res.length > 0) {
+        console.log(res[0]);
+
+        embed.setTitle(`${name}:`);
+        embed.addFields(
+          { name: "Name", value: name },
+          { name: "Age", value: res[0].age },
+          { name: "Pronouns", value: res[0].pronouns ?? "Unspecified" }
+        );
+
+        if (res[0].url) embed.setURL(res[0].url);
+      } else {
+        embed.setTitle(`${name} isn't registered!`);
+      }
+
+      interaction.reply({
+        embeds: [embed],
+      });
+    });
   },
 } as Command;
