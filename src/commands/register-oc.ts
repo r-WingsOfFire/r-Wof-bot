@@ -89,7 +89,7 @@ export default {
     con.query(sql, [interaction.user.id], (err, res) => {
       if (err) throw err;
 
-      if (res.length == 0) {
+      if (res.length === 0) {
         console.log("Undef!");
         let sql = "INSERT INTO rper VALUES (null, ?, ?)";
         con.query(
