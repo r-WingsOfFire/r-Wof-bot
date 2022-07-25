@@ -1,12 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { guildId } = require("../config.json");
 const Discord = require("discord.js");
-const Discordx = require("discordx");
-
-// Redeclares Client in order to add a collection of commands
-class Client extends Discordx.Client {
-  commands = new Discord.Collection();
-}
+const Client = require("../structures/client");
 
 module.exports = {
   /* It's creating a new slash command. */

@@ -1,14 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { guildId } = require("../config.json");
 const Discord = require("discord.js");
-const Discordx = require("discordx");
+const Client = require("../structures/client");
 const MessageEmbed = Discord.MessageEmbed;
-
-// Redeclares Client in order to add a collection of commands
-class Client extends Discordx.Client {
-  commands = new Discord.Collection();
-  quoteBusy = false;
-}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -90,16 +84,14 @@ module.exports = {
         quizzAnswer.first().content.toLowerCase() ===
         theChoosenOne.character.toLowerCase()
       ) {
-        quizzAnswer
-          .first()
-          .reply({
-            embeds: [
-              new Discord.MessageEmbed()
-                .setDescription("Congratulation! This is correct!")
-                .setTitle("Answered correctly!")
-                .setColor("GREEN"),
-            ],
-          });
+        quizzAnswer.first().reply({
+          embeds: [
+            new Discord.MessageEmbed()
+              .setDescription("Congratulation! This is correct!")
+              .setTitle("Answered correctly!")
+              .setColor("GREEN"),
+          ],
+        });
         clearTimeout(timeOut);
         client.quoteBusy = false;
         stopIt = true;

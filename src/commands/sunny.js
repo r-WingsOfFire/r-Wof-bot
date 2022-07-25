@@ -1,14 +1,9 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { guildId } = require("../config.json");
 const Discord = require("discord.js");
-const Discordx = require("discordx");
+const Client = require("../structures/client");
 const { randomInt } = require("crypto");
 const MessageEmbed = Discord.MessageEmbed;
-
-// Redeclares Client in order to add a collection of commands
-class Client extends Discordx.Client {
-  commands = new Discord.Collection();
-}
 
 module.exports = {
   data: new SlashCommandBuilder()
