@@ -5,7 +5,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "module": "CommonJS",
-    "target": "ES2022",
+    "target": "ESNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "strict": true,
@@ -15,7 +15,7 @@
     "declaration": false,
     "importHelpers": true, // required
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2021", "esnext.asynciterable"],
+    "lib": ["ESNext", "ESNext.AsyncIterable"],
     "moduleResolution": "node"
   },
   "include": "./src/**/*.ts",
