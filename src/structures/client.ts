@@ -60,5 +60,6 @@ export class Client<T extends boolean = boolean> extends Discord.Client<T> {
   public async start(token: string): Promise<void> {
     await this.login(token);
     await this.load();
+    this.emit("ready", this as Client<true>);
   }
 }
