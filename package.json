@@ -2,7 +2,7 @@
   "name": "wodbot",
   "version": "1.0.0",
   "description": "A discord bot for the World of dragons podcast server",
-  "main": "index.ts",
+  "main": "./build/index.js",
   "scripts": {
     "start": "npx ts-node ./src/index.ts",
     "publish": "node deploy-commands.js"
