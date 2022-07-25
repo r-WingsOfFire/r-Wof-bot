@@ -41,6 +41,7 @@ export default {
 
         if (res.length > 0) {
           console.log(res[0]);
+
           embed.setTitle(`${name}:`);
           embed.addField("Name", name);
           if (res[0].pronouns) embed.addField("Pronouns", res[0].pronouns);
