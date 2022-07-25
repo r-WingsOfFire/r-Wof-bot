@@ -1,5 +1,3 @@
-import { Intents } from "discord.js";
-import "reflect-metadata";
 import { config } from "dotenv";
 import clientOptions from "./config/config.json";
 import { Client } from "./structures/client";
