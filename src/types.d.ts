@@ -4,7 +4,7 @@ import type { Client } from "./structures/client";
 
 interface CommandFunction {
   (
-    interaction: Discord.CommandInteraction,
+    interaction: Discord.CommandInteraction<"cached">,
     client: Client<true>
   ): void | Promise<void>;
 }
