@@ -1,7 +1,9 @@
 import { Intents } from "discord.js";
 import "reflect-metadata";
 import { config } from "dotenv";
+import clientOptions from "./config/config.json";
 import { Client } from "./structures/client";
+import { ClientOptions } from "./types";
 
 config();
 
@@ -11,6 +13,6 @@ if (token === undefined) {
   process.exit(-1);
 }
 
-const client = new Client(__dirname);
+const client = new Client(clientOptions as ClientOptions, __dirname);
 
 client.start(token);

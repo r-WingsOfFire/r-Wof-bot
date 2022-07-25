@@ -2,25 +2,21 @@ import * as Discord from "discord.js";
 import globCB from "glob";
 import * as path from "path";
 import { promisify } from "util";
-import { Command, GenericEvent } from "../types";
+import { Command, GenericEvent, ClientOptions } from "../types";
 
 const glob = promisify(globCB);
 
 export class Client<T extends boolean = boolean> extends Discord.Client<T> {
+  public declare options: ClientOptions;
   public commands = new Discord.Collection<string, Command>();
   public quoteBusy = false;
   private commandsPath: string;
   private eventsPath: string;
 
-  public constructor(private dir: string) {
-    super({
-      intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_MEMBERS,
-        Discord.Intents.FLAGS.GUILD_MESSAGES,
-      ],
-    });
+  public constructor(options: ClientOptions, private dir: string) {
+    super(options);
 
+    this.options = options;
     this.commandsPath = path.join(this.dir, "commands");
     this.eventsPath = path.join(this.dir, "events");
   }
@@ -46,6 +42,15 @@ export class Client<T extends boolean = boolean> extends Discord.Client<T> {
 
       this.on(event.event, event.execute.bind(null, this as Client<true>));
     }
+
+    const applicationCommandData = this.commands.map((command) =>
+      command.data.toJSON()
+    );
+
+    this.application?.commands.set(
+      applicationCommandData,
+      this.options.guildId
+    );
   }
 
   public async start(token: string): Promise<void> {
