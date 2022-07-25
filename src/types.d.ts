@@ -2,6 +2,10 @@ import type { SlashCommandBuilder } from "@discordjs/builders";
 import type * as Discord from "discord.js";
 import type { Client } from "./structures/client";
 
+interface ClientOptions extends Discord.ClientOptions {
+  guildId: Discord.Snowflake;
+}
+
 interface CommandFunction {
   (
     interaction: Discord.CommandInteraction<"cached">,
