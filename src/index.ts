@@ -1,15 +1,12 @@
-/* It's importing the required modules. */
-import fs = require("fs");
-import path = require("path");
-
-import { SlashCommandBuilder } from "@discordjs/builders";
-import "reflect-metadata";
+import * as fs from "fs";
+import * as path from "path";
 import { Intents } from "discord.js";
-import Discord = require("discord.js");
-import Discordx = require("discordx");
-import dotenv = require("dotenv");
+import "reflect-metadata";
+import * as Discord from "discord.js";
+import { config } from "dotenv";
+import { Client } from "./structures/client";
 
-dotenv.config();
+config();
 
 /* It's getting the token from the .env file. */
 const token = process.env.TOKEN;
@@ -17,24 +14,6 @@ const token = process.env.TOKEN;
 /* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
 if (token === undefined) {
   process.exit(-1);
-}
-
-// Redeclares Client in order to add a collection of commands
-// Seems complicated but it's just long type names so that intellisense understands it
-/* It's a Discord.Client that has a commands property that is a Discord.Collection of strings and
-objects with a data property and an execute method */
-class Client extends Discordx.Client {
-  commands = new Discord.Collection<
-    string,
-    {
-      data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-      execute(
-        interaction: Discord.CommandInteraction<Discord.CacheType>,
-        client: Client
-      ): Promise<void>;
-    }
-  >();
-  quoteBusy = false;
 }
 
 // Create a new client instance
