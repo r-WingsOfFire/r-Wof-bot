@@ -1,7 +1,8 @@
-import type { Command } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
+import { randomInteger } from "util/misc";
 import { quotes } from "../config/quotes.json";
+import type { Command } from "../types";
 
 export default {
   data: new SlashCommandBuilder()
@@ -30,8 +31,7 @@ export default {
     client.quoteBusy = true;
 
     // Choose one randomly
-    const theChosenOne =
-      quotes[Math.floor(Math.random() * quotes.length + 1) - 1];
+    const theChosenOne = quotes[randomInteger(0, quotes.length)];
     const quoteEmbed = new Discord.MessageEmbed()
       .setTitle("Who said this?")
       .setDescription(theChosenOne.quote)
