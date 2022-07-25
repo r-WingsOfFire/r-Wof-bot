@@ -115,8 +115,11 @@ package-lock.json
 # vscode
 .vscode
 
-# token (KEEP IT PRIVATE)
+# Token (KEEP IT PRIVATE)
 .env
 
-# start script
+# Start Script
 start.bat
+
+# config
+config.json
