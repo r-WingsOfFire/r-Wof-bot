@@ -1,0 +1,14 @@
+import type { Command } from "../types";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName("Name")
+    .setDescription("Description")
+    .addUserOption((option) =>
+      option.setName("option").setDescription("description").setRequired(true)
+    ),
+  async execute(interaction, client) {
+    //execute code here
+  },
+} as Command;
