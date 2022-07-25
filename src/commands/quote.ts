@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
-import { randomInteger } from "util/misc";
+import { randomInteger } from "../util/misc";
 import { quotes } from "../config/quotes.json";
 import type { Command } from "../types";
 

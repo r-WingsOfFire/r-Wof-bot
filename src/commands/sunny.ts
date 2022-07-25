@@ -2,7 +2,7 @@ import type { Command } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
 import { quotes } from "../config/quotes.json";
-import { randomInteger } from "util/misc";
+import { randomInteger } from "../util/misc";
 
 const sunnyQuotes = quotes.filter((quote) => quote.character === "Sunny");
 
