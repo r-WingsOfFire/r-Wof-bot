@@ -23,7 +23,10 @@ export default {
     if (!command) return;
 
     try {
-      await command.execute(interaction, client);
+      await command.execute(
+        interaction as Discord.CommandInteraction<"cached">,
+        client
+      );
     } catch (error) {
       console.error(error);
       await interaction.reply({
