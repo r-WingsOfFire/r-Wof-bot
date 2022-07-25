@@ -35,6 +35,7 @@
     "mysql": "^2.18.1"
   },
   "devDependencies": {
+    "@types/glob": "^7.2.0",
     "@types/node": "^18.6.1",
     "dotenv": "^16.0.1",
     "glob": "^8.0.3",
