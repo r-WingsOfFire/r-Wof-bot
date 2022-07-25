@@ -3,7 +3,7 @@
     "enable": true
   },
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "./src/",
     "module": "CommonJS",
     "target": "ESNext",
     "noImplicitAny": true,
