@@ -22,6 +22,19 @@ module.exports = {
    * @returns nuthin
    */
   async execute(interaction, client) {
+    if (interaction.channelId !== "724790540721455144") {
+      interaction.reply({
+        embeds: [
+          new MessageEmbed()
+            .setTitle("Error")
+            .setDescription(
+              "This command can only be used in the <#724790540721455144> channel"
+            )
+            .setColor("RED")
+        ]
+      })
+      return;
+    }
     if (client.quoteBusy == true) {
       interaction.reply({
         embeds: [
@@ -56,22 +69,15 @@ module.exports = {
       .setColor("GREEN");
 
     await interaction.reply({ embeds: [quoteEmbed] });
-    const timeOut = setTimeout(() => {
+    const timeOut = setTimeout(async () => {
       stopIt = true;
-      interaction.editReply({ content: "This quizz is finished.", embeds: [] });
+      let reply = await interaction.fetchReply()
+      interaction.editReply({ embeds: [reply.embeds[0].setColor("RED").setFooter("This quizz is finished.").setTitle("Time's up!")] });
       interaction.channel.send({
         content: `Time's up! The answer was ${theChoosenOne.character}!`,
         embeds: [],
       });
       client.quoteBusy = false;
-      const quizzEndedEmbed = new MessageEmbed()
-        .setTitle("Quizz ended")
-        .setDescription("This quizz has ended!")
-        .setFooter({
-          text: "If you want to try that out, use the /quote command!",
-        })
-        .setColor("GREEN");
-      interaction.editReply({ embeds: [quizzEndedEmbed] });
     }, 20000);
 
     quotes.forEach((quote) => {
@@ -103,9 +109,9 @@ module.exports = {
         clearTimeout(timeOut);
         client.quoteBusy = false;
         stopIt = true;
-        const quizzEndedEmbed = new MessageEmbed()
+        let prompt = await interaction.fetchReply();
+        const quizzEndedEmbed = prompt.embeds[0]
           .setTitle("Quizz ended")
-          .setDescription("This quizz has ended!")
           .setFooter({
             text: "If you want to try that out, use the /quote command!",
           })
