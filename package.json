@@ -1,7 +1,7 @@
 {
-  "name": "wodbot",
+  "name": "r-wof-bot",
   "version": "1.0.0",
-  "description": "A discord bot for the World of dragons podcast server",
+  "description": "A discord bot for the r/WingsOfFire discord server",
   "main": "index.ts",
   "scripts": {
     "start": "npx ts-node index.ts",
@@ -9,23 +9,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dindin-nibnib/WodBot.git"
+    "url": "git+https://github.com/r-WingsOfFire/r-Wof-bot.git"
   },
-  "keywords": [
-    "world",
-    "of",
-    "dragons",
-    "podcast",
-    "wodpod",
-    "discord",
-    "bot"
-  ],
   "author": "dindin-nibnib",
   "license": "GPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/dindin-nibnib/WodBot/issues"
-  },
-  "homepage": "https://github.com/dindin-nibnib/WodBot#readme",
+  "homepage": "https://github.com/r-WingsOfFire/r-Wof-bot",
   "dependencies": {
     "@discordjs/builders": "^0.15.0",
     "@discordjs/rest": "^0.5.0",
