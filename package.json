@@ -4,7 +4,7 @@
   "description": "A discord bot for the r/WingsOfFire discord server",
   "main": "index.ts",
   "scripts": {
-    "start": "npx ts-node index.ts",
+    "start": "npx ts-node src",
     "publish": "node deploy-commands.js"
   },
   "repository": {
