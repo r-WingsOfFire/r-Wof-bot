@@ -2,7 +2,7 @@
   "name": "r-wof-bot",
   "version": "1.0.0",
   "description": "A discord bot for the r/WingsOfFire discord server",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "start": "npx ts-node src",
     "publish": "node deploy-commands.js"
@@ -17,6 +17,7 @@
   "dependencies": {
     "@discordjs/builders": "0.15.0",
     "@discordjs/rest": "0.5.0",
+    "@types/dotenv": "8.2.0",
     "@types/node": "17.0.42",
     "crypto": "1.0.1",
     "discord-api-types": "0.33.5",
