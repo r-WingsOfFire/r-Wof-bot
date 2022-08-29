@@ -35,7 +35,7 @@ module.exports = {
           .setTitle("RP Quizz")
           .setDescription(
             "You have been sent the quizz by dm.\n\n" +
-              "You have 15 seconds to answer each question.\n\n" +
+              "You have 1 minute to answer each question.\n\n" +
               "Good luck!"
           )
           .setFooter({ text: "-RP Quizz" })
@@ -81,7 +81,7 @@ module.exports = {
       const clicked = await msg
         .awaitMessageComponent({
           filter,
-          time: 15_000,
+          time: 60_000,
         })
         .catch((collected) => {
           return;
