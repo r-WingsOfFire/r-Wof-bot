@@ -7,9 +7,8 @@ import "reflect-metadata";
 import { Intents } from "discord.js";
 import Discord = require("discord.js");
 import Discordx = require("discordx");
-import dotenv = require("dotenv");
 
-dotenv.config();
+require("dotenv").config();
 
 /* It's getting the token from the .env file. */
 const token = process.env.TOKEN;
