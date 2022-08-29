@@ -15,6 +15,7 @@ const token = process.env.TOKEN;
 
 /* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
 if (token === undefined) {
+  console.log("No token found in .env file.");
   process.exit(-1);
 }
 
