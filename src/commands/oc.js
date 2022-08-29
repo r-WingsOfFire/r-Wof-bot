@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { guildId } = require("../config.json");
+const { guildId } = require("../../config.json");
 const Discord = require("discord.js");
 const Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
