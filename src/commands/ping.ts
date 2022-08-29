@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
 
 // Redeclares Client in order to add a collection of commands
@@ -14,21 +13,18 @@ module.exports = {
     .setName("ping")
     .setDescription("Replies with pong and sends the ping of the bot"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
     var ping = Date.now() - interaction.createdTimestamp;
-
+    let color: Discord.ColorResolvable;
     if (ping >= 0) {
       if (ping <= 500) color = "GREEN";
-      if (ping <= 1000 && ping > 500) color = "YELLOW";
-      if (ping <= 1500 && ping > 1000) color = "ORANGE";
-      if (ping <= 2000 && ping > 1500) color = "RED";
-      if (ping > 2000) color = "PURPLE";
+      else if (ping <= 1000) color = "YELLOW";
+      else if (ping <= 1500) color = "ORANGE";
+      else if (ping <= 2000) color = "RED";
+      else color = "PURPLE";
       const PingEmbed = new MessageEmbed()
         .setColor(color)
         .setTitle("Pong! :ping_pong:")

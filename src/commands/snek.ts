@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
 
 // Redeclares Client in order to add a collection of commands
 class Client extends Discordx.Client {
@@ -11,13 +10,10 @@ class Client extends Discordx.Client {
 module.exports = {
   data: new SlashCommandBuilder().setName("snek").setDescription("snek"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
     await interaction.reply({
       files: [
         {

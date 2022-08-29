@@ -7,15 +7,15 @@ import "reflect-metadata";
 import { Intents } from "discord.js";
 import Discord = require("discord.js");
 import Discordx = require("discordx");
-import dotenv = require("dotenv");
 
-dotenv.config();
+require("dotenv").config();
 
 /* It's getting the token from the .env file. */
 const token = process.env.TOKEN;
 
 /* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
 if (token === undefined) {
+  console.log("No token found in .env file.");
   process.exit(-1);
 }
 
@@ -49,7 +49,7 @@ const client = new Client({
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
-  .filter((file) => file.endsWith(".js"));
+  .filter((file) => file.endsWith(".ts"));
 
 /* It's importing all the commands from the commands folder. */
 for (const file of commandFiles) {

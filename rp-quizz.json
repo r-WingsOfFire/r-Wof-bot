@@ -1,0 +1,240 @@
+{
+	"questions": [
+		{
+			"question": "Which is NOT true about strengths and weaknesses for a character submission",
+			"answers": [
+				{
+					"text": "Strengths and weakness need to be two sentences minimum",
+					"correct": false
+				},
+				{
+					"text": "At least one of the strengths/weaknesses must be personality based",
+					"correct": false
+				},
+				{
+					"text": "Strengths are optional and only weakness are needed",
+					"correct": true
+				},
+				{
+					"text": "Characters must have weaknesses",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "A character is allowed to be an assassin",
+			"answers": [
+				{
+					"text": "If it makes sense in the backstory",
+					"correct": false
+				},
+				{
+					"text": "If they only kill NPCs",
+					"correct": false
+				},
+				{
+					"text": "If it was a past occupation and they don’t kill anymore",
+					"correct": true
+				},
+				{
+					"text": "Assassins are not allowed in the RP",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "True or false: Members can RP with a character they plan to submit but hasn’t been approved yet",
+			"answers": [
+				{
+					"text": "True",
+					"correct": false
+				},
+				{
+					"text": "False",
+					"correct": true
+				}
+			]
+		},
+		{
+			"question": "What is the age range for students attending JMA?",
+			"answers": [
+				{
+					"text": "3-11 years old",
+					"correct": false
+				},
+				{
+					"text": "2-8 years old",
+					"correct": false
+				},
+				{
+					"text": "0-15 years old",
+					"correct": false
+				},
+				{
+					"text": "2-10 years old",
+					"correct": true
+				}
+			]
+		},
+		{
+			"question": "How many total characters are members allowed to have?",
+			"answers": [
+				{
+					"text": "7",
+					"correct": false
+				},
+				{
+					"text": "6",
+					"correct": true
+				},
+				{
+					"text": "As many as they want",
+					"correct": false
+				},
+				{
+					"text": "5",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "How many days must a member wait after getting an egg approved for it to hatch?",
+			"answers": [
+				{
+					"text": "5 days minimum",
+					"correct": false
+				},
+				{
+					"text": "7 days minimum",
+					"correct": false
+				},
+				{
+					"text": "10 days minimum",
+					"correct": true
+				},
+				{
+					"text": "None",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "How many abilities are hybrids allowed to have?",
+			"answers": [
+				{
+					"text": "1 major, 1 minor, 2 passive",
+					"correct": true
+				},
+				{
+					"text": "2 major, 2 minor, 3 passive",
+					"correct": false
+				},
+				{
+					"text": "No major, 1 minor, 2 passive",
+					"correct": false
+				},
+				{
+					"text": "1 major, 2 minor, 2 passive",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "An RP response can be more than one discord message if",
+			"answers": [
+				{
+					"text": "A member remembers something else to add after sending the first message",
+					"correct": false
+				},
+				{
+					"text": "The response exceeds the character count",
+					"correct": true
+				},
+				{
+					"text": "The response is too long",
+					"correct": false
+				},
+				{
+					"text": "The response is too short",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "What is a self rp",
+			"answers": [
+				{
+					"text": "Role playing in DMs",
+					"correct": false
+				},
+				{
+					"text": "RPing with more than one person in the same RP",
+					"correct": false
+				},
+				{
+					"text": "Roleplaying with only your character/characters",
+					"correct": true
+				},
+				{
+					"text": "Using someone else’s character because they can’t be online in that moment",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "Which of these IS allowed in the RP",
+			"answers": [
+				{
+					"text": "ERP (NSFW RPing)",
+					"correct": false
+				},
+				{
+					"text": "Marriage, with characters over seven years old",
+					"correct": true
+				},
+				{
+					"text": "Pausing an RP",
+					"correct": false
+				},
+				{
+					"text": "Destruction of school property",
+					"correct": false
+				}
+			]
+		},
+		{
+			"question": "True or false: A member does not need RP levels to have a character with Mindreading",
+			"answers": [
+				{
+					"text": "True",
+					"correct": false
+				},
+				{
+					"text": "False",
+					"correct": true
+				}
+			]
+		},
+		{
+			"question": "What happens when a member reaches their sixth RP side warning?",
+			"answers": [
+				{
+					"text": "They are no longer allowed to use Tier unlocks",
+					"correct": false
+				},
+				{
+					"text": "Nothing",
+					"correct": false
+				},
+				{
+					"text": "Lose JMA RP approved for a week",
+					"correct": true
+				},
+				{
+					"text": "Lose RP levels",
+					"correct": false
+				}
+			]
+		}
+	]
+}

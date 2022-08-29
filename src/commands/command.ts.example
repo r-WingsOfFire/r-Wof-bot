@@ -1,0 +1,26 @@
+import { SlashCommandBuilder } from "@discordjs/builders";
+const { guildId } = require("../../config.json");
+import Discord from "discord.js";
+import Discordx from "discordx";
+const MessageEmbed = Discord.MessageEmbed;
+
+// Redeclares Client in order to add a collection of commands
+class Client extends Discordx.Client {
+  commands = new Discord.Collection();
+}
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("Name")
+    .setDescription("Description")
+    .addUserOption((option) =>
+      option.setName("option").setDescription("description").setRequired(true)
+    ),
+
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
+    //execute code here
+  },
+};
