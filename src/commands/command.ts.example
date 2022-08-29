@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-const { guildId } = require("../../config.json");
 import Discord from "discord.js";
 import Discordx from "discordx";
 const MessageEmbed = Discord.MessageEmbed;
