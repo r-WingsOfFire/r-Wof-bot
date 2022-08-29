@@ -125,6 +125,6 @@ module.exports = {
           .setDescription(`You have been granted access to the RP!`),
       ],
     });
-    member.roles.add("");
+    member.roles.add("831308794251575326");
   },
 };
