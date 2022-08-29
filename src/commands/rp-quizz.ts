@@ -29,6 +29,19 @@ module.exports = {
     interaction: Discord.CommandInteraction<Discord.CacheType>,
     client: Client
   ) {
+    interaction.reply({
+      embeds: [
+        new MessageEmbed()
+          .setTitle("RP Quizz")
+          .setDescription(
+            "You have been sent the quizz by dm.\n\n" +
+              "You have 15 seconds to answer each question.\n\n" +
+              "Good luck!"
+          )
+          .setFooter({ text: "-RP Quizz" })
+          .setColor("GOLD"),
+      ],
+    });
     let member = await interaction.member;
     if (!(member instanceof Discord.GuildMember)) return 0;
     let dmChannel = await member.createDM();
@@ -61,21 +74,39 @@ module.exports = {
         ],
         components: [row],
       });
-
       const filter = (
         interaction: Discord.MessageComponentInteraction<Discord.CacheType>
-      ) =>
-        interaction.customId === "button" && interaction.user.id === "someId";
-      const clicked = await msg.awaitMessageComponent({ filter, time: 15_000 });
+      ) => interaction.type === "MESSAGE_COMPONENT";
+
+      const clicked = await msg
+        .awaitMessageComponent({
+          filter,
+          time: 15_000,
+        })
+        .catch((collected) => {
+          return;
+        });
+
+      if (!clicked) {
+        await msg.edit({
+          embeds: [
+            new MessageEmbed()
+              .setTitle("RP Quizz")
+              .setDescription("You took too long to answer!"),
+          ],
+        });
+        return;
+      }
+
       if (clicked.customId === correct.toString()) {
-        msg.edit({
+        await clicked.update({
           embeds: [
             new MessageEmbed().setTitle("RP Quizz").setDescription(`Correct!`),
           ],
           components: [],
         });
       } else {
-        msg.edit({
+        await clicked.update({
           embeds: [
             new MessageEmbed()
               .setTitle("RP Quizz")
