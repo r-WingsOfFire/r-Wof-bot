@@ -57,7 +57,7 @@ module.exports = {
     client.quoteBusy = true;
 
     // Get the quizz quotes
-    const { quotes } = require("../quotes.json");
+    const { quotes } = require("../../quotes.json");
 
     // Choose one randomly
     const theChoosenOne =

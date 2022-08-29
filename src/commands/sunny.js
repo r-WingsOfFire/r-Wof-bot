@@ -22,7 +22,7 @@ module.exports = {
    * @returns nuthin
    */
   async execute(interaction, client) {
-    const { quotes } = require("../quotes.json");
+    const { quotes } = require("../../quotes.json");
     const sunnyQuotes = quotes.filter((quote) => quote.character === "Sunny");
     interaction.reply({
       embeds: [
