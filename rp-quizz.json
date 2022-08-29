@@ -224,11 +224,11 @@
 				},
 				{
 					"text": "Nothing",
-					"correct": true
+					"correct": false
 				},
 				{
 					"text": "Lose JMA RP approved for a week",
-					"correct": false
+					"correct": true
 				},
 				{
 					"text": "Lose RP levels",
