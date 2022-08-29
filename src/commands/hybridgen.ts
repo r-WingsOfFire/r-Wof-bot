@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
 
 // Redeclares Client in order to add a collection of commands
@@ -63,13 +62,10 @@ module.exports = {
         .setRequired(true)
     ),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
     var firstHybridTribe = "";
     var secondHybridTribe = "";
     const pyrrhian = interaction.options.getBoolean("pyrrhia");
@@ -100,6 +96,8 @@ module.exports = {
       });
       return;
     }
+
+    let color: Discord.ColorResolvable;
 
     switch (firstHybridTribe) {
       case "skywing":
@@ -140,6 +138,10 @@ module.exports = {
 
       case "leafwing":
         color = [48, 183, 0];
+        break;
+
+      default:
+        color = "RANDOM";
         break;
     }
 

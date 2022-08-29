@@ -1,11 +1,11 @@
 /* It's importing the required modules. */
-const fs = require("fs");
-const path = require("path");
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+import fs = require("fs");
+import path = require("path");
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v9";
+import dotenv = require("dotenv");
+import { SlashCommandBuilder } from "@discordjs/builders";
 var { clientId, guildId } = require("./config.json");
-const dotenv = require("dotenv");
-const { SlashCommandBuilder } = require("@discordjs/builders");
 
 console.log("Launched!");
 
@@ -40,7 +40,7 @@ const commands = [];
 const commandsPath = path.join(__dirname, "src/commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
-  .filter((file) => file.endsWith(".js"));
+  .filter((file) => file.endsWith(".ts"));
 
 /* It's looping through all the files in the `commands` folder and adding them to the `commands` array. */
 for (const file of commandFiles) {
