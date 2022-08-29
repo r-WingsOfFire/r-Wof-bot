@@ -49,7 +49,7 @@ const client = new Client({
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
-  .filter((file) => file.endsWith(".js"));
+  .filter((file) => file.endsWith(".ts"));
 
 /* It's importing all the commands from the commands folder. */
 for (const file of commandFiles) {

@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
 
 // Redeclares Client in order to add a collection of commands
@@ -14,13 +13,10 @@ module.exports = {
     .setName("pop")
     .setDescription("We love bubble wrap!"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
     interaction.reply({
       content:
         "||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n\

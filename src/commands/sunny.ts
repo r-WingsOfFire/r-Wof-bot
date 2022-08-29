@@ -1,8 +1,7 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
-const { randomInt } = require("crypto");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
+import { randomInt } from "crypto";
 const MessageEmbed = Discord.MessageEmbed;
 
 // Redeclares Client in order to add a collection of commands
@@ -15,15 +14,15 @@ module.exports = {
     .setName("sunny")
     .setDescription("sends a nice sunny quote"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
     const { quotes } = require("../../quotes.json");
-    const sunnyQuotes = quotes.filter((quote) => quote.character === "Sunny");
+    const sunnyQuotes = quotes.filter(
+      (quote: { character: string; quote: string }) =>
+        quote.character === "Sunny"
+    );
     interaction.reply({
       embeds: [
         new MessageEmbed()

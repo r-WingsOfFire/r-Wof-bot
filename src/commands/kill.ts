@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { guildId } = require("../../config.json");
-const Discord = require("discord.js");
-const Discordx = require("discordx");
+import { SlashCommandBuilder } from "@discordjs/builders";
+import Discord = require("discord.js");
+import Discordx = require("discordx");
 
 // Redeclares Client in order to add a collection of commands
 class Client extends Discordx.Client {
@@ -14,16 +13,16 @@ module.exports = {
     .setName("kill")
     .setDescription("Stops the bot"),
 
-  /**
-   * It's a function that is called when the command is executed.
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
-  async execute(interaction, client) {
+  async execute(
+    interaction: Discord.CommandInteraction<Discord.CacheType>,
+    client: Client
+  ) {
+    if (!(interaction.member instanceof Discord.GuildMember))
+      return interaction.reply("You can't use this command in DMs!");
+
     /* It's checking if the user has the role with the ID 795414220707463188. If they don't, it's
     sending a message to the user saying that they don't have the permissions to do that. */
-    if (!interaction.member.roles.resolve("795414220707463188")) {
+    if (!interaction.member?.roles.resolve("795414220707463188")) {
       interaction.reply({
         ephemeral: true,
         content: "You don't have the permissions to do that!",
