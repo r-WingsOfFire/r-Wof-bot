@@ -28,7 +28,9 @@ module.exports = {
     interaction: Discord.CommandInteraction<Discord.CacheType>,
     client: Client
   ) {
-    if (!(interaction.member?.roles instanceof Discord.RoleManager)) {
+    if (
+      !(interaction.member?.roles instanceof Discord.GuildMemberRoleManager)
+    ) {
       interaction.reply("An error has occured. Please contact the bot owner.");
       return;
     }
