@@ -28,6 +28,14 @@ module.exports = {
     interaction: Discord.CommandInteraction<Discord.CacheType>,
     client: Client
   ) {
+    if (!(interaction.member?.roles instanceof Discord.RoleManager)) {
+      interaction.reply("An error has occured. Please contact the bot owner.");
+      return;
+    }
+    if (!!interaction.member?.roles.resolve("831308794251575326")) {
+      interaction.reply("You already have access to the RP!");
+      return;
+    }
     interaction.reply({
       embeds: [
         new MessageEmbed()
