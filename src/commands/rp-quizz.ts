@@ -24,12 +24,6 @@ module.exports = {
     .setName("rp-quizz")
     .setDescription("Solve this quizz to get access to the RP!"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
   async execute(
     interaction: Discord.CommandInteraction<Discord.CacheType>,
     client: Client
