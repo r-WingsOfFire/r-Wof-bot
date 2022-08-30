@@ -7,7 +7,12 @@ import { ButtonStyle } from "discord-api-types/v10";
 import Discord = require("discord.js");
 import Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
-const { questions } = require("../../rp-quizz.json");
+const { questions } = require("../../rp-quizz.json") as {
+  questions: Array<{
+    question: string;
+    answers: Array<{ text: string; correct: boolean }>;
+  }>;
+};
 
 // Redeclares Client in order to add a collection of commands
 class Client extends Discordx.Client {
@@ -19,12 +24,6 @@ module.exports = {
     .setName("rp-quizz")
     .setDescription("Solve this quizz to get access to the RP!"),
 
-  /**
-   *
-   * @param {Discord.CommandInteraction<Discord.CacheType>} interaction the interaction object called
-   * @param {Client} client
-   * @returns nuthin
-   */
   async execute(
     interaction: Discord.CommandInteraction<Discord.CacheType>,
     client: Client
@@ -42,7 +41,7 @@ module.exports = {
           .setColor("GOLD"),
       ],
     });
-    let member = await interaction.member;
+    let member = interaction.member;
     if (!(member instanceof Discord.GuildMember)) return 0;
     let dmChannel = await member.createDM();
     let msg = await dmChannel.send({
@@ -55,11 +54,15 @@ module.exports = {
       let row = new Discord.MessageActionRow<Discord.MessageButton>();
       let button = 0;
       let correct = 0;
+      let description = question.question;
+      const letters = ["A", "B", "C", "D"];
       for (let answer of question.answers) {
+        let letter = letters[question.answers.indexOf(answer)];
+        description += `\n\n${letter} ${answer}`;
         row.addComponents(
           new Discord.MessageButton()
             .setCustomId(button.toString())
-            .setLabel(answer.text)
+            .setLabel(`\t${letter}\t`)
             .setStyle(Discord.Constants.MessageButtonStyles.PRIMARY)
         );
         if (answer.correct) correct = button;
@@ -68,9 +71,7 @@ module.exports = {
 
       msg.edit({
         embeds: [
-          new MessageEmbed()
-            .setTitle("RP Quizz")
-            .setDescription(question.question),
+          new MessageEmbed().setTitle("RP Quizz").setDescription(description),
         ],
         components: [row],
       });
