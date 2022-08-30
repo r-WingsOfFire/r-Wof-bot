@@ -64,7 +64,7 @@ module.exports = {
       const letters = ["A", "B", "C", "D"];
       for (let answer of question.answers) {
         let letter = letters[question.answers.indexOf(answer)];
-        description += `\n${letter} ${answer}`;
+        description += `\n\n${letter} ${answer}`;
         row.addComponents(
           new Discord.MessageButton()
             .setCustomId(button.toString())
