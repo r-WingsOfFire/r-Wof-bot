@@ -58,7 +58,7 @@ module.exports = {
       const letters = ["A", "B", "C", "D"];
       for (let answer of question.answers) {
         let letter = letters[question.answers.indexOf(answer)];
-        description += `\n\n${letter} ${answer}`;
+        description += `\n\n${letter} - ${answer.text}`;
         row.addComponents(
           new Discord.MessageButton()
             .setCustomId(button.toString())
@@ -84,7 +84,7 @@ module.exports = {
           filter,
           time: 60_000,
         })
-        .catch((collected) => {
+        .catch(() => {
           return;
         });
 
@@ -95,6 +95,7 @@ module.exports = {
               .setTitle("RP Quizz")
               .setDescription("You took too long to answer!"),
           ],
+          components: [],
         });
         return;
       }
