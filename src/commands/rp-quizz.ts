@@ -7,7 +7,7 @@ import { ButtonStyle } from "discord-api-types/v10";
 import Discord = require("discord.js");
 import Discordx = require("discordx");
 const MessageEmbed = Discord.MessageEmbed;
-const { questions } = require("../../rp-quizz.json") as {
+const { questions } = require("../../rp-quiz.json") as {
   questions: Array<{
     question: string;
     answers: Array<{ text: string; correct: boolean }>;
@@ -21,8 +21,8 @@ class Client extends Discordx.Client {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("rp-quizz")
-    .setDescription("Solve this quizz to get access to the RP!"),
+    .setName("rp-quiz")
+    .setDescription("Solve this quiz to get access to the RP!"),
 
   async execute(
     interaction: Discord.CommandInteraction<Discord.CacheType>,
@@ -41,13 +41,13 @@ module.exports = {
     interaction.reply({
       embeds: [
         new MessageEmbed()
-          .setTitle("RP Quizz")
+          .setTitle("RP quiz")
           .setDescription(
-            "You have been sent the quizz by dm.\n\n" +
+            "You have been sent the quiz by dm.\n\n" +
               "You have 1 minute to answer each question.\n\n" +
               "Good luck!"
           )
-          .setFooter({ text: "-RP Quizz" })
+          .setFooter({ text: "-RP quiz" })
           .setColor("GOLD"),
       ],
     });
@@ -56,7 +56,7 @@ module.exports = {
     let dmChannel = await member.createDM();
     let msg = await dmChannel.send({
       embeds: [
-        new MessageEmbed().setTitle("RP Quizz").setDescription("Loading..."),
+        new MessageEmbed().setTitle("RP quiz").setDescription("Loading..."),
       ],
     });
 
@@ -81,7 +81,7 @@ module.exports = {
 
       msg.edit({
         embeds: [
-          new MessageEmbed().setTitle("RP Quizz").setDescription(description),
+          new MessageEmbed().setTitle("RP quiz").setDescription(description),
         ],
         components: [row],
       });
@@ -102,7 +102,7 @@ module.exports = {
         await msg.edit({
           embeds: [
             new MessageEmbed()
-              .setTitle("RP Quizz")
+              .setTitle("RP quiz")
               .setDescription("You took too long to answer!"),
           ],
           components: [],
@@ -113,7 +113,7 @@ module.exports = {
       if (clicked.customId === correct.toString()) {
         await clicked.update({
           embeds: [
-            new MessageEmbed().setTitle("RP Quizz").setDescription(`Correct!`),
+            new MessageEmbed().setTitle("RP quiz").setDescription(`Correct!`),
           ],
           components: [],
         });
@@ -121,8 +121,8 @@ module.exports = {
         await clicked.update({
           embeds: [
             new MessageEmbed()
-              .setTitle("RP Quizz")
-              .setDescription(`Wrong answer! This quizz is canceled.`),
+              .setTitle("RP quiz")
+              .setDescription(`Wrong answer! This quiz is canceled.`),
           ],
           components: [],
         });
@@ -133,7 +133,7 @@ module.exports = {
     msg.edit({
       embeds: [
         new MessageEmbed()
-          .setTitle("RP Quizz")
+          .setTitle("RP quiz")
           .setDescription(`You have been granted access to the RP!`),
       ],
     });

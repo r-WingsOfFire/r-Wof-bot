@@ -12,7 +12,7 @@ class Client extends Discordx.Client {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("quote")
-    .setDescription("Quote quizz!"),
+    .setDescription("Quote quiz!"),
 
   async execute(
     interaction: Discord.CommandInteraction<Discord.CacheType>,
@@ -37,7 +37,7 @@ module.exports = {
           new Discord.MessageEmbed({
             color: "RED",
             title: "Busy",
-            description: "A quizz is already running, please wait!",
+            description: "A quiz is already running, please wait!",
           }),
         ],
       });
@@ -52,7 +52,7 @@ module.exports = {
 
     client.quoteBusy = true;
 
-    // Get the quizz quotes
+    // Get the quiz quotes
     const { quotes } = require("../../quotes.json") as {
       quotes: { character: string; quote: string }[];
     };
@@ -74,7 +74,7 @@ module.exports = {
         embeds: [
           reply.embeds[0]
             .setColor("RED")
-            .setFooter("This quizz is finished.")
+            .setFooter("This quiz is finished.")
             .setTitle("Time's up!"),
         ],
       });
@@ -121,7 +121,7 @@ module.exports = {
         let prompt =
           (await interaction.fetchReply()) as Discord.Message<boolean>;
         const quizzEndedEmbed = prompt.embeds[0]
-          .setTitle("Quizz ended")
+          .setTitle("quiz ended")
           .setFooter({
             text: "If you want to try that out, use the /quote command!",
           })
