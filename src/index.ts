@@ -1,3 +1,4 @@
+#!/root/.nvm/versions/node/v16.17.0/bin/ts-node
 /* It's importing the required modules. */
 import fs = require("fs");
 import path = require("path");
