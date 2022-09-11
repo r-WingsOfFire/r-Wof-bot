@@ -120,3 +120,6 @@ package-lock.json
 
 # start script
 start.bat
+
+# service script
+r-wof.service
