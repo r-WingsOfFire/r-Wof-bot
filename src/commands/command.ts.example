@@ -1,25 +1,21 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import Discord from "discord.js";
-import Discordx from "discordx";
+import * as Discord from "discord.js";
 const MessageEmbed = Discord.MessageEmbed;
 
 // Redeclares Client in order to add a collection of commands
-class Client extends Discordx.Client {
-  commands = new Discord.Collection();
+class Client extends Discord.Client {
+	commands = new Discord.Collection();
 }
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("Name")
-    .setDescription("Description")
-    .addUserOption((option) =>
-      option.setName("option").setDescription("description").setRequired(true)
-    ),
+	data: new SlashCommandBuilder()
+		.setName("name")
+		.setDescription("Description"),
 
-  async execute(
-    interaction: Discord.CommandInteraction<Discord.CacheType>,
-    client: Client
-  ) {
-    //execute code here
-  },
+	async execute(
+		interaction: Discord.CommandInteraction<Discord.CacheType>,
+		client: Client
+	) {
+		//yourcodehere
+	},
 };

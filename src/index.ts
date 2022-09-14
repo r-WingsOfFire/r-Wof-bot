@@ -3,10 +3,10 @@
 import fs = require("fs");
 import path = require("path");
 
-import { SlashCommandBuilder } from "@discordjs/builders/dist";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import "reflect-metadata";
-import { Intents } from "discord.js/typings";
-import * as Discord from "discord.js/typings";
+import { Intents } from "discord.js";
+import * as Discord from "discord.js";
 
 require("dotenv").config();
 
@@ -69,6 +69,14 @@ for (const file of commandFiles) {
 client.once("ready", async () => {
 	console.log("Ready!");
 	client.user?.setActivity("flying dragons!", { type: "WATCHING" });
+	setInterval(() => {
+		client.rpQuizzFailed.forEach((v, k) => {
+			if (v - 1 <= 0)
+				client.rpQuizzFailed.delete(k);
+			else
+				client.rpQuizzFailed.set(k, v - 1);
+		});
+	}, 60_000);
 });
 
 client.on("interactionCreate", async (interaction) => {
