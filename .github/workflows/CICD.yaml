@@ -15,7 +15,7 @@ jobs:
           password: ${{ secrets.PASSWD }}
           port: 22
           script: |
-            cd <your-app-folder> # we move into our app's folder
+            cd dindin-nibnib/r-Wof-bot # we move into our app's folder
             git pull # we pull any changes from git
             npm i # we install the dependencies
             npm prune # we remove any unused dependencies
