@@ -93,7 +93,7 @@ const fetchReddit = async () => {
 		children.push(child);
 	});
 
-	let channel = client.users.cache.get("373515998000840714");
+	let channel = GUILD?.channels.resolve("716617066261643314");
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(child.data.title)
