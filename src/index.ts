@@ -10,15 +10,6 @@ import fetch from "node-fetch";
 
 require("dotenv").config();
 
-/* It's getting the token from the .env file. */
-const token = process.env.TOKEN;
-
-/* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
-if (token === undefined) {
-	console.log("No token found in .env file.");
-	process.exit(-1);
-}
-
 // Redeclares Client in order to add a collection of commands
 // Seems complicated but it's just long type names so that intellisense understands it
 /* It's a Discord.Client that has a commands property that is a Discord.Collection of strings and
@@ -52,6 +43,9 @@ const client = new Client({
 	],
 });
 
+//define constants
+const token = process.env.TOKEN;
+const GUILD = client.guilds.resolve("716601325269549127");
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
 	.readdirSync(commandsPath)
@@ -66,6 +60,11 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+/* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
+if (token === undefined) {
+	console.log("No token found in .env file.");
+	process.exit(-1);
+}
 const fetchReddit = async () => {
 	if (client.lastRedditPost === "") {
 		client.lastRedditPost = "t3_xg0w8g"; // (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].name;
