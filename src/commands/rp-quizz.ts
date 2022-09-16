@@ -3,7 +3,7 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 } from "@discordjs/builders";
-import * as Discord from "discord.js/typings";
+import * as Discord from "discord.js";
 const MessageEmbed = Discord.MessageEmbed;
 import { questions } from "../../rp-quiz.json";
 
