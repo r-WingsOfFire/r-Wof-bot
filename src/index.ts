@@ -67,7 +67,7 @@ if (token === undefined) {
 }
 const fetchReddit = async () => {
 	if (client.lastRedditPost === "") {
-		client.lastRedditPost = "t3_xg0w8g"; // (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].name;
+		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].name;
 	}
 
 	let response = await fetch("https://www.reddit.com/r/wingsoffire/new.json");
