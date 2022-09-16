@@ -36,6 +36,7 @@ class Client extends Discord.Client {
 	>();
 	quoteBusy = false;
 	rpQuizzFailed: Map<Discord.Snowflake, number>;
+	lastRedditPost = "";
 	constructor(options: Discord.ClientOptions) {
 		super(options);
 		this.rpQuizzFailed = new Map<Discord.Snowflake, number>();
@@ -66,10 +67,56 @@ for (const file of commandFiles) {
 }
 
 const fetchReddit = async () => {
-	let response = await fetch("https://www.reddit.com/r/wingsoffire.json");
-	let json = await response.json();
+	if (client.lastRedditPost === "") {
+		client.lastRedditPost = "t3_xg0w8g"; // (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].name;
+	}
 
-	console.log(json.data.children);
+	let response = await fetch("https://www.reddit.com/r/wingsoffire/new.json");
+	let json = (await response.json()).data;
+
+	if (json.children[0].name === client.lastRedditPost) {
+		return;
+	}
+	let latestPost = client.lastRedditPost;
+	client.lastRedditPost = json.children[0].name;
+
+	let children: any[] = [];
+	let posted = false;
+	json.children.forEach((child: any) => {
+		if (posted)
+			return;
+
+		if (child.data.name === latestPost) {
+			posted = true;
+			return;
+		}
+		children.push(child);
+	});
+
+	let channel = client.users.cache.get("373515998000840714");
+	children.forEach((child: any) => {
+		let embed = new Discord.MessageEmbed()
+			.setTitle(child.data.title)
+			.setDescription(child.data.selftext)
+			.setColor("RED")
+			.setAuthor({ name: child.data.author })
+			.setURL(`https://www.reddit.com${child.data.permalink}`);
+		if (child.data.is_gallery) {
+			embed.setFooter({ text: "Gallery" });
+			embed.setThumbnail(child.data.thumbnail);
+		} else if (child.data.is_reddit_media_domain) {
+			embed.setImage(child.data.url_overridden_by_dest);
+			embed.setFooter({ text: "Media" });
+		} else {
+			embed.setThumbnail(child.data.thumbnail);
+			embed.setFooter({ text: "Post" });
+		}
+		channel?.send({
+			embeds: [
+				embed
+			]
+		});
+	});
 };
 
 /* It's a listener that will be called when the client is ready. */
@@ -85,7 +132,7 @@ client.once("ready", async () => {
 		});
 	}, 60_000);
 
-	const interval = setInterval(fetchReddit, 30_000);
+	setInterval(fetchReddit, 3_000);
 	fetchReddit();
 });
 
