@@ -1,11 +1,12 @@
 /* It's importing the required modules. */
-import fs = require("fs");
-import path = require("path");
+import * as fs from "fs";
+import * as path from "path";
 
 import { SlashCommandBuilder } from "@discordjs/builders";
 import "reflect-metadata";
 import { Intents } from "discord.js";
 import * as Discord from "discord.js";
+import fetch from "node-fetch";
 
 require("dotenv").config();
 
@@ -64,6 +65,13 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+const fetchReddit = async () => {
+	let response = await fetch("https://www.reddit.com/r/wingsoffire.json");
+	let json = await response.json();
+
+	console.log(json.data.children);
+};
+
 /* It's a listener that will be called when the client is ready. */
 client.once("ready", async () => {
 	console.log("Ready!");
@@ -76,6 +84,9 @@ client.once("ready", async () => {
 				client.rpQuizzFailed.set(k, v - 1);
 		});
 	}, 60_000);
+
+	const interval = setInterval(fetchReddit, 30_000);
+	fetchReddit();
 });
 
 client.on("interactionCreate", async (interaction) => {
