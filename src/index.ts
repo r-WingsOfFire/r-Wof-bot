@@ -93,7 +93,7 @@ const fetchReddit = async () => {
 		children.push(child);
 	});
 
-	let channel = GUILD?.channels.resolve("716617066261643314$") as Discord.TextChannel;
+	let channel = GUILD?.channels.resolve("716617066261643314") as Discord.TextChannel;
 	if (channel?.type !== "GUILD_TEXT")
 		return;
 
