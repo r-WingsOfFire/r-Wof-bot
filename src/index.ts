@@ -93,7 +93,10 @@ const fetchReddit = async () => {
 		children.push(child);
 	});
 
-	let channel = GUILD?.channels.resolve("716617066261643314");
+	let channel = GUILD?.channels.resolve("716617066261643314$") as Discord.TextChannel;
+	if (channel?.type !== "GUILD_TEXT")
+		return;
+
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
 			.setTitle(child.data.title)
