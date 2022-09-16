@@ -2,7 +2,7 @@ import {
 	SlashCommandBuilder,
 	ActionRowBuilder,
 	ButtonBuilder,
-} from "@discordjs/builders/dist";
+} from "@discordjs/builders";
 import * as Discord from "discord.js/typings";
 const MessageEmbed = Discord.MessageEmbed;
 import { questions } from "../../rp-quiz.json";
