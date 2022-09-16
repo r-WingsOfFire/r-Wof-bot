@@ -65,6 +65,7 @@ if (token === undefined) {
 	console.log("No token found in .env file.");
 	process.exit(-1);
 }
+
 const fetchReddit = async () => {
 	if (client.lastRedditPost === "") {
 		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].name;
