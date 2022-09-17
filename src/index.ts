@@ -127,6 +127,7 @@ const fetchReddit = async () => {
 /* It's a listener that will be called when the client is ready. */
 client.once("ready", async () => {
 	console.log("Ready!");
+	console.log("At " + new Date(Date.now()).toTimeString());
 	client.user?.setActivity("flying dragons!", { type: "WATCHING" });
 	setInterval(() => {
 		client.rpQuizzFailed.forEach((v, k) => {
