@@ -94,8 +94,10 @@ const fetchReddit = async () => {
 	});
 
 	let channel = GUILD?.channels.resolve("716617066261643314") as Discord.TextChannel;
-	if (channel?.type !== "GUILD_TEXT")
+	if (channel?.type !== "GUILD_TEXT") {
+		console.log("Error: Not a text channel");
 		return;
+	}
 
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
