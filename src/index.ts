@@ -79,7 +79,7 @@ const fetchReddit = async () => {
 	}
 	console.log("Posts available!");
 	let latestPost = client.lastRedditPost;
-	client.lastRedditPost = json.children[0].name;
+	client.lastRedditPost = json.children[0].data.name;
 
 	let children: any[] = [];
 	let posted = false;
