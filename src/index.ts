@@ -44,7 +44,7 @@ const client = new Client({
 });
 
 //define constants
-const token = process.env.TOKEN;
+const TOKEN = process.env.TOKEN;
 const GUILD = client.guilds.resolve("716601325269549127");
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
@@ -61,8 +61,14 @@ for (const file of commandFiles) {
 }
 
 /* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
-if (token === undefined) {
+if (TOKEN === undefined) {
 	console.log("No token found in .env file.");
+	process.exit(-1);
+}
+
+// Checks if the guild is defined. Returns with an error if it isn't.
+if (GUILD === undefined) {
+	console.log("No guild found.");
 	process.exit(-1);
 }
 
@@ -94,9 +100,11 @@ const fetchReddit = async () => {
 		children.push(child);
 	});
 
+	console.log("Posting: " + children.length);
+
 	let channel = GUILD?.channels.resolve("716617066261643314") as Discord.TextChannel;
-	if (channel?.type !== "GUILD_TEXT") {
-		console.log("Error: Not a text channel");
+	if (!channel) {
+		console.log("Channel not found. Returning.");
 		return;
 	}
 
@@ -167,7 +175,7 @@ client.on("interactionCreate", async (interaction) => {
 			client.commands.set(command.data.name, command);
 		}
 		client.destroy();
-		client.login(token);
+		client.login(TOKEN);
 		return;
 	}
 	/* It's getting the command from the client's commands collection. */
@@ -188,4 +196,4 @@ client.on("interactionCreate", async (interaction) => {
 	}
 });
 
-client.login(token);
+client.login(TOKEN);
