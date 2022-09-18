@@ -125,9 +125,11 @@ const fetchReddit = async () => {
 		} else if (child.data.is_reddit_media_domain) {
 			embed.setImage(child.data.url_overridden_by_dest);
 			embed.setFooter({ text: "Media" });
-		} else {
+		} else if (child.data.thumbnail !== "self") {
 			embed.setThumbnail(child.data.thumbnail);
 			embed.setFooter({ text: "Post" });
+		} else {
+			embed.setFooter({ text: "Text" });
 		}
 		CHANNEL.send({
 			embeds: [
