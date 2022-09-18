@@ -43,6 +43,7 @@ const client = new Client({
 	],
 });
 
+
 //define constants
 const TOKEN = process.env.TOKEN;
 const GUILD = client.guilds.cache.get("716601325269549127");
@@ -67,12 +68,14 @@ if (TOKEN === undefined) {
 }
 
 // Checks if the guild is defined. Returns with an error if it isn't.
-if (!GUILD) {
+/*if (!GUILD) {
+	console.log(client.guilds.cache);
 	console.log("No guild found.");
 	process.exit(-1);
-}
+}*/
 
 const fetchReddit = async () => {
+	let guild = await client.guilds.fetch("716601325269549127");
 	if (client.lastRedditPost === "") {
 		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
 	}
@@ -102,7 +105,7 @@ const fetchReddit = async () => {
 
 	console.log("Posting: " + children.length);
 
-	let channel = GUILD.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
+	let channel = guild.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
 	if (!channel) {
 		console.log("Channel not found. Returning.");
 		return;
