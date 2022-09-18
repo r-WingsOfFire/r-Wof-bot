@@ -1,23 +1,14 @@
-#!/root/.nvm/versions/node/v16.17.0/bin/ts-node
 /* It's importing the required modules. */
-import fs = require("fs");
-import path = require("path");
+import * as fs from "fs";
+import * as path from "path";
 
 import { SlashCommandBuilder } from "@discordjs/builders";
 import "reflect-metadata";
 import { Intents } from "discord.js";
 import * as Discord from "discord.js";
+import fetch from "node-fetch";
 
 require("dotenv").config();
-
-/* It's getting the token from the .env file. */
-const token = process.env.TOKEN;
-
-/* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
-if (token === undefined) {
-	console.log("No token found in .env file.");
-	process.exit(-1);
-}
 
 // Redeclares Client in order to add a collection of commands
 // Seems complicated but it's just long type names so that intellisense understands it
@@ -36,6 +27,7 @@ class Client extends Discord.Client {
 	>();
 	quoteBusy = false;
 	rpQuizzFailed: Map<Discord.Snowflake, number>;
+	lastRedditPost = "";
 	constructor(options: Discord.ClientOptions) {
 		super(options);
 		this.rpQuizzFailed = new Map<Discord.Snowflake, number>();
@@ -51,6 +43,10 @@ const client = new Client({
 	],
 });
 
+
+//define constants
+const TOKEN = process.env.TOKEN;
+const GUILD = client.guilds.cache.get("716601325269549127");
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
 	.readdirSync(commandsPath)
@@ -65,9 +61,88 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+/* It's checking if the token is undefined. If it is, it exits the process with an exit code of -1. */
+if (TOKEN === undefined) {
+	console.log("No token found in .env file.");
+	process.exit(-1);
+}
+
+// Checks if the guild is defined. Returns with an error if it isn't.
+/*if (!GUILD) {
+	console.log(client.guilds.cache);
+	console.log("No guild found.");
+	process.exit(-1);
+}*/
+
+const fetchReddit = async () => {
+	let guild = await client.guilds.fetch("716601325269549127");
+	if (client.lastRedditPost === "") {
+		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
+	}
+
+	let response = await fetch("https://www.reddit.com/r/wingsoffire/new.json");
+	let json = (await response.json()).data;
+
+	if (json.children[0].data.name === client.lastRedditPost) {
+		return;
+	}
+	console.log("Posts available!");
+	let latestPost = client.lastRedditPost;
+	client.lastRedditPost = json.children[0].data.name;
+
+	let children: any[] = [];
+	let posted = false;
+	json.children.forEach((child: any) => {
+		if (posted)
+			return;
+
+		if (child.data.name === latestPost) {
+			posted = true;
+			return;
+		}
+		children.push(child);
+	});
+
+	console.log("Posting: " + children.length);
+
+	let channel = guild.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
+	if (!channel) {
+		console.log("Channel not found. Returning.");
+		return;
+	}
+	const CHANNEL = channel as Discord.TextChannel;
+
+	children.forEach((child: any) => {
+		let embed = new Discord.MessageEmbed()
+			.setTitle(child.data.title)
+			.setDescription(child.data.selftext.length > 254 ? child.data.selftext.substring(0, 252) + "..." : child.data.selftext)
+			.setColor("RED")
+			.setAuthor({ name: child.data.author })
+			.setURL(`https://www.reddit.com${child.data.permalink}`);
+		if (child.data.is_gallery) {
+			embed.setFooter({ text: "Gallery" });
+			embed.setThumbnail(child.data.thumbnail);
+		} else if (child.data.is_reddit_media_domain) {
+			embed.setImage(child.data.url_overridden_by_dest);
+			embed.setFooter({ text: "Media" });
+		} else if (child.data.thumbnail !== "self") {
+			embed.setThumbnail(child.data.thumbnail);
+			embed.setFooter({ text: "Post" });
+		} else {
+			embed.setFooter({ text: "Text" });
+		}
+		CHANNEL.send({
+			embeds: [
+				embed
+			]
+		});
+	});
+};
+
 /* It's a listener that will be called when the client is ready. */
 client.once("ready", async () => {
 	console.log("Ready!");
+	console.log("At " + new Date(Date.now()).toTimeString());
 	client.user?.setActivity("flying dragons!", { type: "WATCHING" });
 	setInterval(() => {
 		client.rpQuizzFailed.forEach((v, k) => {
@@ -77,6 +152,9 @@ client.once("ready", async () => {
 				client.rpQuizzFailed.set(k, v - 1);
 		});
 	}, 60_000);
+
+	setInterval(fetchReddit, 3_000);
+	fetchReddit();
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -103,7 +181,7 @@ client.on("interactionCreate", async (interaction) => {
 			client.commands.set(command.data.name, command);
 		}
 		client.destroy();
-		client.login(token);
+		client.login(TOKEN);
 		return;
 	}
 	/* It's getting the command from the client's commands collection. */
@@ -124,4 +202,4 @@ client.on("interactionCreate", async (interaction) => {
 	}
 });
 
-client.login(token);
+client.login(TOKEN);

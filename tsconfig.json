@@ -3,9 +3,10 @@
 		"enable": true
 	},
 	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
 		"baseUrl": "./",
 		"module": "CommonJS",
-		"target": "ES2022",
+		"target": "ESNext",
 		"noImplicitAny": true,
 		"sourceMap": true,
 		"strict": true,
