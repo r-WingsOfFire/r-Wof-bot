@@ -45,7 +45,7 @@ const client = new Client({
 
 //define constants
 const TOKEN = process.env.TOKEN;
-const GUILD = client.guilds.resolve("716601325269549127");
+const GUILD = client.guilds.cache.get("716601325269549127");
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
 	.readdirSync(commandsPath)
@@ -67,7 +67,7 @@ if (TOKEN === undefined) {
 }
 
 // Checks if the guild is defined. Returns with an error if it isn't.
-if (GUILD === null) {
+if (!GUILD) {
 	console.log("No guild found.");
 	process.exit(-1);
 }
@@ -102,8 +102,8 @@ const fetchReddit = async () => {
 
 	console.log("Posting: " + children.length);
 
-	let channel = GUILD.channels.resolve("716617066261643314") as Discord.TextChannel | null;
-	if (channel === null) {
+	let channel = GUILD.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
+	if (!channel) {
 		console.log("Channel not found. Returning.");
 		return;
 	}
