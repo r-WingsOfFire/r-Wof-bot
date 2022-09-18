@@ -67,7 +67,7 @@ if (TOKEN === undefined) {
 }
 
 // Checks if the guild is defined. Returns with an error if it isn't.
-if (GUILD === undefined) {
+if (GUILD === null) {
 	console.log("No guild found.");
 	process.exit(-1);
 }
@@ -102,11 +102,12 @@ const fetchReddit = async () => {
 
 	console.log("Posting: " + children.length);
 
-	let channel = GUILD?.channels.resolve("716617066261643314") as Discord.TextChannel;
-	if (!channel) {
+	let channel = GUILD.channels.resolve("716617066261643314") as Discord.TextChannel | null;
+	if (channel === null) {
 		console.log("Channel not found. Returning.");
 		return;
 	}
+	const CHANNEL = channel as Discord.TextChannel;
 
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
@@ -125,7 +126,7 @@ const fetchReddit = async () => {
 			embed.setThumbnail(child.data.thumbnail);
 			embed.setFooter({ text: "Post" });
 		}
-		channel?.send({
+		CHANNEL.send({
 			embeds: [
 				embed
 			]
