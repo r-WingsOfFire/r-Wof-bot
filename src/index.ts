@@ -114,22 +114,18 @@ const fetchReddit = async () => {
 
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
-			.setTitle(`[${child.data.link_flair_text}] ${child.data.title}`)
+			.setTitle(child.data.title)
 			.setDescription(child.data.selftext.length > 254 ? child.data.selftext.substring(0, 252) + "..." : child.data.selftext)
 			.setColor("RED")
 			.setAuthor({ name: child.data.author })
-			.setURL(`https://www.reddit.com${child.data.permalink}`);
+			.setURL(`https://www.reddit.com${child.data.permalink}`)
+			.setFooter(child.data.link_flair_text ? child.data.link_flair_text : "No flair");
 		if (child.data.is_gallery) {
-			embed.setFooter({ text: "Gallery" });
 			embed.setThumbnail(child.data.thumbnail);
 		} else if (child.data.is_reddit_media_domain) {
 			embed.setImage(child.data.url_overridden_by_dest);
-			embed.setFooter({ text: "Media" });
 		} else if (child.data.thumbnail !== "self") {
 			embed.setThumbnail(child.data.thumbnail);
-			embed.setFooter({ text: "Post" });
-		} else {
-			embed.setFooter({ text: "Text" });
 		}
 		CHANNEL.send({
 			embeds: [
