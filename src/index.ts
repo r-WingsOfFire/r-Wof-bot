@@ -114,7 +114,7 @@ const fetchReddit = async () => {
 
 	children.forEach((child: any) => {
 		let embed = new Discord.MessageEmbed()
-			.setTitle(child.data.title)
+			.setTitle(`[${child.data.link_flair_text}] ${child.data.title}`)
 			.setDescription(child.data.selftext.length > 254 ? child.data.selftext.substring(0, 252) + "..." : child.data.selftext)
 			.setColor("RED")
 			.setAuthor({ name: child.data.author })
