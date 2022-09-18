@@ -153,7 +153,7 @@ client.once("ready", async () => {
 		});
 	}, 60_000);
 
-	setInterval(fetchReddit, 3_000);
+	setInterval(fetchReddit, 10_000);
 	fetchReddit();
 });
 
