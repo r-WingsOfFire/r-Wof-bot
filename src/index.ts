@@ -28,6 +28,7 @@ class Client extends Discord.Client {
 	quoteBusy = false;
 	rpQuizzFailed: Map<Discord.Snowflake, number>;
 	lastRedditPost = "";
+	posting = false;
 	constructor(options: Discord.ClientOptions) {
 		super(options);
 		this.rpQuizzFailed = new Map<Discord.Snowflake, number>();
@@ -75,6 +76,11 @@ if (TOKEN === undefined) {
 }*/
 
 const fetchReddit = async () => {
+	//avoid duplicate posts
+	if (client.posting)
+		return;
+
+	client.posting = true;
 	let guild = await client.guilds.fetch("716601325269549127");
 	if (client.lastRedditPost === "") {
 		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
@@ -133,6 +139,7 @@ const fetchReddit = async () => {
 			]
 		});
 	});
+	client.posting = false;
 };
 
 /* It's a listener that will be called when the client is ready. */
