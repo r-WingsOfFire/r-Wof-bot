@@ -47,7 +47,6 @@ const client = new Client({
 
 //define constants
 const TOKEN = process.env.TOKEN;
-const GUILD = client.guilds.cache.get("716601325269549127");
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
 	.readdirSync(commandsPath)
@@ -68,78 +67,76 @@ if (TOKEN === undefined) {
 	process.exit(-1);
 }
 
-// Checks if the guild is defined. Returns with an error if it isn't.
-/*if (!GUILD) {
-	console.log(client.guilds.cache);
-	console.log("No guild found.");
-	process.exit(-1);
-}*/
-
 const fetchReddit = async () => {
 	//avoid duplicate posts
 	if (client.posting)
 		return;
 
 	client.posting = true;
-	let guild = await client.guilds.fetch("716601325269549127");
-	if (client.lastRedditPost === "") {
-		client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
-	}
+	try {
+		let guild = await client.guilds.fetch("716601325269549127");
+		if (client.lastRedditPost === "") {
+			client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
+		}
 
-	let response = await fetch("https://www.reddit.com/r/wingsoffire/new.json");
-	let json = (await response.json()).data;
+		let response = await fetch("https://www.reddit.com/r/wingsoffire/new.json");
+		let json = (await response.json()).data;
 
-	if (json.children[0].data.name === client.lastRedditPost) {
-		return;
-	}
-	console.log("Posts available!");
-	let latestPost = client.lastRedditPost;
-	client.lastRedditPost = json.children[0].data.name;
-
-	let children: any[] = [];
-	let posted = false;
-	json.children.forEach((child: any) => {
-		if (posted)
-			return;
-
-		if (child.data.name === latestPost) {
-			posted = true;
+		if (json.children[0].data.name === client.lastRedditPost) {
 			return;
 		}
-		children.push(child);
-	});
+		console.log("Posts available!");
+		let latestPost = client.lastRedditPost;
+		client.lastRedditPost = json.children[0].data.name;
 
-	console.log("Posting: " + children.length);
+		let children: any[] = [];
+		let posted = false;
+		json.children.forEach((child: any) => {
+			if (posted)
+				return;
 
-	let channel = guild.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
-	if (!channel) {
-		console.log("Channel not found. Returning.");
-		return;
-	}
-	const CHANNEL = channel as Discord.TextChannel;
-
-	children.forEach((child: any) => {
-		let embed = new Discord.MessageEmbed()
-			.setTitle(child.data.title)
-			.setDescription(child.data.selftext.length > 254 ? child.data.selftext.substring(0, 252) + "..." : child.data.selftext)
-			.setColor("RED")
-			.setAuthor({ name: child.data.author })
-			.setURL(`https://www.reddit.com${child.data.permalink}`)
-			.setFooter(child.data.link_flair_text ? child.data.link_flair_text : "No flair");
-		if (child.data.is_gallery) {
-			embed.setThumbnail(child.data.thumbnail);
-		} else if (child.data.is_reddit_media_domain) {
-			embed.setImage(child.data.url_overridden_by_dest);
-		} else if (child.data.thumbnail !== "self") {
-			embed.setThumbnail(child.data.thumbnail);
-		}
-		CHANNEL.send({
-			embeds: [
-				embed
-			]
+			if (child.data.name === latestPost) {
+				posted = true;
+				return;
+			}
+			children.push(child);
 		});
-	});
-	client.posting = false;
+
+		console.log("Posting: " + children.length);
+
+		let channel = guild.channels.cache.get("716617066261643314") as Discord.TextChannel | undefined;
+		if (!channel) {
+			console.log("Channel not found. Returning.");
+			return;
+		}
+		const CHANNEL = channel as Discord.TextChannel;
+
+		children.forEach((child: any) => {
+			let embed = new Discord.MessageEmbed()
+				.setTitle(child.data.title)
+				.setDescription(child.data.selftext.length > 254 ? child.data.selftext.substring(0, 252) + "..." : child.data.selftext)
+				.setColor("RED")
+				.setAuthor({ name: child.data.author })
+				.setURL(`https://www.reddit.com${child.data.permalink}`)
+				.setFooter(child.data.link_flair_text ? child.data.link_flair_text : "No flair");
+			if (child.data.is_gallery) {
+				embed.setThumbnail(child.data.thumbnail);
+			} else if (child.data.is_reddit_media_domain) {
+				embed.setImage(child.data.url_overridden_by_dest);
+			} else if (child.data.thumbnail !== "self") {
+				embed.setThumbnail(child.data.thumbnail);
+			}
+			CHANNEL.send({
+				embeds: [
+					embed
+				]
+			});
+		});
+		client.posting = false;
+	} catch (e) {
+		console.log(e);
+		client.posting = false;
+	}
 };
 
 /* It's a listener that will be called when the client is ready. */
