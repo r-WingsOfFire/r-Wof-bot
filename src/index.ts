@@ -122,7 +122,7 @@ const fetchReddit = async () => {
 				.setColor("RED")
 				.setAuthor({ name: child.data.author })
 				.setURL(`https://www.reddit.com${child.data.permalink}`)
-				.setFooter(child.data.link_flair_text ? child.data.link_flair_text : "No flair");
+				.setFooter({ text: child.data.link_flair_text ? child.data.link_flair_text : "No flair" });
 			if (child.data.is_gallery) {
 				embed.setThumbnail(child.data.thumbnail);
 			} else if (child.data.is_reddit_media_domain) {
