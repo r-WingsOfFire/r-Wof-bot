@@ -85,6 +85,7 @@ const fetchReddit = async () => {
 		let json = (await response.json()).data;
 
 		if (json.children[0].data.name === client.lastRedditPost) {
+			console.log("No new posts");
 			return;
 		}
 
