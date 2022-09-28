@@ -74,6 +74,8 @@ const fetchReddit = async () => {
 
 	client.posting = true;
 	try {
+		console.log("Posting!");
+
 		let guild = await client.guilds.fetch("716601325269549127");
 		if (client.lastRedditPost === "") {
 			client.lastRedditPost = (await (await fetch("https://www.reddit.com/r/WingsOfFire/new.json")).json()).data.children[0].data.name;
@@ -85,6 +87,7 @@ const fetchReddit = async () => {
 		if (json.children[0].data.name === client.lastRedditPost) {
 			return;
 		}
+
 		console.log("Posts available!");
 		let latestPost = client.lastRedditPost;
 		client.lastRedditPost = json.children[0].data.name;
