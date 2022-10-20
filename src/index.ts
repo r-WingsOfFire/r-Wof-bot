@@ -7,6 +7,7 @@ import "reflect-metadata";
 import { Intents } from "discord.js";
 import * as Discord from "discord.js";
 import fetch from "node-fetch";
+import { EmbedType } from "discord-api-types/v9";
 
 require("dotenv").config();
 
@@ -123,7 +124,9 @@ const fetchReddit = async () => {
 				.setAuthor({ name: child.data.author })
 				.setURL(`https://www.reddit.com${child.data.permalink}`)
 				.setFooter({ text: child.data.link_flair_text ? child.data.link_flair_text : "No flair" });
-			if (child.data.is_gallery) {
+			if (child.data.spoiler) {
+				embed.setTitle(`[SPOILER] ${embed.title}`);
+			} else if (child.data.is_gallery) {
 				embed.setThumbnail(child.data.thumbnail);
 			} else if (child.data.is_reddit_media_domain) {
 				embed.setImage(child.data.url_overridden_by_dest);
