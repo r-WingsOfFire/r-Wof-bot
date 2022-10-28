@@ -70,8 +70,10 @@ if (TOKEN === undefined) {
 
 const fetchReddit = async () => {
 	//avoid duplicate posts
-	if (client.posting)
+	if (client.posting) {
+		console.log("Already posting...");
 		return;
+	}
 
 	client.posting = true;
 	try {
