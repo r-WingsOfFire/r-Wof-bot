@@ -33,7 +33,7 @@ module.exports = {
 			interaction.reply(`You have already failed the RP quiz. Please wait ${client.rpQuizzFailed.get(interaction.user.id)} minutes.`);
 			return;
 		}
-		if (!!interaction.member?.roles.resolve("831308794251575326")) {
+		if ((!!interaction.member?.roles.resolve("831308794251575326")) && interaction.member.user.id !== "373515998000840714") {
 			interaction.reply("You already have access to the RP!");
 			return;
 		}
